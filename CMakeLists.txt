@@ -33,6 +33,8 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
+include_directories("src/")
+
 file(GLOB pinpon_SRC
     "src/*.h"
     "src/*.cc"
@@ -42,11 +44,11 @@ file(GLOB pinpon_test_SRC
     "test/*.cc"
 )
 
-add_executable(pinpon ${pinpon_SRC})
+add_executable(pinpon main.cc ${pinpon_SRC})
 
 # Now simply link against gtest or gtest_main as needed. Eg
 set(CTEST_OUTPUT_ON_FAILURE ON)
 enable_testing()
-add_executable(pinpon_test ${pinpon_test_SRC})
+add_executable(pinpon_test ${pinpon_SRC} ${pinpon_test_SRC})
 target_link_libraries(pinpon_test gtest_main)
 add_test(NAME pinpon_test COMMAND pinpon_test)
