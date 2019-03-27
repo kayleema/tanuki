@@ -17,7 +17,7 @@ bool charIsSymbolic(wchar_t c);
 
 enum TokenType {
 	LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, INDENT, DEDENT, 
-	NUMBER
+	NUMBER, FUNC, RETURN, IF, ELSE
 };
 
 class Token {
