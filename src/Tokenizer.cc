@@ -87,6 +87,7 @@ vector<Token> Tokenizer::getAllTokens() {
 }
 
 Token FileTokenizer::getToken() {
+	// cout << "getting" << endl;
 	wchar_t first = input->getChar();
 	if (input->eof()) {
 		return Token(TokenType::END, L"", linenumber);
