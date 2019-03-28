@@ -16,7 +16,7 @@ SyntaxNode *Parser::run_expression() {
 			result->children.push_back(tail);
 			return result;
 		} else {
-			return new SyntaxNode(NodeType::TERMINAL);
+			return new SyntaxNode(start);
 		}
 	}
 	if (accept(TokenType::NUMBER, &start)) {
@@ -37,7 +37,7 @@ SyntaxNode *Parser::run_expression_tail() {
 		if (tail) {
 			node->children.push_back(tail);
 		}
-		return args;
+		return node;
 	}
 	return nullptr;
 }

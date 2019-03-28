@@ -4,6 +4,7 @@
 
 #include "Tokenizer.h"
 #include "Parser.h"
+#include "Evaluate.h"
 
 TEST(tokenizer, simple_test)
 {
@@ -60,7 +61,7 @@ TEST(tokenizer, functions)
 TEST(parser, functions)
 {
 	auto stringInput = StringInputSource(
-		L"あ（い（）、４５６、う（１２３））"
+		L"あ（い（）、４５６、う（１２３））（え）"
 	);
 	auto testTokenizer = FileTokenizer(&stringInput);
 	auto parser = Parser(&testTokenizer);
@@ -70,15 +71,39 @@ TEST(parser, functions)
 	string expected = (
 		"CALL\n"
 		" TERMINAL symbol：”あ”、1列\n"
-		" ARGS\n"
-		"  CALL\n"
-		"   TERMINAL symbol：”い”、1列\n"
+		" CALL_TAIL\n"
+		"  ARGS\n"
+		"   CALL\n"
+		"    TERMINAL symbol：”い”、1列\n"
+		"    CALL_TAIL\n"
+		"     ARGS\n"
+		"   TERMINAL number：”４５６（456）”、1列\n"
+		"   CALL\n"
+		"    TERMINAL symbol：”う”、1列\n"
+		"    CALL_TAIL\n"
+		"     ARGS\n"
+		"      TERMINAL number：”１２３（123）”、1列\n"
+		"  CALL_TAIL\n"
 		"   ARGS\n"
-		"  TERMINAL number：”４５６（456）”、1列\n"
-		"  CALL\n"
-		"   TERMINAL symbol：”う”、1列\n"
-		"   ARGS\n"
-		"    TERMINAL number：”１２３（123）”、1列\n"
+		"    TERMINAL symbol：”え”、1列\n"
 	);
 	EXPECT_EQ(expected, treeString);
+}
+
+TEST(eval, functions)
+{
+	auto stringInput = StringInputSource(
+		// L"足す（２、引く（５、２））"
+		L"足す（２、足す（３、２）、２）"
+	);
+	auto testTokenizer = FileTokenizer(&stringInput);
+	auto parser = Parser(&testTokenizer);
+	SyntaxNode *tree = parser.run();
+	string treeString = tree->toString();
+	cout << treeString << endl;
+	Environment env;
+	Value *v = env.eval(tree);
+	NumberValue expected(9);
+	// cout << ((NumberValue *)v)->value;
+	EXPECT_TRUE(expected.equals(v));
 }

@@ -24,9 +24,9 @@ combined cmake and make and run test:
 --------
   ./pinpon <ファイル名.pin>
 
-  ./pinpon ../例文.pin
+  ./pinpon ../関数.pin
 
-Partial Formal Grammar
+Formal Grammar (incomplete)
 ----------------------
 terminals: 
   LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, INDENT,
