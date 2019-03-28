@@ -5,7 +5,7 @@
 #include "Parser.h"
 
 enum class ValueType {
-	NUM, FUNC
+	NUM, FUNC, NONE
 };
 
 class NumberValue;
@@ -15,7 +15,7 @@ public:
 	Value(ValueType t) : type(t) {};
 
 	virtual bool equals(Value *rhs) const;
-	
+
 	virtual string toString() const;
 
 	NumberValue *toNumberValue() { return (NumberValue *) this; }
@@ -69,11 +69,22 @@ public:
 	};
 };
 
+class FunctionPrint : public FunctionValue {
+public:
+	virtual Value *apply(vector<Value *> args) const {
+		for (auto value : args) {
+			cout << value->toNumberValue()->value << endl;
+		}
+		return new Value(ValueType::NONE);
+	};
+};
+
 class Environment {
 public:
 	Environment() {
 		bindings[L"足す"] = new FunctionSum();
 		bindings[L"引く"] = new FunctionDiff();
+		bindings[L"表示"] = new FunctionPrint();
 	}
 
 	unordered_map<wstring, Value*> bindings;
