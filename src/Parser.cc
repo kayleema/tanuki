@@ -3,7 +3,54 @@
 
 SyntaxNode *Parser::run() {
 	current = lexer->getToken();
+	return run_text();
+}
+
+SyntaxNode *Parser::run_text() {
+	auto result = new SyntaxNode(NodeType::TEXT);
+
+	do {
+		while (accept(TokenType::NEWL)) {}
+		SyntaxNode *statement = run_statement();
+		if (!statement) {
+			return result;
+		}
+		result->children.push_back(statement);
+	} while(true);
+}
+
+SyntaxNode *Parser::run_statement() {
+	SyntaxNode *result;
+	if ((result = run_function())) {
+		return result;
+	}
 	return run_expression();
+}
+
+SyntaxNode *Parser::run_function() {
+	if(!accept(TokenType::FUNC)) {
+		return nullptr;
+	}
+	expect(TokenType::COMMA);
+	Token name;
+	accept(TokenType::SYMBOL, &name);
+	auto result = new SyntaxNode(NodeType::FUNC);
+	result->children.push_back(new SyntaxNode(name));
+	expect(TokenType::LPAREN);
+	auto params = new SyntaxNode(NodeType::PARAMS);
+	result->children.push_back(params);
+	while (!accept(TokenType::RPAREN)){
+		Token param;
+		if(accept(TokenType::SYMBOL, &param)){
+			params->children.push_back(new SyntaxNode(param));
+			accept(TokenType::COMMA);
+		}
+	}
+	expect(TokenType::NEWL);
+	expect(TokenType::INDENT);
+	result->children.push_back(run_text());
+	expect(TokenType::DEDENT);
+	return result;
 }
 
 SyntaxNode *Parser::run_expression() {
@@ -72,7 +119,8 @@ bool Parser::expect(TokenType type) {
 	if (accept(type)) {
 		return true;
 	}
-	cout << "unexpected" << endl;
+	cout << "unexpected " << current.toString() << endl;
+	cout << "           " << Token(type, L"", -1).toString() << endl;
 	return false;
 }
 
@@ -82,7 +130,7 @@ string SyntaxNode::toString(int indent) {
 	string indentation(indent, ' ');
 	result << indentation;
 
-	const string ss[] = {"CALL", "TERMINAL", "ARGS", "CALL_TAIL"};
+	const string ss[] = {"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS"};
 	result << ss[(int)type];
 	if (type == NodeType::TERMINAL) {
 		result << " " << content.toString();

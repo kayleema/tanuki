@@ -6,6 +6,9 @@
 #include "Value.h"
 
 class Environment {
+	Value *eval_call(SyntaxNode *node);
+	Value *eval_terminal(SyntaxNode *node);
+	Value *eval_text(SyntaxNode *node);
 public:
 	Environment();
 

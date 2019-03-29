@@ -12,15 +12,18 @@ public:
 	Parser(Tokenizer *t) : lexer(t) {}
 
 	SyntaxNode *run();
-	SyntaxNode *run_args();
+	SyntaxNode *run_text();
+	SyntaxNode *run_statement();
+	SyntaxNode *run_function();
 	SyntaxNode *run_expression();
+	SyntaxNode *run_args();
 	SyntaxNode *run_expression_tail();
 	bool accept(TokenType type, Token *out=nullptr);
 	bool expect(TokenType type);
 };
 
 enum class NodeType {
-	CALL, TERMINAL, ARGS, CALL_TAIL
+	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS
 };
 
 class SyntaxNode {

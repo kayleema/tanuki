@@ -70,7 +70,7 @@ bool Token::operator==(const Token& rhs) const{
 
 // Tokenizer Implementation
 static const unordered_map<wstring, TokenType> identifiers({
-	{L"変数", TokenType::FUNC},
+	{L"関数", TokenType::FUNC},
 	{L"戻り", TokenType::RETURN},
 	{L"もし", TokenType::IF},
 	{L"その他", TokenType::ELSE},
@@ -87,6 +87,11 @@ vector<Token> Tokenizer::getAllTokens() {
 }
 
 Token FileTokenizer::getToken() {
+	if (!nextTokens.empty()) {
+		Token result = nextTokens.front();
+		nextTokens.pop();
+		return result;
+	}
 	// cout << "getting" << endl;
 	wchar_t first = input->getChar();
 	if (input->eof()) {
@@ -107,13 +112,31 @@ Token FileTokenizer::getToken() {
 			newIndentLevel++;
 			input->getChar();
 		}
+		if (newIndentLevel == indentLevel) {
+			return getToken();
+		}
 		auto newTokenType = (newIndentLevel > indentLevel) ? 
 			TokenType::INDENT : TokenType::DEDENT;
+		int difference = abs(newIndentLevel - indentLevel);
 		indentLevel = newIndentLevel;
+		for (int i = 0; i < difference - 1; i++) {
+			nextTokens.push(Token(newTokenType, L"", linenumber));
+		}
 		return Token(newTokenType, L"", linenumber);
 	}
 	if (first == newline) {
 		linenumber++;
+		if (input->peekChar() != L'　' && 
+				input->peekChar() != L'\n' && 
+				indentLevel > 0) {
+			// Dedent to zero case
+			for (int i = 0; i < (indentLevel - 1); i++) {
+				nextTokens.push(Token(TokenType::DEDENT, L"", linenumber));
+			}
+			indentLevel = 0;
+			nextTokens.push(Token(TokenType::NEWL, L"", linenumber));
+			return Token(TokenType::DEDENT, L"", linenumber);
+		}
 		return Token(TokenType::NEWL, L"", linenumber);
 	}
 	if (charIsNumberic(first)) {

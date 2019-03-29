@@ -8,6 +8,7 @@
 #include <clocale>
 #include <cwchar>
 #include <sstream>
+#include <queue>
 #include "InputSource.h"
 
 using namespace std;
@@ -45,6 +46,7 @@ class FileTokenizer : public Tokenizer {
 	InputSource *input;
 	int linenumber = 1;
 	int indentLevel = 0;
+	queue<Token> nextTokens;
 public:
 	FileTokenizer(InputSource *input) : input(input) {
 	}
