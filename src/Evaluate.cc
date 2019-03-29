@@ -25,20 +25,9 @@ Value *Environment::eval(SyntaxNode *tree) {
 	return new NumberValue(5);
 }
 
-bool Value::equals(Value *rhs) const{
-	return (type == rhs->type);
+// Global Environment Constructor
+Environment::Environment() {
+	bindings[L"足す"] = new FunctionSum();
+	bindings[L"引く"] = new FunctionDiff();
+	bindings[L"表示"] = new FunctionPrint();
 }
-
-bool NumberValue::equals(Value *rhs) const{
-	return Value::equals(rhs) && (value == ((NumberValue *)rhs)->value);
-}
-
-string Value::toString() const{
-	return "generic value";
-}
-string NumberValue::toString() const{
-	ostringstream result;
-	result << "NumberValue(" << value << ")";
-	return result.str();
-}
-

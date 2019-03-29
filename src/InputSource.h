@@ -4,6 +4,7 @@
 
 using namespace std;
 
+// Abstract base class for raw input
 class InputSource {
 public:
 	virtual wchar_t getChar() = 0;
