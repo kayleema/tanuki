@@ -14,6 +14,8 @@ public:
 	SyntaxNode *run();
 	SyntaxNode *run_text();
 	SyntaxNode *run_statement();
+	SyntaxNode *run_return();
+	SyntaxNode *run_if();
 	SyntaxNode *run_function();
 	SyntaxNode *run_expression();
 	SyntaxNode *run_args();
@@ -23,7 +25,7 @@ public:
 };
 
 enum class NodeType {
-	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS
+	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS, RETURN, IF
 };
 
 class SyntaxNode {

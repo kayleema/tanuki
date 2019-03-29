@@ -21,10 +21,43 @@ SyntaxNode *Parser::run_text() {
 
 SyntaxNode *Parser::run_statement() {
 	SyntaxNode *result;
+	if ((result = run_return())) {
+		return result;
+	}
+	if ((result = run_if())) {
+		return result;
+	}
 	if ((result = run_function())) {
 		return result;
 	}
 	return run_expression();
+}
+
+SyntaxNode *Parser::run_if() {
+	if(accept(TokenType::IF)) {
+		expect(TokenType::COMMA);
+		SyntaxNode *condition = run_expression();
+		expect(TokenType::NEWL);
+		expect(TokenType::INDENT);
+		SyntaxNode *body = run_text();
+		expect(TokenType::DEDENT);
+		auto result = new SyntaxNode(NodeType::IF);
+		result->children.push_back(condition);
+		result->children.push_back(body);
+		return result;
+	}
+	return nullptr;
+}
+
+SyntaxNode *Parser::run_return() {
+	if (accept(TokenType::RETURN)) {
+		expect(TokenType::COMMA);
+		SyntaxNode *rhs = run_expression();
+		auto result = new SyntaxNode(NodeType::RETURN);
+		result->children.push_back(rhs);
+		return result;
+	}
+	return nullptr;
 }
 
 SyntaxNode *Parser::run_function() {
@@ -130,7 +163,10 @@ string SyntaxNode::toString(int indent) {
 	string indentation(indent, ' ');
 	result << indentation;
 
-	const string ss[] = {"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS"};
+	const string ss[] = {
+		"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
+		"RETURN", "IF"
+	};
 	result << ss[(int)type];
 	if (type == NodeType::TERMINAL) {
 		result << " " << content.toString();
