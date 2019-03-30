@@ -29,8 +29,13 @@ Value *Environment::eval_call(SyntaxNode *tree) {
 	FunctionValue *function = (FunctionValue*)first;
 	SyntaxNode *tail = tree->children[1];
 
-	// auto result = eval_calltail(function, tail);
+	auto result = eval_calltail(function, tail);
 
+	first->refs--;
+	return result;
+}
+
+Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail) {
 	SyntaxNode *args_tree = tail->children[0];
 	vector<Value *> args;
 	for (auto expression : args_tree->children) {
@@ -39,23 +44,19 @@ Value *Environment::eval_call(SyntaxNode *tree) {
 		args.push_back(arg);
 	}
 	auto result = function->apply(args, this);
+	auto finalResult = result;
 	result->refs++;
 
-	if (tree->children[1]->children.size() == 2) {
-		cout << "high order" << endl;
-
+	if (tail->children.size() == 2) {
+		auto nextTail = tail->children[1];
+		finalResult = eval_calltail((FunctionValue*)result, nextTail);
 	}
 
 	for (auto arg : args) {
 		arg->refs--;
 	}
 	result->refs--;
-	first->refs--;
-	return result;
-}
-
-Value *Environment::eval_calltail(SyntaxNode *tree) {
-
+	return finalResult;
 }
 
 Value *Environment::eval_terminal(SyntaxNode *tree) {

@@ -10,7 +10,7 @@ class Context;
 
 class Environment {
 	Value *eval_call(SyntaxNode *node);
-	Value *eval_calltail(SyntaxNode *node);
+	Value *eval_calltail(FunctionValue* function, SyntaxNode *node);
 	Value *eval_terminal(SyntaxNode *node);
 	Value *eval_text(SyntaxNode *node);
 	Value *eval_function(SyntaxNode *node);
