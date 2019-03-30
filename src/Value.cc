@@ -12,7 +12,11 @@ bool NumberValue::equals(Value *rhs) const{
 }
 
 string Value::toString() const{
-	return "generic value";
+	ostringstream result;
+	result << "Value(";
+	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN"})[(int)type];
+	result << ")";
+	return result.str();
 }
 string NumberValue::toString() const{
 	ostringstream result;
@@ -26,14 +30,17 @@ string UserFunctionValue::toString() const {
 	return result.str();
 }
 Value *UserFunctionValue::apply(
-		vector<Value *> args, Environment *parent) const {
-	Environment *env = new Environment(parent);
-	for (int i = 0; i < args.size(); i++) {
+		vector<Value *> args, Environment *caller) const {
+	Environment *env = parentEnv->newChildEnvironment();
+	env->caller = caller;
+	for (size_t i = 0; i < args.size(); i++) {
 		env->bind(params[i],args[i]);
 	}
 	auto bodyReturnValue = env->eval(body);
 	if (bodyReturnValue->type == ValueType::RETURN) {
-		return ((ReturnValue*)bodyReturnValue)->inner;
+		auto inner = ((ReturnValue*)bodyReturnValue)->inner;
+		delete bodyReturnValue;
+		return inner;
 	}
 	return bodyReturnValue;
 }
@@ -44,7 +51,7 @@ Value *FunctionSum::apply(
 	for (auto value : args) {
 		result += value->toNumberValue()->value;
 	}
-	return new NumberValue(result);
+	return env->context->newNumberValue(result);
 };
 
 Value *FunctionDiff::apply(
@@ -59,7 +66,7 @@ Value *FunctionDiff::apply(
 			result -= value->toNumberValue()->value;
 		}
 	}
-	return new NumberValue(result);
+	return env->context->newNumberValue(result);
 };
 
 Value *FunctionPrint::apply(
@@ -67,13 +74,13 @@ Value *FunctionPrint::apply(
 	for (auto value : args) {
 		cout << value->toNumberValue()->value << endl;
 	}
-	return new Value(ValueType::NONE);
+	return env->context->newNoneValue();
 };
 
 Value *FunctionEqual::apply(
 		vector<Value *> args, Environment *env) const {
 	if(args[0]->equals(args[1])) {
-		return new NumberValue(1);
+		return env->context->newNumberValue(1);
 	}
-	return new NumberValue(0);
+	return env->context->newNumberValue(0);
 };

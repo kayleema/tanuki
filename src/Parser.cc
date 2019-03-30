@@ -177,3 +177,9 @@ string SyntaxNode::toString(int indent) {
 	}
 	return result.str();
 }
+
+SyntaxNode::~SyntaxNode() {
+	for (auto child : children) {
+		delete child;
+	}
+}

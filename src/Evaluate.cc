@@ -1,6 +1,7 @@
 #include "Evaluate.h"
 
 Value *Environment::eval(SyntaxNode *tree) {
+	context->collect(this);
 	if (tree->type == NodeType::CALL) {
 		return eval_call(tree);
 	}
@@ -19,18 +20,42 @@ Value *Environment::eval(SyntaxNode *tree) {
 	if (tree->type == NodeType::IF) {
 		return eval_if(tree);
 	}
-	return new NumberValue(44444444);
+	return context->newNoneValue();
 }
 
 Value *Environment::eval_call(SyntaxNode *tree) {
 	Value *first = eval(tree->children[0]);
+	first->refs++;
 	FunctionValue *function = (FunctionValue*)first;
-	SyntaxNode *args_tree = tree->children[1]->children[0];
+	SyntaxNode *tail = tree->children[1];
+
+	// auto result = eval_calltail(function, tail);
+
+	SyntaxNode *args_tree = tail->children[0];
 	vector<Value *> args;
 	for (auto expression : args_tree->children) {
-		args.push_back(eval(expression));
+		auto arg = eval(expression);
+		arg->refs++;
+		args.push_back(arg);
 	}
-	return function->apply(args, this);
+	auto result = function->apply(args, this);
+	result->refs++;
+
+	if (tree->children[1]->children.size() == 2) {
+		cout << "high order" << endl;
+
+	}
+
+	for (auto arg : args) {
+		arg->refs--;
+	}
+	result->refs--;
+	first->refs--;
+	return result;
+}
+
+Value *Environment::eval_calltail(SyntaxNode *tree) {
+
 }
 
 Value *Environment::eval_terminal(SyntaxNode *tree) {
@@ -39,9 +64,10 @@ Value *Environment::eval_terminal(SyntaxNode *tree) {
 		return lookup(name);
 	}
 	if (tree->content.type == TokenType::NUMBER) {
-		return new NumberValue(tree->content.number);
+		auto result = context->newNumberValue(tree->content.number);
+		return result;
 	}
-	return new Value(ValueType::NONE);
+	return context->newNoneValue();
 }
 
 Value *Environment::eval_text(SyntaxNode *tree) {
@@ -49,9 +75,12 @@ Value *Environment::eval_text(SyntaxNode *tree) {
 		Value *statementReturnValue = eval(statement);
 		if (statementReturnValue->type == ValueType::RETURN) {
 			return statementReturnValue;
+		} else if (statementReturnValue != nullptr && 
+				statementReturnValue->type != ValueType::NONE) {
+			// delete statementReturnValue;
 		}
 	}
-	return new Value(ValueType::NONE);
+	return context->newNoneValue();
 }
 
 Value *Environment::eval_function(SyntaxNode *tree) {
@@ -61,9 +90,9 @@ Value *Environment::eval_function(SyntaxNode *tree) {
 		params.push_back(param->content.content);
 	}
 	auto body = tree->children[2];
-	auto function = new UserFunctionValue(params, body);
+	auto function = context->newUserFunctionValue(params, body, this);
 	bindings[name] = function;
-	return new Value(ValueType::NONE);
+	return context->newNoneValue();
 }
 
 Value *Environment::eval_return(SyntaxNode *tree) {
@@ -78,7 +107,7 @@ Value *Environment::eval_if(SyntaxNode *tree) {
 		auto result = eval(body);
 		return result;
 	}
-	return new Value(ValueType::NONE);
+	return context->newNoneValue();
 }
 
 Value *Environment::lookup(wstring name) {
@@ -95,8 +124,12 @@ void Environment::bind(wstring name, Value *value) {
 	bindings[name] = value;
 }
 
+Environment *Environment::newChildEnvironment() {
+	return context->newChildEnvironment(this);
+}
+
 // Global Environment Constructor
-Environment::Environment() {
+Environment::Environment(Context *context): context(context) {
 	bindings[L"足す"] = new FunctionSum();
 	bindings[L"引く"] = new FunctionDiff();
 	bindings[L"表示"] = new FunctionPrint();

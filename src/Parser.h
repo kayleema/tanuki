@@ -37,6 +37,8 @@ public:
 	SyntaxNode(NodeType _type) : type(_type) {}
 	SyntaxNode(Token _content) : type(NodeType::TERMINAL), content(_content) {}
 
+	~SyntaxNode();
+
 	string toString(int indent = 0);
 };
 

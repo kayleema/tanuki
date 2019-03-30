@@ -15,7 +15,11 @@ class NumberValue;
 
 class Value {
 public:
-	Value(ValueType t) : type(t) {};
+	Value(ValueType t) : type(t) {
+		// cout << "Construct value " << this->toString() << endl;
+	};
+
+	virtual ~Value() {}
 
 	virtual bool equals(Value *rhs) const;
 
@@ -26,11 +30,12 @@ public:
 	virtual bool isTruthy() const { return false; };
 
 	ValueType type;
+	int refs = 0;
 };
 
 class NumberValue : public Value {
 public:
-	NumberValue(int n) : value(n), Value(ValueType::NUM) {};
+	NumberValue(int n) : Value(ValueType::NUM), value(n) {};
 
 	virtual bool equals(Value *rhs) const override;
 
@@ -45,10 +50,14 @@ public:
 class ReturnValue : public Value {
 public:
 	Value *inner;
-	ReturnValue(Value *inner) : inner(inner), Value(ValueType::RETURN) {};
+	ReturnValue(Value *inner) : Value(ValueType::RETURN), inner(inner) {};
 };
 
 class Environment;
+
+enum class FunctionValueType {
+	NONE, USER_FUNCTION
+};
 
 class FunctionValue : public Value {
 public:
@@ -56,6 +65,8 @@ public:
 
 	virtual Value *apply(
 		vector<Value *> args, Environment *env) const = 0;
+
+	FunctionValueType functionType = FunctionValueType::NONE;
 };
 
 class SyntaxNode;
@@ -64,8 +75,13 @@ class UserFunctionValue : public FunctionValue {
 	vector<wstring> params;
 	SyntaxNode *body;
 public:
-	UserFunctionValue(vector<wstring> params, SyntaxNode *body)
-	 : FunctionValue(), params(params), body(body) {};
+	UserFunctionValue(vector<wstring> params, SyntaxNode *body, 
+		Environment *parentEnv)
+	 : FunctionValue(), params(params), body(body), parentEnv(parentEnv) {
+		functionType = FunctionValueType::USER_FUNCTION;
+	 };
+
+	Environment *parentEnv;
 
 	virtual Value *apply(
 		vector<Value *> args, Environment *env) const override;
