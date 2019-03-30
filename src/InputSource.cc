@@ -1,4 +1,5 @@
 #include <codecvt>
+#include <iostream>
 #include "InputSource.h"
 
 FileInputSource::FileInputSource(char* filename) : file(filename) {
@@ -8,6 +9,7 @@ FileInputSource::FileInputSource(char* filename) : file(filename) {
 wchar_t FileInputSource::getChar() {
 	wchar_t first;
 	file.get(first);
+	// cout << (int)first << endl;
 	return first;
 }
 

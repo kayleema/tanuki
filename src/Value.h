@@ -8,7 +8,7 @@
 using namespace std;
 
 enum class ValueType {
-	NUM, FUNC, NONE, RETURN, STRING
+	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL
 };
 
 class NumberValue;
@@ -45,7 +45,7 @@ public:
 
 	virtual bool isTruthy() const override { return value != 0; };
 
-	int value;
+	long value;
 };
 
 class StringValue : public Value {
@@ -66,6 +66,13 @@ class ReturnValue : public Value {
 public:
 	Value *inner;
 	ReturnValue(Value *inner) : Value(ValueType::RETURN), inner(inner) {};
+};
+
+class TailCallValue : public Value {
+public:
+	vector<Value*> args;
+	TailCallValue(vector<Value*> _args)
+	 : Value(ValueType::TAIL_CALL), args(_args) {};
 };
 
 class Environment;

@@ -14,7 +14,7 @@ bool NumberValue::equals(Value *rhs) const{
 string Value::toString() const{
 	ostringstream result;
 	result << "Value(";
-	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN", "STRING"})[(int)type];
+	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL"})[(int)type];
 	result << ")";
 	return result.str();
 }
@@ -34,17 +34,27 @@ string UserFunctionValue::toString() const {
 }
 Value *UserFunctionValue::apply(
 		vector<Value *> args, Environment *caller) const {
-	Environment *env = parentEnv->newChildEnvironment();
-	env->caller = caller;
-	for (size_t i = 0; i < args.size(); i++) {
-		env->bind(params[i],args[i]);
-	}
-	auto bodyReturnValue = env->eval(body);
-	if (bodyReturnValue->type == ValueType::RETURN) {
-		auto inner = ((ReturnValue*)bodyReturnValue)->inner;
-		delete bodyReturnValue;
-		return inner;
-	}
+	Value *bodyReturnValue;
+	Environment *env;
+	do {
+		env = parentEnv->newChildEnvironment();
+		env->caller = caller;
+
+		for (size_t i = 0; i < args.size(); i++) {
+			env->bind(params[i],args[i]);
+		}
+		bodyReturnValue = env->eval(body, this);
+		if (bodyReturnValue->type == ValueType::RETURN) {
+			auto inner = ((ReturnValue*)bodyReturnValue)->inner;
+			delete bodyReturnValue;
+			return inner;
+		}
+		if (bodyReturnValue->type == ValueType::TAIL_CALL) {
+			//cout << "tailing" << endl;
+			args = ((TailCallValue *)bodyReturnValue)->args;
+			delete bodyReturnValue;
+		}
+	} while(bodyReturnValue->type == ValueType::TAIL_CALL);
 	return bodyReturnValue;
 }
 

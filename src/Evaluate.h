@@ -9,13 +9,15 @@
 class Context;
 
 class Environment {
-	Value *eval_call(SyntaxNode *node);
-	Value *eval_calltail(FunctionValue* function, SyntaxNode *node);
+	Value *eval_call(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
+	Value *eval_calltail(FunctionValue* function, SyntaxNode *node, 
+		const FunctionValue* tailContext = nullptr);
 	Value *eval_terminal(SyntaxNode *node);
-	Value *eval_text(SyntaxNode *node);
+	Value *eval_text(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 	Value *eval_function(SyntaxNode *node);
-	Value *eval_return(SyntaxNode *node);
+	Value *eval_return(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 	Value *eval_if(SyntaxNode *node);
+	Value *eval_assign(SyntaxNode *node);
 public:
 	Environment(Context *context);
 	Environment(Environment *parent, Context *_context=nullptr)
@@ -37,9 +39,12 @@ public:
 	Value *lookup(wstring name);
 	void bind(wstring name, Value *value);
 
-	Value *eval(SyntaxNode *node);
+	Value *eval(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 
 	Environment *newChildEnvironment();
+	void tailReset() {
+		bindings.clear();
+	}
 };
 
 class Context {

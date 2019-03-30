@@ -2,7 +2,8 @@
 #include "Parser.h"
 
 SyntaxNode *Parser::run() {
-	current = lexer->getToken();
+	allTokens = lexer->getAllTokens();
+	currentTokenIndex = 0;
 	return run_text();
 }
 
@@ -30,6 +31,9 @@ SyntaxNode *Parser::run_statement() {
 	if ((result = run_function())) {
 		return result;
 	}
+	if ((result = run_assign())) {
+		return result;
+	}
 	return run_expression();
 }
 
@@ -54,6 +58,18 @@ SyntaxNode *Parser::run_return() {
 		expect(TokenType::COMMA);
 		SyntaxNode *rhs = run_expression();
 		auto result = new SyntaxNode(NodeType::RETURN);
+		result->children.push_back(rhs);
+		return result;
+	}
+	return nullptr;
+}
+
+SyntaxNode *Parser::run_assign() {
+	Token lhs;
+	if (accept({TokenType::SYMBOL, TokenType::ASSIGN}, {&lhs, nullptr})) {
+		auto rhs = run_expression();
+		auto result = new SyntaxNode(NodeType::ASSIGN);
+		result->children.push_back(new SyntaxNode(lhs));
 		result->children.push_back(rhs);
 		return result;
 	}
@@ -127,7 +143,7 @@ SyntaxNode *Parser::run_expression_tail() {
 
 SyntaxNode *Parser::run_args() {
 	auto node = new SyntaxNode(NodeType::ARGS);
-	if (current.type == TokenType::RPAREN) {
+	if (currentToken().type == TokenType::RPAREN) {
 		return node;
 	} else {
 		do {
@@ -139,25 +155,49 @@ SyntaxNode *Parser::run_args() {
 }
 
 bool Parser::accept(TokenType type, Token *out) {
-	if (current.type == type) {
+	if (currentToken().type == type) {
 		// cout << "accept " << current.toString() << endl;
 		if (out) {
-			*out = current;
+			*out = currentToken();
 		}
-		current = lexer->getToken();
+		currentTokenIndex++;
 		return true;
 	}
 	// cout << "not accept " << current.toString() << endl;
 	return false;
 }
 
+bool Parser::accept(vector<TokenType> types, vector<Token *> outs) {
+	int i = 0;
+	for (auto type : types) {
+		if(allTokens[currentTokenIndex + i].type != type) {
+			return false;
+		}
+		i++;
+	}
+	i = 0;
+	for (auto out : outs) {
+		if(out) {
+			*out = allTokens[currentTokenIndex + i];
+		}
+		i++;
+	}
+
+	currentTokenIndex += types.size();
+	return true;
+}
+
 bool Parser::expect(TokenType type) {
 	if (accept(type)) {
 		return true;
 	}
-	cout << "unexpected " << current.toString() << endl;
+	cout << "unexpected " << currentToken().toString() << endl;
 	cout << "           " << Token(type, L"", -1).toString() << endl;
 	return false;
+}
+
+Token Parser::currentToken() {
+	return allTokens[currentTokenIndex];
 }
 
 string SyntaxNode::toString(int indent) {
@@ -168,7 +208,7 @@ string SyntaxNode::toString(int indent) {
 
 	const string ss[] = {
 		"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
-		"RETURN", "IF"
+		"RETURN", "IF", "ASSIGN"
 	};
 	result << ss[(int)type];
 	if (type == NodeType::TERMINAL) {

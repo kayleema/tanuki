@@ -1,47 +1,63 @@
 #include "Evaluate.h"
 
-Value *Environment::eval(SyntaxNode *tree) {
+Value *Environment::eval(SyntaxNode *tree, 
+		const FunctionValue* tailContext) {
 	context->collect(this);
 	if (tree->type == NodeType::CALL) {
-		return eval_call(tree);
+		return eval_call(tree, tailContext);
 	}
 	if (tree->type == NodeType::TERMINAL) {
 		return eval_terminal(tree);
 	}
 	if (tree->type == NodeType::TEXT) {
-		return eval_text(tree);
+		return eval_text(tree, tailContext);
 	}
 	if (tree->type == NodeType::FUNC) {
 		return eval_function(tree);
 	}
 	if (tree->type == NodeType::RETURN) {
-		return eval_return(tree);
+		return eval_return(tree, tailContext);
 	}
 	if (tree->type == NodeType::IF) {
 		return eval_if(tree);
 	}
+	if (tree->type == NodeType::ASSIGN) {
+		return eval_assign(tree);
+	}
 	return context->newNoneValue();
 }
 
-Value *Environment::eval_call(SyntaxNode *tree) {
+Value *Environment::eval_call(SyntaxNode *tree, 
+		const FunctionValue* tailContext) {
 	Value *first = eval(tree->children[0]);
 	first->refs++;
 	FunctionValue *function = (FunctionValue*)first;
 	SyntaxNode *tail = tree->children[1];
 
-	auto result = eval_calltail(function, tail);
+	auto result = eval_calltail(function, tail, tailContext);
 
 	first->refs--;
 	return result;
 }
 
-Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail) {
+Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail, 
+		const FunctionValue* tailContext) {
+	if (tail->children.size() == 2) {
+		tailContext = nullptr;
+	}
+
 	SyntaxNode *args_tree = tail->children[0];
 	vector<Value *> args;
 	for (auto expression : args_tree->children) {
 		auto arg = eval(expression);
 		arg->refs++;
 		args.push_back(arg);
+	}
+	if (function == tailContext) {
+		for (auto arg : args) {
+			arg->refs--;
+		}
+		return new TailCallValue(args);
 	}
 	auto result = function->apply(args, this);
 	auto finalResult = result;
@@ -75,10 +91,12 @@ Value *Environment::eval_terminal(SyntaxNode *tree) {
 	return context->newNoneValue();
 }
 
-Value *Environment::eval_text(SyntaxNode *tree) {
+Value *Environment::eval_text(SyntaxNode *tree, 
+		const FunctionValue* tailContext) {
 	for (auto statement : tree->children) {
-		Value *statementReturnValue = eval(statement);
-		if (statementReturnValue->type == ValueType::RETURN) {
+		Value *statementReturnValue = eval(statement, tailContext);
+		if (statementReturnValue->type == ValueType::RETURN ||
+			statementReturnValue->type == ValueType::TAIL_CALL) {
 			return statementReturnValue;
 		} else if (statementReturnValue != nullptr && 
 				statementReturnValue->type != ValueType::NONE) {
@@ -100,8 +118,13 @@ Value *Environment::eval_function(SyntaxNode *tree) {
 	return context->newNoneValue();
 }
 
-Value *Environment::eval_return(SyntaxNode *tree) {
-	return new ReturnValue(eval(tree->children[0]));
+Value *Environment::eval_return(SyntaxNode *tree, 
+		const FunctionValue* tailContext) {
+	auto result = eval(tree->children[0], tailContext);
+	if (result->type == ValueType::TAIL_CALL) {
+		return result;
+	}
+	return new ReturnValue(result);
 }
 
 Value *Environment::eval_if(SyntaxNode *tree) {
@@ -112,6 +135,12 @@ Value *Environment::eval_if(SyntaxNode *tree) {
 		auto result = eval(body);
 		return result;
 	}
+	return context->newNoneValue();
+}
+
+Value *Environment::eval_assign(SyntaxNode *tree) {
+	wstring lhs = tree->children[0]->content.content;
+	bind(lhs, eval(tree->children[1]));
 	return context->newNoneValue();
 }
 
