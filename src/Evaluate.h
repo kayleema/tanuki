@@ -128,6 +128,12 @@ public:
 		return result;
 	}
 
+	StringValue *newStringValue(wstring str) {
+		auto result = new StringValue(str);
+		values.insert(result);
+		return result;
+	}
+
 	UserFunctionValue *newUserFunctionValue(
 			vector<wstring> params, SyntaxNode *body, Environment *e) {
 		auto result = new UserFunctionValue(params, body, e);

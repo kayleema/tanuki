@@ -15,6 +15,8 @@ string encodeUTF8(const wstring &in) {
 
 const wchar_t lparen = L'（';
 const wchar_t rparen = L'）';
+const wchar_t lsquare = L'「';
+const wchar_t rsquare = L'」';
 const wchar_t comma = L'、';
 const wchar_t space = L'　';
 const wchar_t newline = L'\n';
@@ -43,7 +45,8 @@ int parseNumeric(wstring s) {
 
 static const char * TokenTypeStrings[] = {
 	"lparen", "rparen", "comma", "symbol", "end", "start", "space", 
-	"newl", "indent", "dedent", "number", "function", "return", "if", "else"
+	"newl", "indent", "dedent", "number", "function", "return", "if", "else",
+	"string",
 };
 
 Token::Token(TokenType type, wstring _content, int line)
@@ -102,6 +105,14 @@ Token FileTokenizer::getToken() {
 	}
 	if (first == rparen) {
 		return Token(TokenType::RPAREN, L"）", linenumber);
+	}
+	if (first == lsquare) {
+		wstring resultString;
+		wchar_t c;
+		while ((c = input->getChar()) != L'」') {
+			resultString.push_back(c);
+		}
+		return Token(TokenType::STRING, resultString, linenumber);
 	}
 	if (first == comma) {
 		return Token(TokenType::COMMA, L"、", linenumber);

@@ -68,6 +68,10 @@ Value *Environment::eval_terminal(SyntaxNode *tree) {
 		auto result = context->newNumberValue(tree->content.number);
 		return result;
 	}
+	if (tree->content.type == TokenType::STRING) {
+		auto result = context->newStringValue(tree->content.content);
+		return result;
+	}
 	return context->newNoneValue();
 }
 

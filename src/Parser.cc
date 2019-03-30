@@ -88,6 +88,9 @@ SyntaxNode *Parser::run_function() {
 
 SyntaxNode *Parser::run_expression() {
 	Token start;
+	if (accept(TokenType::STRING, &start)) {
+		return new SyntaxNode(start);
+	}
 	if (accept(TokenType::SYMBOL, &start)) {
 		auto tail = run_expression_tail();
 		if (tail) {

@@ -14,7 +14,7 @@ bool NumberValue::equals(Value *rhs) const{
 string Value::toString() const{
 	ostringstream result;
 	result << "Value(";
-	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN"})[(int)type];
+	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN", "STRING"})[(int)type];
 	result << ")";
 	return result.str();
 }
@@ -22,6 +22,9 @@ string NumberValue::toString() const{
 	ostringstream result;
 	result << "NumberValue(" << value << ")";
 	return result.str();
+}
+string StringValue::toString() const{
+	return string("string");
 }
 
 string UserFunctionValue::toString() const {
@@ -72,7 +75,11 @@ Value *FunctionDiff::apply(
 Value *FunctionPrint::apply(
 		vector<Value *> args, Environment *env) const {
 	for (auto value : args) {
-		cout << value->toNumberValue()->value << endl;
+		if (value->type == ValueType::NUM) {
+			cout << value->toNumberValue()->value << endl;
+		} else if (value->type == ValueType::STRING) {
+			cout << encodeUTF8(value->toStringValue()->value) << endl;
+		}
 	}
 	return env->context->newNoneValue();
 };

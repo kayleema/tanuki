@@ -40,6 +40,7 @@ productions:
   statement => FUNC COMMA SYMBOL LPAREN param_list RPAREN NEWL INDENT text DEDENT
   statement => RETURN return_value
   statement => if_statement
+  statement => SYMBOL ASSIGN expression
   statement => expression
 
   param_list => SYMBOL [COMMA SYMBOL]* | EPSILON

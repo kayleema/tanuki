@@ -20,6 +20,7 @@ public:
 	SyntaxNode *run_expression();
 	SyntaxNode *run_args();
 	SyntaxNode *run_expression_tail();
+	
 	bool accept(TokenType type, Token *out=nullptr);
 	bool expect(TokenType type);
 };

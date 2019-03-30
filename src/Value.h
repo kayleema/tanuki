@@ -8,10 +8,11 @@
 using namespace std;
 
 enum class ValueType {
-	NUM, FUNC, NONE, RETURN
+	NUM, FUNC, NONE, RETURN, STRING
 };
 
 class NumberValue;
+class StringValue;
 
 class Value {
 public:
@@ -26,6 +27,7 @@ public:
 	virtual string toString() const;
 
 	NumberValue *toNumberValue() { return (NumberValue *) this; }
+	StringValue *toStringValue() { return (StringValue *) this; }
 
 	virtual bool isTruthy() const { return false; };
 
@@ -44,6 +46,19 @@ public:
 	virtual bool isTruthy() const override { return value != 0; };
 
 	int value;
+};
+
+class StringValue : public Value {
+public:
+	StringValue(wstring str) : Value(ValueType::STRING), value(str) {};
+
+	// virtual bool equals(Value *rhs) const override;
+
+	virtual string toString() const override;
+
+	// virtual bool isTruthy() const override { return value != 0; };
+
+	wstring value;
 };
 
 // Indicates that an expression should force exit of func body eval.
