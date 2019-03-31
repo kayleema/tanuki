@@ -80,12 +80,16 @@ SyntaxNode *Parser::run_function() {
 	if(!accept(TokenType::FUNC)) {
 		return nullptr;
 	}
-	expect(TokenType::COMMA);
+	if(!expect(TokenType::COMMA)) {
+		return nullptr;
+	}
 	Token name;
 	accept(TokenType::SYMBOL, &name);
 	auto result = new SyntaxNode(NodeType::FUNC);
 	result->children.push_back(new SyntaxNode(name));
-	expect(TokenType::LPAREN);
+	if(!expect(TokenType::LPAREN)) {
+		return nullptr;
+	}
 	auto params = new SyntaxNode(NodeType::PARAMS);
 	result->children.push_back(params);
 	while (!accept(TokenType::RPAREN)){
@@ -95,10 +99,13 @@ SyntaxNode *Parser::run_function() {
 			accept(TokenType::COMMA);
 		}
 	}
-	expect(TokenType::NEWL);
-	expect(TokenType::INDENT);
+	if(!expect(TokenType::NEWL) || !expect(TokenType::INDENT)){
+		return nullptr;
+	}
 	result->children.push_back(run_text());
-	expect(TokenType::DEDENT);
+	if(!expect(TokenType::DEDENT)) {
+		return nullptr;
+	}
 	return result;
 }
 
@@ -192,7 +199,7 @@ bool Parser::expect(TokenType type) {
 		return true;
 	}
 	cout << "unexpected " << currentToken().toString() << endl;
-	cout << "           " << Token(type, L"", -1).toString() << endl;
+	cout << "  expected " << Token(type, L"", -1).toString() << endl;
 	return false;
 }
 

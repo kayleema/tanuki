@@ -78,6 +78,10 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 Value *Environment::eval_terminal(SyntaxNode *tree) {
 	if (tree->content.type == TokenType::SYMBOL) {
 		wstring name = tree->content.content;
+		auto result = lookup(name);
+		if (!result) {
+			return context->newNoneValue();
+		}
 		return lookup(name);
 	}
 	if (tree->content.type == TokenType::NUMBER) {
@@ -151,6 +155,7 @@ Value *Environment::lookup(wstring name) {
 	if (parent) {
 		return parent->lookup(name);
 	}
+	cout << "lookup failure" << endl;
 	return nullptr;
 }
 

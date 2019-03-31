@@ -8,11 +8,13 @@
 
 using namespace std;
 
+int interractive();
+
 int main(int argc, char **argv) 
 {
 	setlocale(LC_ALL, "");
 	if (argc < 2) {
-		cout << "Incorrect Usage" << endl;
+		cout << "使い方は間違い" << endl;
 		return 1;
 	}
 	bool print_ast = false;
@@ -28,10 +30,21 @@ int main(int argc, char **argv)
 			}
 		}
 		if (strcmp(argv[i], "-h") == 0) {
-			cout << "PinPon プログラミング言語" << endl;
+			cout << "ＰｉｎＰｏｎプログラミング言語" << endl;
+			cout << "ーーーーーーーーーーーーーーー" << endl;
 			cout << "使い方：" << endl;
-			cout << "./pinpon ソースコードのファイル名.pin" << endl << endl;
+			cout << "　./pinpon ファイル名.pin" << endl;
+			cout << endl;
+			cout << "パラメーター：" << endl;
+			cout << "　-i：インタラクティブ・モード（REPL）" << endl;
+			cout << "　-d lex：lexerの結果を表示（ディバギング）" << endl;
+			cout << "　-d ast：parserの結果を表示（ディバギング）" << endl;
+			cout << "　-h：このメッセジを表示" << endl << endl;
 			return 0;
+		}
+		if (strcmp(argv[i], "-i") == 0) {
+			cout << "インタラクティブ・モード" << endl;
+			return interractive();
 		}
 	}
 
@@ -40,7 +53,7 @@ int main(int argc, char **argv)
 	auto t = FileTokenizer(&input);
 
 	if (print_lex) {
-		cout << "LEXER OUTPUT:" << endl;
+		cout << "LEXER 結果:" << endl;
 		Token current;
 		while ((current = t.getToken()).type != TokenType::END) {
 			cout << (current.toString()) << endl;
@@ -66,4 +79,59 @@ int main(int argc, char **argv)
 	delete tree;
 	context.cleanup();
     return 0;
+}
+
+wstring decodeUTF8(const string &in) {
+	try
+    {
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
+	    return conv1.from_bytes(in);
+    }
+    catch (const std::range_error & exception)
+    {
+        return wstring(L"XXX");
+    }
+}
+
+int interractive() {
+	Context context;
+	Environment *env = new Environment(&context);
+	string inputraw;
+	wstring input;
+	bool continuation = false;
+	while (true) {
+		if(continuation) {
+			cout << "｜：";
+		} else {
+			cout << "＞：";
+		}
+		getline (cin, inputraw);
+		input = input + decodeUTF8(inputraw) + L"\n";
+		if (inputraw.find("関数") == 0 ||
+			inputraw.find("もし") == 0 ||
+			(continuation && (inputraw.length() != 0))) {
+			continuation = true;
+			continue;
+		} else if (continuation) {
+			continuation = false;
+		}
+
+		if (inputraw == "終わり") {
+			return 0;
+		}
+
+		auto source = StringInputSource(input.c_str());
+		auto tokenizer = FileTokenizer(&source);
+		auto parser = Parser(&tokenizer);
+		SyntaxNode *tree = parser.run();
+		if (!tree || tree->children.size() == 0) {
+			cout << "parser fail" << endl;
+			input = L"";
+			continue;
+		}
+		Value *result = env->eval(tree->children[0]);
+		cout << result->toString() << endl;
+
+		input = L"";
+	}
 }
