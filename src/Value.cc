@@ -14,7 +14,7 @@ bool NumberValue::equals(Value *rhs) const{
 string Value::toString() const{
 	ostringstream result;
 	result << "Value(";
-	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL"})[(int)type];
+	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT"})[(int)type];
 	result << ")";
 	return result.str();
 }
@@ -29,6 +29,12 @@ string StringValue::toString() const{
 
 bool StringValue::equals(Value *rhs) const{
 	return Value::equals(rhs) && (value == ((StringValue*)(rhs))->value);
+}
+
+string DictionaryValue::toString() const{
+	ostringstream result;
+	result << "DictionaryValue(" << value.size() << ")";
+	return result.str();
 }
 
 string UserFunctionValue::toString() const {
@@ -54,7 +60,6 @@ Value *UserFunctionValue::apply(
 			return inner;
 		}
 		if (bodyReturnValue->type == ValueType::TAIL_CALL) {
-			//cout << "tailing" << endl;
 			args = ((TailCallValue *)bodyReturnValue)->args;
 			delete bodyReturnValue;
 		}
@@ -93,6 +98,8 @@ Value *FunctionPrint::apply(
 			cout << value->toNumberValue()->value << endl;
 		} else if (value->type == ValueType::STRING) {
 			cout << encodeUTF8(value->toStringValue()->value) << endl;
+		} else {
+			cout << value->toString() << endl;
 		}
 	}
 	return env->context->newNoneValue();
@@ -104,4 +111,9 @@ Value *FunctionEqual::apply(
 		return env->context->newNumberValue(1);
 	}
 	return env->context->newNumberValue(0);
+};
+
+Value *FunctionNewDictionary::apply(
+		vector<Value *> args, Environment *env) const {
+	return env->context->newDictionaryValue();
 };

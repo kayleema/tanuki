@@ -14,12 +14,12 @@ TEST(eval, functions)
 	SyntaxNode *tree = parser.run();
 	SyntaxNode *expr = tree->children[0];
 	string treeString = expr->toString();
-	// cout << treeString << endl;
+
 	Context context;
 	Environment *env = new Environment(&context);
 	Value *v = env->eval(expr);
 	NumberValue expected(9);
-	// cout << ((NumberValue *)v)->value;
+
 	EXPECT_TRUE(expected.equals(v));
 
 	context.cleanup();
@@ -140,8 +140,27 @@ TEST(program, string_eq) {
 
 	EXPECT_FALSE(env.lookup(L"あ")->isTruthy());
 	EXPECT_TRUE(env.lookup(L"い")->isTruthy());
+}
 
-	// v = env.eval(tree->children[2]);
-	// expected = new NumberValue(1597);
-	// EXPECT_TRUE(expected->equals(v));
+TEST(program, dictionary) {
+	auto stringInput = StringInputSource(
+		L"ほげ＝辞書（）\n"
+		L"ほげ・あ＝辞書（）\n"
+		L"ほげ・あ・い＝辞書（）\n"
+		L"関数、ピン（）\n"
+		L"　返す、ほげ・あ・い\n"
+		L"ほげ・あ・い・う＝ピン\n"
+		L"ほげ・あ・い・え＝５\n"
+		L"あ＝ほげ・あ・い・う（）・え\n"
+	);
+
+
+	auto testTokenizer = FileTokenizer(&stringInput);
+	auto parser = Parser(&testTokenizer);
+	SyntaxNode *tree = parser.run();
+	Context context;
+	Environment env(&context);
+	env.eval(tree);
+
+	EXPECT_TRUE(env.lookup(L"あ")->equals(new NumberValue(5)));
 }

@@ -4,11 +4,12 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <unordered_map>
 
 using namespace std;
 
 enum class ValueType {
-	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL
+	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT
 };
 
 class NumberValue;
@@ -17,7 +18,6 @@ class StringValue;
 class Value {
 public:
 	Value(ValueType t) : type(t) {
-		// cout << "Construct value " << this->toString() << endl;
 	};
 
 	virtual ~Value() {}
@@ -57,6 +57,21 @@ public:
 	virtual string toString() const override;
 
 	wstring value;
+};
+
+class DictionaryValue : public Value {
+public:
+	DictionaryValue() : Value(ValueType::DICT) {}
+
+	unordered_map<wstring, Value*> value;
+
+	void set(wstring name, Value *v) { value[name] = v; }
+
+	Value *get(wstring name) { return value[name]; }
+
+	bool has(wstring name) { return value.count(name); }
+
+	virtual string toString() const override;
 };
 
 // Indicates that an expression should force exit of func body eval.
@@ -129,6 +144,12 @@ public:
 };
 
 class FunctionEqual : public FunctionValue {
+public:
+	virtual Value *apply(
+		vector<Value *> args, Environment *env) const override;
+};
+
+class FunctionNewDictionary : public FunctionValue {
 public:
 	virtual Value *apply(
 		vector<Value *> args, Environment *env) const override;

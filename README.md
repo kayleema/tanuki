@@ -30,7 +30,7 @@ Formal Grammar (incomplete)
 ----------------------
 terminals: 
   LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, INDENT,
-  DEDENT, NUMBER, FUNC, RETURN, IF, ELSE
+  DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING, DOT
 
 productions:
   text => NEWLINE statement
@@ -53,6 +53,7 @@ productions:
   expression => expression_fns - expression
   expression => expression_fns
   expression_fns => SYMBOL
+  expression_fns => SYMBOL expression_fns_tail
   expression_fns => SYMBOL expression_fns_tail
   expression_fns => NUMBER
   expression_fns => NUMBER expression_fns_tail

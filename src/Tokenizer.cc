@@ -20,6 +20,7 @@ const wchar_t rsquare = L'」';
 const wchar_t comma = L'、';
 const wchar_t space = L'　';
 const wchar_t assign = L'＝';
+const wchar_t dot = L'・';
 const wchar_t newline = L'\n';
 
 bool charIsSymbolic(wchar_t c) {
@@ -29,7 +30,8 @@ bool charIsSymbolic(wchar_t c) {
 		c != comma &&
 		c != space &&
 		c != newline &&
-		c != assign;
+		c != assign &&
+		c != dot;
 }
 
 bool charIsNumberic(wchar_t c) {
@@ -48,7 +50,7 @@ int parseNumeric(wstring s) {
 static const char * TokenTypeStrings[] = {
 	"lparen", "rparen", "comma", "symbol", "end", "start", "space", 
 	"newl", "indent", "dedent", "number", "function", "return", "if", "else",
-	"string", "assign"
+	"string", "assign", "dot"
 };
 
 Token::Token(TokenType type, wstring _content, int line)
@@ -113,6 +115,9 @@ Token FileTokenizer::getToken() {
 	}
 	if (first == assign) {
 		return Token(TokenType::ASSIGN, L"＝", linenumber);
+	}
+	if (first == dot) {
+		return Token(TokenType::DOT, L"・", linenumber);
 	}
 	if (first == space) {
 		int newIndentLevel = 1;

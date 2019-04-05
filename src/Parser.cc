@@ -145,6 +145,27 @@ SyntaxNode *Parser::run_expression_tail() {
 		}
 		return node;
 	}
+	Token symbol;
+	if (accept({TokenType::DOT, TokenType::SYMBOL}, {nullptr, &symbol}, {TokenType::ASSIGN})) {
+		auto node = new SyntaxNode(NodeType::GET);
+		node->children.push_back(new SyntaxNode(symbol));
+		auto tail = run_expression_tail();
+		if (tail) {
+			node->children.push_back(tail);
+		}
+		return node;
+	}
+	if (accept(
+			{TokenType::DOT, TokenType::SYMBOL, TokenType::ASSIGN}, 
+			{nullptr, &symbol, nullptr})) {
+		auto node = new SyntaxNode(NodeType::SET);
+		node->children.push_back(new SyntaxNode(symbol));
+		auto rhs = run_expression();
+		if (rhs) {
+			node->children.push_back(rhs);
+		}
+		return node;
+	}
 	return nullptr;
 }
 
@@ -163,21 +184,23 @@ SyntaxNode *Parser::run_args() {
 
 bool Parser::accept(TokenType type, Token *out) {
 	if (currentToken().type == type) {
-		// cout << "accept " << current.toString() << endl;
 		if (out) {
 			*out = currentToken();
 		}
 		currentTokenIndex++;
 		return true;
 	}
-	// cout << "not accept " << current.toString() << endl;
 	return false;
 }
 
 bool Parser::accept(vector<TokenType> types, vector<Token *> outs) {
 	int i = 0;
 	for (auto type : types) {
-		if(allTokens[currentTokenIndex + i].type != type) {
+		size_t tokenIndex = currentTokenIndex + i;
+		if (tokenIndex >= allTokens.size()) {
+			break;
+		}
+		if(allTokens[tokenIndex].type != type) {
 			return false;
 		}
 		i++;
@@ -192,6 +215,21 @@ bool Parser::accept(vector<TokenType> types, vector<Token *> outs) {
 
 	currentTokenIndex += types.size();
 	return true;
+}
+
+bool Parser::accept(vector<TokenType> types, vector<Token *> outs, vector<TokenType> rejectTypes) {
+	int i = 0;
+	for (auto rejectType : rejectTypes) {
+		size_t tokenIndex = currentTokenIndex + types.size() + i;
+		if (tokenIndex >= allTokens.size()) {
+			break;
+		}
+		if (allTokens[tokenIndex].type == rejectType) {
+			return false;
+		}
+		i++;
+	}
+	return Parser::accept(types, outs);
 }
 
 bool Parser::expect(TokenType type) {
@@ -215,7 +253,7 @@ string SyntaxNode::toString(int indent) {
 
 	const string ss[] = {
 		"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
-		"RETURN", "IF", "ASSIGN"
+		"RETURN", "IF", "ASSIGN", "GET", "SET"
 	};
 	result << ss[(int)type];
 	if (type == NodeType::TERMINAL) {

@@ -31,14 +31,27 @@ Value *Environment::eval_call(SyntaxNode *tree,
 		const FunctionValue* tailContext) {
 	Value *first = eval(tree->children[0]);
 	first->refs++;
-	FunctionValue *function = (FunctionValue*)first;
 	SyntaxNode *tail = tree->children[1];
 
-	auto result = eval_calltail(function, tail, tailContext);
+	Value *result = eval_tail(first, tail, tailContext);
 
 	first->refs--;
 	return result;
 }
+
+Value *Environment::eval_tail(Value* first, SyntaxNode *tail, 
+		const FunctionValue* tailContext) {
+	if (tail->type == NodeType::CALL_TAIL) {
+		return eval_calltail((FunctionValue*)first, tail, tailContext);
+	} else if (tail->type == NodeType::GET) {
+		return eval_get((DictionaryValue*)first, tail);
+	} else if (tail->type == NodeType::SET) {
+		return eval_set((DictionaryValue*)first, tail);
+	} else {
+		return context->newNoneValue();
+	}
+}
+
 
 Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail, 
 		const FunctionValue* tailContext) {
@@ -65,7 +78,7 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 
 	if (tail->children.size() == 2) {
 		auto nextTail = tail->children[1];
-		finalResult = eval_calltail((FunctionValue*)result, nextTail);
+		finalResult = eval_tail(result, nextTail);
 	}
 
 	for (auto arg : args) {
@@ -73,6 +86,28 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 	}
 	result->refs--;
 	return finalResult;
+}
+
+Value *Environment::eval_get(DictionaryValue* source, SyntaxNode *tree) {
+	wstring key = tree->children[0]->content.content;
+	if (!source->has(key)) {
+		cout << "エラー：辞書にキーは入っていない。" << endl;
+		return context->newNoneValue();
+	}
+	auto result = source->get(key);
+	result->refs++;
+	if (tree->children.size() == 2) {
+		result = eval_tail(result, tree->children[1]);
+	}
+	result->refs--;
+	return result;
+}
+
+Value *Environment::eval_set(DictionaryValue* source, SyntaxNode *tree) {
+	wstring key = tree->children[0]->content.content;
+	auto rhs = eval(tree->children[1]);
+	source->set(key, rhs);
+	return context->newNoneValue();
 }
 
 Value *Environment::eval_terminal(SyntaxNode *tree) {
@@ -104,7 +139,6 @@ Value *Environment::eval_text(SyntaxNode *tree,
 			return statementReturnValue;
 		} else if (statementReturnValue != nullptr && 
 				statementReturnValue->type != ValueType::NONE) {
-			// delete statementReturnValue;
 		}
 	}
 	return context->newNoneValue();
@@ -173,4 +207,5 @@ Environment::Environment(Context *context): context(context) {
 	bindings[L"引く"] = new FunctionDiff();
 	bindings[L"表示"] = new FunctionPrint();
 	bindings[L"イコール"] = new FunctionEqual();
+	bindings[L"辞書"] = new FunctionNewDictionary();
 }

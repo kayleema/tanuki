@@ -24,12 +24,13 @@ public:
 
 	bool accept(TokenType type, Token *out=nullptr);
 	bool accept(vector<TokenType> types, vector<Token *> outs);
+	bool accept(vector<TokenType> types, vector<Token *> outs, vector<TokenType> reject);
 	bool expect(TokenType type);
 	Token currentToken();
 };
 
 enum class NodeType {
-	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS, RETURN, IF, ASSIGN
+	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS, RETURN, IF, ASSIGN, GET, SET
 };
 
 class SyntaxNode {

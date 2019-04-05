@@ -73,6 +73,7 @@ int main(int argc, char **argv)
 	}
 
 	Context context;
+	context.setFrequency(10000);
 	Environment *env = new Environment(&context);
 	env->eval(tree);
 

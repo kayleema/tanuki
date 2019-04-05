@@ -10,8 +10,11 @@ class Context;
 
 class Environment {
 	Value *eval_call(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
+	Value *eval_tail(Value* first, SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 	Value *eval_calltail(FunctionValue* function, SyntaxNode *node, 
 		const FunctionValue* tailContext = nullptr);
+	Value *eval_get(DictionaryValue *source, SyntaxNode *tree);
+	Value *eval_set(DictionaryValue *source, SyntaxNode *tree);
 	Value *eval_terminal(SyntaxNode *node);
 	Value *eval_text(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 	Value *eval_function(SyntaxNode *node);
@@ -51,6 +54,9 @@ class Context {
 	unordered_set<Value *> values;
 	unordered_set<Environment *> environments;
 
+	int iteration = 0;
+	int frequency = 1;
+
 public:
 	unordered_set<Value *> usedValues;
 	unordered_set<Environment *> usedEnvironments;
@@ -62,6 +68,12 @@ public:
 				((FunctionValue *)value)->functionType == FunctionValueType::USER_FUNCTION) {
 				auto f = (UserFunctionValue *)value;
 				mark(f->parentEnv);
+			}
+			if (value->type == ValueType::DICT) {
+				auto d = (DictionaryValue *)value;
+				for (auto item : d->value) {
+					mark(item.second);
+				}
 			}
 		}
 	}
@@ -83,6 +95,11 @@ public:
 	}
 
 	void collect(Environment *current_env) {
+		iteration++;
+		if ((iteration % frequency != 0)) {
+			return;
+		}
+
 		usedValues.clear();
 		usedEnvironments.clear();
 		mark(current_env);
@@ -91,7 +108,6 @@ public:
 				if (value->refs){
 					usedValues.insert(value);
 				} else {
-					// cout << "collect " << value->toString() << endl;
 					delete value;
 				}
 			} else {
@@ -100,7 +116,6 @@ public:
 		values = usedValues;
 		for (auto *environment : environments) {
 			if (!usedEnvironments.count(environment)) {
-				// cout << "collect env " << environment << endl;
 				delete environment;
 			}
 		}
@@ -109,16 +124,15 @@ public:
 
 	void cleanup() {
 		for (auto value : values) {
-			// cout << "cleanup value " << value->toString();
 			delete value;
-			// cout << "...done"  << endl;
 		}
 		for (auto environment : environments) {
-			// cout << "cleanup environment";
 			delete environment;
-			// cout << "...done"  << endl;
 		}
-		// cout << "cleanup done" << endl;
+	}
+
+	void setFrequency(int freq) {
+		frequency = freq;
 	}
 
 	Value *newNoneValue() {
@@ -129,7 +143,6 @@ public:
 	NumberValue *newNumberValue(int number) {
 		auto result = new NumberValue(number);
 		values.insert(result);
-		// cout << "tracking " << result->toString() << endl;
 		return result;
 	}
 
@@ -139,11 +152,16 @@ public:
 		return result;
 	}
 
+	DictionaryValue *newDictionaryValue() {
+		auto result = new DictionaryValue();
+		values.insert(result);
+		return result;
+	}
+
 	UserFunctionValue *newUserFunctionValue(
 			vector<wstring> params, SyntaxNode *body, Environment *e) {
 		auto result = new UserFunctionValue(params, body, e);
 		values.insert(result);
-		// cout << "new user function " << result->toString() << endl;
 		return result;
 	}
 
