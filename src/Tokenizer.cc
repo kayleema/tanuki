@@ -50,7 +50,7 @@ int parseNumeric(wstring s) {
 static const char * TokenTypeStrings[] = {
 	"lparen", "rparen", "comma", "symbol", "end", "start", "space", 
 	"newl", "indent", "dedent", "number", "function", "return", "if", "else",
-	"string", "assign", "dot"
+	"string", "assign", "dot", "elif"
 };
 
 Token::Token(TokenType type, wstring _content, int line)
@@ -80,6 +80,7 @@ static const unordered_map<wstring, TokenType> identifiers({
 	{L"関数", TokenType::FUNC},
 	{L"返す", TokenType::RETURN},
 	{L"もし", TokenType::IF},
+	{L"他でもし", TokenType::ELIF},
 	{L"その他", TokenType::ELSE},
 });
 

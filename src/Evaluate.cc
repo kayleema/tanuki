@@ -166,12 +166,17 @@ Value *Environment::eval_return(SyntaxNode *tree,
 }
 
 Value *Environment::eval_if(SyntaxNode *tree) {
-	SyntaxNode *condition = tree->children[0];
-	SyntaxNode *body = tree->children[1];
-	Value *condValue = eval(condition);
-	if (condValue->isTruthy()) {
-		auto result = eval(body);
-		return result;
+	for (size_t i = 0; i < tree->children.size(); i += 2) {
+		if (i == tree->children.size() - 1) {
+			return eval(tree->children[i]);
+		}
+		SyntaxNode *condition = tree->children[i];
+		SyntaxNode *body = tree->children[i+1];
+		Value *condValue = eval(condition);
+		if (condValue->isTruthy()) {
+			auto result = eval(body);
+			return result;
+		}
 	}
 	return context->newNoneValue();
 }

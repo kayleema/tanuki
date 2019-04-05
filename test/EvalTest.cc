@@ -164,3 +164,31 @@ TEST(program, dictionary) {
 
 	EXPECT_TRUE(env.lookup(L"あ")->equals(new NumberValue(5)));
 }
+
+TEST(program, if_elif_else) {
+	auto stringInput = StringInputSource(
+		L"関数、五番です（番号）\n"
+		L"　もし、イコール（番号、５）\n"
+		L"　　返す、１\n"
+		L"　他でもし、イコール（番号、６）\n"
+		L"　　返す、６\n"
+		L"　その他\n"
+		L"　　返す、０\n"
+		L"\n"
+		L"あ＝五番です（５）\n"
+		L"い＝五番です（６）\n"
+		L"う＝五番です（７）\n"
+	);
+
+
+	auto testTokenizer = FileTokenizer(&stringInput);
+	auto parser = Parser(&testTokenizer);
+	SyntaxNode *tree = parser.run();
+	Context context;
+	Environment env(&context);
+	env.eval(tree);
+
+	EXPECT_TRUE(env.lookup(L"あ")->equals(new NumberValue(1)));
+	EXPECT_TRUE(env.lookup(L"い")->equals(new NumberValue(6)));
+	EXPECT_TRUE(env.lookup(L"う")->equals(new NumberValue(0)));
+}

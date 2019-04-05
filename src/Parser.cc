@@ -48,6 +48,23 @@ SyntaxNode *Parser::run_if() {
 		auto result = new SyntaxNode(NodeType::IF);
 		result->children.push_back(condition);
 		result->children.push_back(body);
+		while (accept(TokenType::ELIF)) {
+			expect(TokenType::COMMA);
+			SyntaxNode *conditionElif = run_expression();
+			expect(TokenType::NEWL);
+			expect(TokenType::INDENT);
+			SyntaxNode *bodyElif = run_text();
+			expect(TokenType::DEDENT);
+			result->children.push_back(conditionElif);
+			result->children.push_back(bodyElif);
+		}
+		if (accept(TokenType::ELSE)) {
+			expect(TokenType::NEWL);
+			expect(TokenType::INDENT);
+			SyntaxNode *bodyElse = run_text();
+			result->children.push_back(bodyElse);
+			expect(TokenType::DEDENT);
+		}
 		return result;
 	}
 	return nullptr;
