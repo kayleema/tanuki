@@ -76,7 +76,7 @@ bool Token::operator==(const Token& rhs) const{
 // Tokenizer Implementation
 static const unordered_map<wstring, TokenType> identifiers({
 	{L"関数", TokenType::FUNC},
-	{L"戻り", TokenType::RETURN},
+	{L"返す", TokenType::RETURN},
 	{L"もし", TokenType::IF},
 	{L"その他", TokenType::ELSE},
 });
