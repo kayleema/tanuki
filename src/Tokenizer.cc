@@ -108,14 +108,6 @@ Token FileTokenizer::getToken() {
 	if (first == rparen) {
 		return Token(TokenType::RPAREN, L"）", linenumber);
 	}
-	if (first == lsquare) {
-		wstring resultString;
-		wchar_t c;
-		while ((c = input->getChar()) != rsquare) {
-			resultString.push_back(c);
-		}
-		return Token(TokenType::STRING, resultString, linenumber);
-	}
 	if (first == comma) {
 		return Token(TokenType::COMMA, L"、", linenumber);
 	}
@@ -162,8 +154,23 @@ Token FileTokenizer::getToken() {
 		}
 		return Token(TokenType::NUMBER, wstring(resultNumber), linenumber);
 	}
+	if (first == lsquare) {
+		wstring resultString = wstring(L"");
+		wchar_t nextChar;
+		while ((nextChar = input->getChar()) != rsquare) {
+			resultString.push_back(nextChar);
+			if (nextChar == newline) {
+				linenumber++;
+			}
+			if (input->eof()) {
+				cout << "エラー：文字列を読みながら、ファイルの終わり（ＥＯＦ）" << endl;
+				return Token(TokenType::END, L"", linenumber);
+			}
+		}
+		return Token(TokenType::STRING, wstring(resultString), linenumber);
+	}
 	wstring resultSymbol = wstring(1, first);
-	while(charIsSymbolic(input->peekChar()) && !input->eof()) {
+	while (charIsSymbolic(input->peekChar()) && !input->eof()) {
 		resultSymbol.push_back(input->getChar());
 	}
 	if (identifiers.count(resultSymbol)) {
