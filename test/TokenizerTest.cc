@@ -25,14 +25,14 @@ TEST(tokenizer, multiline)
 {
 	auto stringInput = StringInputSource(
 		L"関数、フィボナッチ（番号）\n"
-		L"　戻り、１２３"
+		L"　返す、１２３"
 	);
 	auto testTokenizer = FileTokenizer(&stringInput);
 	auto allTokens = testTokenizer.getAllTokens();
 	EXPECT_EQ(12, allTokens.size());
 	EXPECT_EQ(allTokens[6], Token(TokenType::NEWL, L"",2));
 	EXPECT_EQ(allTokens[7], Token(TokenType::INDENT, L"",2));
-	EXPECT_EQ(allTokens[8], Token(TokenType::RETURN, L"戻り",2));
+	EXPECT_EQ(allTokens[8], Token(TokenType::RETURN, L"返す",2));
 	EXPECT_EQ(allTokens[9], Token(TokenType::COMMA, L"、",2));
 	EXPECT_EQ(allTokens[10], Token(TokenType::NUMBER, L"１２３",2));
 	EXPECT_EQ(allTokens[11], Token(TokenType::END, L"",2));

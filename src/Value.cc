@@ -27,6 +27,10 @@ string StringValue::toString() const{
 	return string("string");
 }
 
+bool StringValue::equals(Value *rhs) const{
+	return Value::equals(rhs) && (value == ((StringValue*)(rhs))->value);
+}
+
 string UserFunctionValue::toString() const {
 	ostringstream result;
 	result << "UserFunctionValue(" << "..." << ")";

@@ -29,7 +29,7 @@ public:
 	NumberValue *toNumberValue() { return (NumberValue *) this; }
 	StringValue *toStringValue() { return (StringValue *) this; }
 
-	virtual bool isTruthy() const { return false; };
+	virtual bool isTruthy() const { return true; };
 
 	ValueType type;
 	int refs = 0;
@@ -52,11 +52,9 @@ class StringValue : public Value {
 public:
 	StringValue(wstring str) : Value(ValueType::STRING), value(str) {};
 
-	// virtual bool equals(Value *rhs) const override;
+	virtual bool equals(Value *rhs) const override;
 
 	virtual string toString() const override;
-
-	// virtual bool isTruthy() const override { return value != 0; };
 
 	wstring value;
 };

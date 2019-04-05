@@ -29,7 +29,7 @@ TEST(eval, user_function)
 {
 	auto stringInput = StringInputSource(
 		L"関数、プラス二（あ）\n"
-		L"　戻り、足す（あ、２）\n"
+		L"　返す、足す（あ、２）\n"
 		L""
 	);
 	auto testTokenizer = FileTokenizer(&stringInput);
@@ -58,8 +58,8 @@ TEST(eval, if_statement)
 	auto stringInput = StringInputSource(
 		L"関数、五番です（番号）\n"
 		L"　もし、イコール（番号、５）\n"
-		L"　　戻り、１\n"
-		L"　戻り、０\n"
+		L"　　返す、１\n"
+		L"　返す、０\n"
 		L""
 	);
 	auto testTokenizer = FileTokenizer(&stringInput);
@@ -98,10 +98,10 @@ TEST(program, fibonacci) {
 	auto stringInput = StringInputSource(
 		L"関数、フィボナッチ（号）\n"
 		L"　もし、イコール（号、１）\n"
-		L"　　戻り、１\n"
+		L"　　返す、１\n"
 		L"　もし、イコール（号、０）\n"
-		L"　　戻り、１\n"
-		L"　戻り、足す（フィボナッチ（引く（号、１））、フィボナッチ（引く（号、２）））\n"
+		L"　　返す、１\n"
+		L"　返す、足す（フィボナッチ（引く（号、１））、フィボナッチ（引く（号、２）））\n"
 		L"\n"
 		L"フィボナッチ（７）\n"
 		L"フィボナッチ（１６）\n"
@@ -122,4 +122,26 @@ TEST(program, fibonacci) {
 	v = env.eval(tree->children[2]);
 	expected = new NumberValue(1597);
 	EXPECT_TRUE(expected->equals(v));
+}
+
+TEST(program, string_eq) {
+	auto stringInput = StringInputSource(
+		L"あ＝イコール（「ほげ」、「ほけ」）\n"
+		L"い＝イコール（「ほげ」、「ほげ」）\n"
+	);
+
+
+	auto testTokenizer = FileTokenizer(&stringInput);
+	auto parser = Parser(&testTokenizer);
+	SyntaxNode *tree = parser.run();
+	Context context;
+	Environment env(&context);
+	env.eval(tree);
+
+	EXPECT_FALSE(env.lookup(L"あ")->isTruthy());
+	EXPECT_TRUE(env.lookup(L"い")->isTruthy());
+
+	// v = env.eval(tree->children[2]);
+	// expected = new NumberValue(1597);
+	// EXPECT_TRUE(expected->equals(v));
 }
