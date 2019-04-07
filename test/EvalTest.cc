@@ -3,6 +3,7 @@
 #include "Tokenizer.h"
 #include "Parser.h"
 #include "Evaluate.h"
+#include "Context.h"
 
 TEST(eval, functions)
 {

@@ -61,8 +61,9 @@ public:
 
 class DictionaryValue : public Value {
 public:
-	DictionaryValue() : Value(ValueType::DICT) {}
+	DictionaryValue() : Value(ValueType::DICT), parent(nullptr) {}
 
+	DictionaryValue *parent;
 	unordered_map<wstring, Value*> value;
 
 	void set(wstring name, Value *v) { value[name] = v; }

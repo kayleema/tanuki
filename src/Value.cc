@@ -2,6 +2,7 @@
 
 #include "Value.h"
 #include "Evaluate.h"
+#include "Context.h"
 
 bool Value::equals(Value *rhs) const{
 	return (type == rhs->type);

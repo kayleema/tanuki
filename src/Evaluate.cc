@@ -1,4 +1,5 @@
 #include "Evaluate.h"
+#include "Context.h"
 
 Value *Environment::eval(SyntaxNode *tree, 
 		const FunctionValue* tailContext) {

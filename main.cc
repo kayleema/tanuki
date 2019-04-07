@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Tokenizer.h"
+#include "Context.h"
 #include "Parser.h"
 #include "Evaluate.h"
 #include <fcntl.h>
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
 		cout << "使い方は間違い" << endl;
 		return 1;
 	}
+	int freq = 10000;
 	bool print_ast = false;
 	bool print_lex = false;
 	for (int i = 1; i < argc; i++) {
@@ -29,6 +31,11 @@ int main(int argc, char **argv)
 				print_lex = true;
 			}
 		}
+		if (strcmp(argv[i], "-f") == 0) {
+			i++;
+			freq = atoi(argv[i]);
+			cout << "Freq set to " << freq << endl;
+		}
 		if (strcmp(argv[i], "-h") == 0) {
 			cout << "ＰｉｎＰｏｎプログラミング言語" << endl;
 			cout << "ーーーーーーーーーーーーーーー" << endl;
@@ -39,6 +46,7 @@ int main(int argc, char **argv)
 			cout << "　-i：インタラクティブ・モード（REPL）" << endl;
 			cout << "　-d lex：lexerの結果を表示（ディバギング）" << endl;
 			cout << "　-d ast：parserの結果を表示（ディバギング）" << endl;
+			cout << "　-f 数字：evalの何回目の時にメモリを掃除（デフォルトは１万）" << endl;
 			cout << "　-h：このメッセジを表示" << endl << endl;
 			return 0;
 		}
@@ -73,7 +81,7 @@ int main(int argc, char **argv)
 	}
 
 	Context context;
-	context.setFrequency(10000);
+	context.setFrequency(freq);
 	Environment *env = new Environment(&context);
 	env->eval(tree);
 
