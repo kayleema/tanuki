@@ -145,6 +145,13 @@ SyntaxNode *Parser::run_expression() {
 	if (accept(TokenType::NUMBER, &start)) {
 		return new SyntaxNode(start);
 	}
+	if (accept(TokenType::MINUS, &start)) {
+		if (accept(TokenType::NUMBER, &start)) {
+			start.number = -start.number;
+			return new SyntaxNode(start);
+		}
+		return nullptr;
+	}
 	return nullptr;
 }
 

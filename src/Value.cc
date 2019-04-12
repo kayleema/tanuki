@@ -43,6 +43,7 @@ string UserFunctionValue::toString() const {
 	result << "UserFunctionValue(" << "..." << ")";
 	return result.str();
 }
+
 Value *UserFunctionValue::apply(
 		vector<Value *> args, Environment *caller) const {
 	Value *bodyReturnValue;
@@ -67,54 +68,3 @@ Value *UserFunctionValue::apply(
 	} while(bodyReturnValue->type == ValueType::TAIL_CALL);
 	return bodyReturnValue;
 }
-
-Value *FunctionSum::apply(
-		vector<Value *> args, Environment *env) const {
-	int result = 0;
-	for (auto value : args) {
-		result += value->toNumberValue()->value;
-	}
-	return env->context->newNumberValue(result);
-};
-
-Value *FunctionDiff::apply(
-		vector<Value *> args, Environment *env) const {
-	int result = 0;
-	bool first = true;
-	for (auto value : args) {
-		if (first) {
-			first = false;
-			result = value->toNumberValue()->value;
-		} else {
-			result -= value->toNumberValue()->value;
-		}
-	}
-	return env->context->newNumberValue(result);
-};
-
-Value *FunctionPrint::apply(
-		vector<Value *> args, Environment *env) const {
-	for (auto value : args) {
-		if (value->type == ValueType::NUM) {
-			cout << value->toNumberValue()->value << endl;
-		} else if (value->type == ValueType::STRING) {
-			cout << encodeUTF8(value->toStringValue()->value) << endl;
-		} else {
-			cout << value->toString() << endl;
-		}
-	}
-	return env->context->newNoneValue();
-};
-
-Value *FunctionEqual::apply(
-		vector<Value *> args, Environment *env) const {
-	if(args[0]->equals(args[1])) {
-		return env->context->newNumberValue(1);
-	}
-	return env->context->newNumberValue(0);
-};
-
-Value *FunctionNewDictionary::apply(
-		vector<Value *> args, Environment *env) const {
-	return env->context->newDictionaryValue();
-};

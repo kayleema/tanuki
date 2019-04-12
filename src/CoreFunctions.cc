@@ -1,0 +1,115 @@
+#include "Value.h"
+#include "Evaluate.h"
+#include "Context.h"
+#include <iostream>
+
+const wchar_t *corePinponStarter = 
+#include "core.pin"
+;
+
+// Builtin Functions
+class FunctionSum : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		long result = 0;
+		for (auto value : args) {
+			result += value->toNumberValue()->value;
+		}
+		return env->context->newNumberValue(result);
+	};
+};
+
+class FunctionDiff : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		long result = 0;
+		bool first = true;
+		for (auto value : args) {
+			if (first) {
+				first = false;
+				result = value->toNumberValue()->value;
+			} else {
+				result -= value->toNumberValue()->value;
+			}
+		}
+		return env->context->newNumberValue(result);
+	};
+};
+
+class FunctionDiv : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		long result = 0;
+		bool first = true;
+		for (auto value : args) {
+			if (first) {
+				first = false;
+				result = value->toNumberValue()->value;
+			} else {
+				result /= value->toNumberValue()->value;
+			}
+		}
+		return env->context->newNumberValue(result);
+	};
+};
+
+class FunctionPrint : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		for (auto value : args) {
+			if (value->type == ValueType::NUM) {
+				cout << value->toNumberValue()->value;
+			} else if (value->type == ValueType::STRING) {
+				cout << encodeUTF8(value->toStringValue()->value);
+			} else {
+				cout << value->toString();
+			}
+		}
+		cout << endl;
+		return env->context->newNoneValue();
+	};
+};
+
+class FunctionEqual : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		if(args[0]->equals(args[1])) {
+			return env->context->newNumberValue(1);
+		}
+		return env->context->newNumberValue(0);
+	};
+};
+
+class FunctionCompare : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		if ((args[0]->type != ValueType::NUM) || 
+				(args[1]->type != ValueType::NUM)) {
+			return env->context->newNumberValue(0);
+		}
+		auto a = args[0]->toNumberValue()->value;
+		auto b = args[1]->toNumberValue()->value;
+		return env->context->newNumberValue((a > b) - (a < b));
+	};
+};
+
+class FunctionNewDictionary : public FunctionValue {
+public:
+	Value *apply(vector<Value *> args, Environment *env) const override {
+		auto result = env->context->newDictionaryValue();
+		if (args.size() > 0 && result->type == ValueType::DICT) {
+			result->setParent(args[0]->toDictionaryValue());
+		}
+		return result;
+	};
+};
+
+void initModule(Environment *env) {
+	env->bind(L"足す", new FunctionSum());
+	env->bind(L"引く", new FunctionDiff());
+	env->bind(L"割り算", new FunctionDiv());
+	env->bind(L"表示", new FunctionPrint());
+	env->bind(L"イコール", new FunctionEqual());
+	env->bind(L"比べ", new FunctionCompare());
+	env->bind(L"辞書", new FunctionNewDictionary());
+}

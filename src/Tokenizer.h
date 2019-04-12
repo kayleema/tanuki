@@ -18,7 +18,7 @@ bool charIsSymbolic(wchar_t c);
 
 enum TokenType {
 	LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, INDENT, DEDENT, 
-	NUMBER, FUNC, RETURN, IF, ELSE, STRING, ASSIGN, DOT, ELIF
+	NUMBER, FUNC, RETURN, IF, ELSE, STRING, ASSIGN, DOT, ELIF, MINUS
 };
 
 class Token {
@@ -30,7 +30,7 @@ public:
 	TokenType type;
 	wstring content;
 	int line;
-	int number;
+	long number;
 
 	string toString() const;
 	bool operator==(const Token& rhs) const;

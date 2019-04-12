@@ -1,5 +1,6 @@
 #include "Evaluate.h"
 #include "Context.h"
+#include "CoreFunctions.h"
 
 Value *Environment::eval(SyntaxNode *tree, 
 		const FunctionValue* tailContext) {
@@ -92,7 +93,7 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 Value *Environment::eval_get(DictionaryValue* source, SyntaxNode *tree) {
 	wstring key = tree->children[0]->content.content;
 	if (!source->has(key)) {
-		cout << "エラー：辞書にキーは入っていない。" << endl;
+		cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
 		return context->newNoneValue();
 	}
 	auto result = source->get(key);
@@ -209,9 +210,5 @@ Environment *Environment::newChildEnvironment() {
 
 // Global Environment Constructor
 Environment::Environment(Context *context): context(context) {
-	bindings[L"足す"] = new FunctionSum();
-	bindings[L"引く"] = new FunctionDiff();
-	bindings[L"表示"] = new FunctionPrint();
-	bindings[L"イコール"] = new FunctionEqual();
-	bindings[L"辞書"] = new FunctionNewDictionary();
+	initModule(this);
 }

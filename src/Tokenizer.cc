@@ -22,6 +22,7 @@ const wchar_t space = L'　';
 const wchar_t assign = L'＝';
 const wchar_t dot = L'・';
 const wchar_t newline = L'\n';
+const wchar_t minuszenkaku = L'－';
 
 bool charIsSymbolic(wchar_t c) {
 	return 
@@ -38,11 +39,12 @@ bool charIsNumberic(wchar_t c) {
 	return c <= L'９' && c >= L'０';
 }
 
-int parseNumeric(wstring s) {
+long parseNumeric(wstring s) {
+	// cout << encodeUTF8(s) << result << endl;
 	if (s.length() == 0) {
 		return 0;
 	}
-	int result = s.back() - L'０';
+	long result = s.back() - L'０';
 	s.pop_back();
 	return result + parseNumeric(s) * 10;
 }
@@ -50,7 +52,7 @@ int parseNumeric(wstring s) {
 static const char * TokenTypeStrings[] = {
 	"lparen", "rparen", "comma", "symbol", "end", "start", "space", 
 	"newl", "indent", "dedent", "number", "function", "return", "if", "else",
-	"string", "assign", "dot", "elif"
+	"string", "assign", "dot", "elif", "minus"
 };
 
 Token::Token(TokenType type, wstring _content, int line)
@@ -119,6 +121,9 @@ Token FileTokenizer::getToken() {
 	}
 	if (first == dot) {
 		return Token(TokenType::DOT, L"・", linenumber);
+	}
+	if (first == minuszenkaku) {
+		return Token(TokenType::MINUS, L"－", linenumber);
 	}
 	if (first == space) {
 		int newIndentLevel = 1;

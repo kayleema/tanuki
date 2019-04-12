@@ -14,6 +14,9 @@ void Context::mark(Value *value) {
 			for (auto item : d->value) {
 				mark(item.second);
 			}
+			if (d->parent) {
+				mark(d->parent);
+			}
 		}
 	}
 }
@@ -81,7 +84,7 @@ Value *Context::newNoneValue() {
 	return &staticNone;
 }
 
-NumberValue *Context::newNumberValue(int number) {
+NumberValue *Context::newNumberValue(long number) {
 	auto result = new NumberValue(number);
 	values.insert(result);
 	return result;

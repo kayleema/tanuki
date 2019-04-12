@@ -14,6 +14,7 @@ enum class ValueType {
 
 class NumberValue;
 class StringValue;
+class DictionaryValue;
 
 class Value {
 public:
@@ -28,6 +29,7 @@ public:
 
 	NumberValue *toNumberValue() { return (NumberValue *) this; }
 	StringValue *toStringValue() { return (StringValue *) this; }
+	DictionaryValue *toDictionaryValue() { return (DictionaryValue *) this; }
 
 	virtual bool isTruthy() const { return true; };
 
@@ -37,7 +39,7 @@ public:
 
 class NumberValue : public Value {
 public:
-	NumberValue(int n) : Value(ValueType::NUM), value(n) {};
+	NumberValue(long n) : Value(ValueType::NUM), value(n) {};
 
 	virtual bool equals(Value *rhs) const override;
 
@@ -60,17 +62,28 @@ public:
 };
 
 class DictionaryValue : public Value {
+
 public:
 	DictionaryValue() : Value(ValueType::DICT), parent(nullptr) {}
-
-	DictionaryValue *parent;
 	unordered_map<wstring, Value*> value;
+	DictionaryValue *parent = nullptr;
+
+	void setParent(DictionaryValue *p) { parent = p; }
 
 	void set(wstring name, Value *v) { value[name] = v; }
 
-	Value *get(wstring name) { return value[name]; }
+	Value *get(wstring name) {
+		if (value.count(name)) {
+			return value[name];
+		} else if (parent) {
+			return parent->get(name);
+		}
+		return nullptr;
+	}
 
-	bool has(wstring name) { return value.count(name); }
+	bool has(wstring name) {
+		return value.count(name) || (parent && parent->has(name));
+	}
 
 	virtual string toString() const override;
 };
@@ -123,37 +136,6 @@ public:
 		vector<Value *> args, Environment *env) const override;
 
 	virtual string toString() const override;
-};
-
-// Builtin Functions
-class FunctionSum : public FunctionValue {
-public:
-	virtual Value *apply(
-		vector<Value *> args, Environment *env) const override;
-};
-
-class FunctionDiff : public FunctionValue {
-public:
-	virtual Value *apply(
-		vector<Value *> args, Environment *env) const override;
-};
-
-class FunctionPrint : public FunctionValue {
-public:
-	virtual Value *apply(
-		vector<Value *> args, Environment *env) const override;
-};
-
-class FunctionEqual : public FunctionValue {
-public:
-	virtual Value *apply(
-		vector<Value *> args, Environment *env) const override;
-};
-
-class FunctionNewDictionary : public FunctionValue {
-public:
-	virtual Value *apply(
-		vector<Value *> args, Environment *env) const override;
 };
 
 #endif

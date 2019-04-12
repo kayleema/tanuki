@@ -3,11 +3,14 @@
 #include "Context.h"
 #include "Parser.h"
 #include "Evaluate.h"
+#include "CoreFunctions.h"
 #include <fcntl.h>
 #include <sys/uio.h>
 #include <locale.h>
 
 using namespace std;
+
+void evalPinponStarter(Environment *env);
 
 int interractive();
 
@@ -83,6 +86,7 @@ int main(int argc, char **argv)
 	Context context;
 	context.setFrequency(freq);
 	Environment *env = new Environment(&context);
+	evalPinponStarter(env);
 	env->eval(tree);
 
 	delete tree;
@@ -105,6 +109,7 @@ wstring decodeUTF8(const string &in) {
 int interractive() {
 	Context context;
 	Environment *env = new Environment(&context);
+	evalPinponStarter(env);
 	string inputraw;
 	wstring input;
 	bool continuation = false;
@@ -143,4 +148,12 @@ int interractive() {
 
 		input = L"";
 	}
+}
+
+void evalPinponStarter(Environment *env) {
+	auto source = StringInputSource(corePinponStarter);
+	auto tokenizer = FileTokenizer(&source);
+	auto parser = Parser(&tokenizer);
+	SyntaxNode *tree = parser.run();
+	env->eval(tree);
 }

@@ -27,7 +27,7 @@ public:
 	void setFrequency(int freq);
 
 	Value *newNoneValue();
-	NumberValue *newNumberValue(int number);
+	NumberValue *newNumberValue(long number);
 	StringValue *newStringValue(wstring str);
 	DictionaryValue *newDictionaryValue();
 	UserFunctionValue *newUserFunctionValue(
