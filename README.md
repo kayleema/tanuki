@@ -3,28 +3,30 @@
 
 Compilation
 -----------
+```
   mkdir build
   cd build
   cmake ..
   make
   ./pinpon
+```
 
 テストする
 ---------
-  cd build
-  CTEST_OUTPUT_ON_FAILURE=1 make test
+  `cd build`
+  `CTEST_OUTPUT_ON_FAILURE=1 make test`
 
 or:
-  make pinpon_test && ./pinpon_test
+  `make pinpon_test && ./pinpon_test`
 
 combined cmake and make and run test:
-  cmake .. && make pinpon_test && ./pinpon_test
+  `cmake .. && make pinpon_test && ./pinpon_test`
 
 呼び方
 --------
-  ./pinpon <ファイル名.pin>
+  `./pinpon <ファイル名.pin>`
 
-  ./pinpon ../関数.pin
+  `./pinpon ../関数.pin`
 
 Formal Grammar (incomplete)
 ----------------------
@@ -33,6 +35,7 @@ terminals:
   DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING, DOT
 
 productions:
+```
   text => NEWLINE statement
   text => statement text
   text => EPSILON
@@ -61,4 +64,4 @@ productions:
   expression_fns_tail => EPSILON
 
   arg_list => expression [COMMA expression]* | EPSILON
-
+```
