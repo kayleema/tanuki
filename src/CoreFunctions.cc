@@ -1,6 +1,8 @@
 #include "Value.h"
 #include "Evaluate.h"
 #include "Context.h"
+#include "InputSource.h"
+
 #include <iostream>
 
 const wchar_t *corePinponStarter = 
@@ -95,13 +97,48 @@ public:
 
 class FunctionNewDictionary : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
-		auto result = env->context->newDictionaryValue();
-		if (args.size() > 0 && result->type == ValueType::DICT) {
-			result->setParent(args[0]->toDictionaryValue());
-		}
-		return result;
-	};
+    Value *apply(const vector<Value *> &args, Environment *env) const override {
+        auto result = env->context->newDictionaryValue();
+        if (args.size() > 0 && result->type == ValueType::DICT) {
+            result->setParent(args[0]->toDictionaryValue());
+        }
+        return result;
+    };
+};
+
+class FunctionReadFile : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env) const override {
+        if (args.size() != 1) {
+            return env->context->newNoneValue();
+        }
+        wstring fileName = args[0]->toStringValue()->value;
+        FileInputSource fileInputSource(encodeUTF8(fileName).c_str());
+        wstring sourceCode(L"");
+        wchar_t newChar;
+        while ((newChar = fileInputSource.getChar()) != -1) {
+            sourceCode.push_back(newChar);
+        }
+        return env->context->newStringValue(sourceCode);
+    };
+};
+
+class FunctionEval : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env) const override {
+        if (args.size() != 1) {
+            return env->context->newNoneValue();
+        }
+        auto moduleEnv = env->newChildEnvironment();
+        wstring text = args[0]->toStringValue()->value;
+        StringInputSource inputSource(text.c_str());
+        FileTokenizer tokenizer(&inputSource);
+        Parser parser(&tokenizer);
+        SyntaxNode *ast = parser.run();
+        moduleEnv->eval(ast);
+        delete ast;
+        return moduleEnv->toNewDictionaryValue();
+    };
 };
 
 void initModule(Environment *env) {
@@ -112,4 +149,6 @@ void initModule(Environment *env) {
 	env->bind(L"イコール", new FunctionEqual());
 	env->bind(L"比べ", new FunctionCompare());
 	env->bind(L"辞書", new FunctionNewDictionary());
+    env->bind(L"ファイル読む", new FunctionReadFile());
+    env->bind(L"評価", new FunctionEval());
 }

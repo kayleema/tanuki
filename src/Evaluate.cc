@@ -212,3 +212,11 @@ Environment *Environment::newChildEnvironment() {
 Environment::Environment(Context *context): context(context) {
 	initModule(this);
 }
+
+DictionaryValue *Environment::toNewDictionaryValue() {
+    auto result = context->newDictionaryValue();
+    for (auto binding : bindings) {
+        result->set(binding.first, binding.second);
+    }
+    return result;
+}

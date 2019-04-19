@@ -45,9 +45,12 @@ public:
 	Value *eval(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 
 	Environment *newChildEnvironment();
+
 	void tailReset() {
 		bindings.clear();
 	}
+
+	DictionaryValue *toNewDictionaryValue();
 };
 
 #endif

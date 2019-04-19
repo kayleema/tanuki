@@ -2,7 +2,7 @@
 #include <iostream>
 #include "InputSource.h"
 
-FileInputSource::FileInputSource(char* filename) : file(filename) {
+FileInputSource::FileInputSource(const char* filename) : file(filename) {
 	file.imbue(std::locale(std::locale(), new std::codecvt_utf8<wchar_t>));
 }
 

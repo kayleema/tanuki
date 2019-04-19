@@ -9,6 +9,7 @@ string encodeUTF8(const wstring &in) {
     }
     catch (const std::range_error & exception)
     {
+        cout << "could not convert to utf8 string " << in.size() << endl;
         return string("XXX");
     }
 }

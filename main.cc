@@ -12,7 +12,7 @@ using namespace std;
 
 void evalPinponStarter(Environment *env);
 
-int interractive();
+int interractive(int freq);
 
 int main(int argc, char **argv) 
 {
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "-i") == 0) {
 			cout << "インタラクティブ・モード" << endl;
-			return interractive();
+			return interractive(freq);
 		}
 	}
 
@@ -106,8 +106,9 @@ wstring decodeUTF8(const string &in) {
     }
 }
 
-int interractive() {
+int interractive(int freq) {
 	Context context;
+	context.setFrequency(freq);
 	Environment *env = new Environment(&context);
 	evalPinponStarter(env);
 	string inputraw;

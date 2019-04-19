@@ -9,10 +9,10 @@
 using namespace std;
 
 enum class ValueType {
-	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT
+	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT, MODULE
 };
 static const string ValueTypeStrings[] = {
-	"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT"
+	"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT", "MODULE"
 };
 
 class NumberValue;
@@ -140,5 +140,6 @@ public:
 
 	virtual string toString() const override;
 };
+
 
 #endif

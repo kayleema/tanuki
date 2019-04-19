@@ -17,7 +17,7 @@ public:
 class FileInputSource : public InputSource {
 	wifstream file;
 public:
-	FileInputSource(char* filename);
+	FileInputSource(const char* filename);
 
 	wchar_t getChar() override;
 
