@@ -15,7 +15,7 @@ bool NumberValue::equals(Value *rhs) const{
 string Value::toString() const{
 	ostringstream result;
 	result << "Value(";
-	result << vector<string>({"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT"})[(int)type];
+	result << ValueTypeStrings[(int)type];
 	result << ")";
 	return result.str();
 }
@@ -45,13 +45,13 @@ string UserFunctionValue::toString() const {
 }
 
 Value *UserFunctionValue::apply(
-		vector<Value *> args, Environment *caller) const {
+		const vector<Value *> &argsIn, Environment *caller) const {
 	Value *bodyReturnValue;
 	Environment *env;
+	env = parentEnv->newChildEnvironment();
+	env->caller = caller;
+	vector<Value *> args = argsIn;
 	do {
-		env = parentEnv->newChildEnvironment();
-		env->caller = caller;
-
 		for (size_t i = 0; i < args.size(); i++) {
 			env->bind(params[i],args[i]);
 		}
@@ -64,6 +64,7 @@ Value *UserFunctionValue::apply(
 		if (bodyReturnValue->type == ValueType::TAIL_CALL) {
 			args = ((TailCallValue *)bodyReturnValue)->args;
 			delete bodyReturnValue;
+			env->tailReset();
 		}
 	} while(bodyReturnValue->type == ValueType::TAIL_CALL);
 	return bodyReturnValue;

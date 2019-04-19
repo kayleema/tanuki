@@ -275,11 +275,7 @@ string SyntaxNode::toString(int indent) {
 	string indentation(indent, ' ');
 	result << indentation;
 
-	const string ss[] = {
-		"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
-		"RETURN", "IF", "ASSIGN", "GET", "SET"
-	};
-	result << ss[(int)type];
+	result << NodeTypeStrings[(int)type];
 	if (type == NodeType::TERMINAL) {
 		result << " " << content.toString();
 	}

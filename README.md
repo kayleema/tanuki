@@ -75,3 +75,13 @@ productions:
 
   arg_list => expression [COMMA expression]* | EPSILON
 ```
+
+まだ実装されてない事
+------------------
+* import
+* keyword arguments
+* dynamic dict lookup
+* dynamic dict set
+* short form method definition
+* short form method call
+* infix operators
