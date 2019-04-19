@@ -7,15 +7,40 @@
 #include <fcntl.h>
 #include <sys/uio.h>
 #include <locale.h>
+#include <dlfcn.h>
 
 using namespace std;
 
 void evalPinponStarter(Environment *env);
 
-int interractive(int freq);
+int interactive(int freq);
+
+void loadDynamic() {\
+    void *handle = dlopen ("libpinpon_dynamic.dylib", RTLD_LAZY);
+    if (!handle) {
+        cout << "could not load dynlib" << endl;
+        return;
+    }
+    void *symbol = dlsym(handle, "pinponLoadModule");
+    char *error = nullptr;
+    if ((error = dlerror()) != nullptr)  {
+        cout << "could not load symbol : " << error <<  endl;
+        return;
+    }
+
+    auto functionPointer = (Value * (*)()) symbol;
+
+    Value * dynamic_result = (*functionPointer)();
+
+    cout << dynamic_result->toString() << endl;
+
+    dlclose(handle);
+}
 
 int main(int argc, char **argv) 
 {
+    // loadDynamic(); // Test example of dynamic module loading
+
 	setlocale(LC_ALL, "");
 	if (argc < 2) {
 		cout << "使い方は間違い" << endl;
@@ -55,7 +80,7 @@ int main(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "-i") == 0) {
 			cout << "インタラクティブ・モード" << endl;
-			return interractive(freq);
+			return interactive(freq);
 		}
 	}
 
@@ -85,7 +110,7 @@ int main(int argc, char **argv)
 
 	Context context;
 	context.setFrequency(freq);
-	Environment *env = new Environment(&context);
+	auto *env = new Environment(&context);
 	evalPinponStarter(env);
 	env->eval(tree);
 
@@ -106,10 +131,10 @@ wstring decodeUTF8(const string &in) {
     }
 }
 
-int interractive(int freq) {
+int interactive(int freq) {
 	Context context;
 	context.setFrequency(freq);
-	Environment *env = new Environment(&context);
+	auto *env = new Environment(&context);
 	evalPinponStarter(env);
 	string inputraw;
 	wstring input;
@@ -139,7 +164,7 @@ int interractive(int freq) {
 		auto tokenizer = FileTokenizer(&source);
 		auto parser = Parser(&tokenizer);
 		SyntaxNode *tree = parser.run();
-		if (!tree || tree->children.size() == 0) {
+		if (!tree || tree->children.empty()) {
 			cout << "parser fail" << endl;
 			input = L"";
 			continue;
