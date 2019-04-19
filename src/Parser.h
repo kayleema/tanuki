@@ -31,8 +31,12 @@ public:
 };
 
 enum class NodeType {
-	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS, RETURN, IF, ASSIGN,
-	GET, SET
+	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
+	RETURN, IF, ASSIGN, GET, SET
+};
+static const string NodeTypeStrings[] = {
+	"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
+	"RETURN", "IF", "ASSIGN", "GET", "SET"
 };
 
 class SyntaxNode {

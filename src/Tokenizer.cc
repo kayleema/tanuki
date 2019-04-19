@@ -49,12 +49,6 @@ long parseNumeric(wstring s) {
 	return result + parseNumeric(s) * 10;
 }
 
-static const char * TokenTypeStrings[] = {
-	"lparen", "rparen", "comma", "symbol", "end", "start", "space", 
-	"newl", "indent", "dedent", "number", "function", "return", "if", "else",
-	"string", "assign", "dot", "elif", "minus"
-};
-
 Token::Token(TokenType type, wstring _content, int line)
 	: type(type), content(_content), line(line) {
 	if (type == TokenType::NUMBER) {

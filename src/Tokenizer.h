@@ -17,8 +17,14 @@ string encodeUTF8(const wstring &in);
 bool charIsSymbolic(wchar_t c);
 
 enum TokenType {
-	LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, INDENT, DEDENT, 
-	NUMBER, FUNC, RETURN, IF, ELSE, STRING, ASSIGN, DOT, ELIF, MINUS
+	LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, 
+	INDENT, DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING,
+	ASSIGN, DOT, ELIF, MINUS, IMPORT
+};
+static const char * TokenTypeStrings[] = {
+	"lparen", "rparen", "comma", "symbol", "end", "start", "space", "newl",
+	"indent", "dedent", "number", "function", "return", "if", "else", "string",
+	"assign", "dot", "elif", "minus", "import"
 };
 
 class Token {

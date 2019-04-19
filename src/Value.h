@@ -11,6 +11,9 @@ using namespace std;
 enum class ValueType {
 	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT
 };
+static const string ValueTypeStrings[] = {
+	"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT"
+};
 
 class NumberValue;
 class StringValue;
@@ -113,7 +116,7 @@ public:
 	FunctionValue() : Value(ValueType::FUNC) {};
 
 	virtual Value *apply(
-		vector<Value *> args, Environment *env) const = 0;
+		const vector<Value *> &args, Environment *env) const = 0;
 
 	FunctionValueType functionType = FunctionValueType::NONE;
 };
@@ -133,7 +136,7 @@ public:
 	Environment *parentEnv;
 
 	virtual Value *apply(
-		vector<Value *> args, Environment *env) const override;
+		const vector<Value *> &args, Environment *env) const override;
 
 	virtual string toString() const override;
 };
