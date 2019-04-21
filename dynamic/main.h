@@ -1,10 +1,10 @@
 #ifndef PINPON_MAIN_H
 #define PINPON_MAIN_H
 
-#include "Value.h"
+#include "Evaluate.h"
 
 extern "C" {
-    Value *pinponLoadModule();
+    void pinponLoadModule(Environment *env);
 }
 
 #endif //PINPON_MAIN_H

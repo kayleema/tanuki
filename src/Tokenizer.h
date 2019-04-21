@@ -14,6 +14,7 @@
 using namespace std;
 
 string encodeUTF8(const wstring &in);
+wstring decodeUTF8(const string &in);
 bool charIsSymbolic(wchar_t c);
 
 enum TokenType {

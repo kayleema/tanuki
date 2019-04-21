@@ -19,6 +19,7 @@ class Environment {
 	Value *eval_text(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
 	Value *eval_function(SyntaxNode *node);
 	Value *eval_return(SyntaxNode *node, const FunctionValue* tailContext = nullptr);
+	Value *eval_import(SyntaxNode *node);
 	Value *eval_if(SyntaxNode *node);
 	Value *eval_assign(SyntaxNode *node);
 public:

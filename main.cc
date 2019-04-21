@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <sys/uio.h>
 #include <locale.h>
-#include <dlfcn.h>
+#include "Extension.h"
 
 using namespace std;
 
@@ -15,32 +15,8 @@ void evalPinponStarter(Environment *env);
 
 int interactive(int freq);
 
-void loadDynamic() {\
-    void *handle = dlopen ("libpinpon_dynamic.dylib", RTLD_LAZY);
-    if (!handle) {
-        cout << "could not load dynlib" << endl;
-        return;
-    }
-    void *symbol = dlsym(handle, "pinponLoadModule");
-    char *error = nullptr;
-    if ((error = dlerror()) != nullptr)  {
-        cout << "could not load symbol : " << error <<  endl;
-        return;
-    }
-
-    auto functionPointer = (Value * (*)()) symbol;
-
-    Value * dynamic_result = (*functionPointer)();
-
-    cout << dynamic_result->toString() << endl;
-
-    dlclose(handle);
-}
-
 int main(int argc, char **argv) 
 {
-    // loadDynamic(); // Test example of dynamic module loading
-
 	setlocale(LC_ALL, "");
 	if (argc < 2) {
 		cout << "使い方は間違い" << endl;
@@ -84,8 +60,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-    std::cout << "始まります" << std::endl;
-	auto input = FileInputSource(argv[argc - 1]);
+	std::cout << "始まります" << std::endl;
+	const char *sourceFilename = argv[argc - 1];
+	auto input = FileInputSource(sourceFilename);
 	auto t = FileTokenizer(&input);
 
 	if (print_lex) {
@@ -111,24 +88,16 @@ int main(int argc, char **argv)
 	Context context;
 	context.setFrequency(freq);
 	auto *env = new Environment(&context);
+	env->bind(
+		L"FILE",
+		context.newStringValue(decodeUTF8(sourceFilename))
+	);
 	evalPinponStarter(env);
 	env->eval(tree);
 
 	delete tree;
 	context.cleanup();
     return 0;
-}
-
-wstring decodeUTF8(const string &in) {
-	try
-    {
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
-	    return conv1.from_bytes(in);
-    }
-    catch (const std::range_error & exception)
-    {
-        return wstring(L"XXX");
-    }
 }
 
 int interactive(int freq) {

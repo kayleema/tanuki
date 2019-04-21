@@ -25,6 +25,9 @@ SyntaxNode *Parser::run_statement() {
 	if ((result = run_return())) {
 		return result;
 	}
+	if ((result = run_import())) {
+		return result;
+	}
 	if ((result = run_if())) {
 		return result;
 	}
@@ -76,6 +79,20 @@ SyntaxNode *Parser::run_return() {
 		SyntaxNode *rhs = run_expression();
 		auto result = new SyntaxNode(NodeType::RETURN);
 		result->children.push_back(rhs);
+		return result;
+	}
+	return nullptr;
+}
+
+SyntaxNode *Parser::run_import() {
+	if (accept(TokenType::IMPORT)) {
+		auto result = new SyntaxNode(NodeType::IMPORT);
+		expect(TokenType::COMMA);
+		do {
+			Token part;
+			accept(TokenType::SYMBOL, &part);
+			result->children.push_back(new SyntaxNode(part));
+		} while (accept(TokenType::DOT));
 		return result;
 	}
 	return nullptr;

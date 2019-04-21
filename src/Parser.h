@@ -15,6 +15,7 @@ public:
 	SyntaxNode *run_text();
 	SyntaxNode *run_statement();
 	SyntaxNode *run_return();
+	SyntaxNode *run_import();
 	SyntaxNode *run_if();
 	SyntaxNode *run_assign();
 	SyntaxNode *run_function();
@@ -32,11 +33,11 @@ public:
 
 enum class NodeType {
 	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
-	RETURN, IF, ASSIGN, GET, SET
+	RETURN, IF, ASSIGN, GET, SET, IMPORT
 };
 static const string NodeTypeStrings[] = {
 	"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
-	"RETURN", "IF", "ASSIGN", "GET", "SET"
+	"RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT"
 };
 
 class SyntaxNode {

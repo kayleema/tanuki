@@ -1,7 +1,8 @@
 #include "main.h"
+#include "Context.h"
 #include <iostream>
 
-Value *pinponLoadModule() {
-    auto result = new NumberValue(1234);
-    return result;
+void pinponLoadModule(Environment *env) {
+	cout << "loadmodule" << endl;
+	env->bind(L"あ", env->context->newStringValue(L"ホゲホゲホゲホゲホゲホゲ"));
 }

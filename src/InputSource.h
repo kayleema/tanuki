@@ -24,6 +24,8 @@ public:
 	wchar_t peekChar() override;
 
 	bool eof() override;
+
+	bool good() { return file.good(); }
 };
 
 class StringInputSource : public InputSource {

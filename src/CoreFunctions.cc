@@ -2,6 +2,7 @@
 #include "Evaluate.h"
 #include "Context.h"
 #include "InputSource.h"
+#include "Extension.h"
 
 #include <iostream>
 
@@ -141,6 +142,15 @@ public:
     };
 };
 
+class FunctionLoadExt : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env) const override {
+        wstring name = args[0]->toStringValue()->value;
+        loadDynamic(env, encodeUTF8(name).c_str());
+        return env->context->newNoneValue();
+    };
+};
+
 void initModule(Environment *env) {
 	env->bind(L"足す", new FunctionSum());
 	env->bind(L"引く", new FunctionDiff());
@@ -151,4 +161,5 @@ void initModule(Environment *env) {
 	env->bind(L"辞書", new FunctionNewDictionary());
     env->bind(L"ファイル読む", new FunctionReadFile());
     env->bind(L"評価", new FunctionEval());
+    env->bind(L"エキステンション", new FunctionLoadExt());
 }

@@ -1,6 +1,7 @@
 #include "Evaluate.h"
 #include "Context.h"
 #include "CoreFunctions.h"
+#include <libgen.h>
 
 Value *Environment::eval(SyntaxNode *tree, 
 		const FunctionValue* tailContext) {
@@ -19,6 +20,9 @@ Value *Environment::eval(SyntaxNode *tree,
 	}
 	if (tree->type == NodeType::RETURN) {
 		return eval_return(tree, tailContext);
+	}
+	if (tree->type == NodeType::IMPORT) {
+		return eval_import(tree);
 	}
 	if (tree->type == NodeType::IF) {
 		return eval_if(tree);
@@ -165,6 +169,38 @@ Value *Environment::eval_return(SyntaxNode *tree,
 		return result;
 	}
 	return new ReturnValue(result);
+}
+
+Value *Environment::eval_import(SyntaxNode *tree) {
+	auto path = encodeUTF8(lookup(L"FILE")->toStringValue()->value);
+	auto cdir = strdup(path.c_str());
+	auto dir = string(dirname(cdir));
+	free(cdir);
+
+	auto relativePath = string();
+	wstring dirToken;
+	for (auto child : tree->children) {
+		dirToken = child->content.content;
+		relativePath += string("/") + encodeUTF8(dirToken);
+	}
+	relativePath += string(".pin");
+
+	string tryPath = dir + relativePath;
+
+	FileInputSource fileInputSource(tryPath.c_str());
+	if (!fileInputSource.good()) {
+		cout << "ERROR: could not import" << endl;
+		return context->newNoneValue();
+	}
+	FileTokenizer tokenizer(&fileInputSource);
+	Parser parser(&tokenizer);
+	auto parsedTree = parser.run();
+	auto importEnv = newChildEnvironment();
+	importEnv->bind(L"FILE", context->newStringValue(decodeUTF8(tryPath)));
+	importEnv->eval(parsedTree);
+	auto module = importEnv->toNewDictionaryValue();
+	bind(dirToken, module);
+	return context->newNoneValue();
 }
 
 Value *Environment::eval_if(SyntaxNode *tree) {

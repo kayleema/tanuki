@@ -14,6 +14,18 @@ string encodeUTF8(const wstring &in) {
     }
 }
 
+wstring decodeUTF8(const string &in) {
+	try
+    {
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
+	    return conv1.from_bytes(in);
+    }
+    catch (const std::range_error & exception)
+    {
+        return wstring(L"XXX");
+    }
+}
+
 const wchar_t lparen = L'（';
 const wchar_t rparen = L'）';
 const wchar_t lsquare = L'「';
@@ -79,6 +91,7 @@ static const unordered_map<wstring, TokenType> identifiers({
 	{L"もし", TokenType::IF},
 	{L"他でもし", TokenType::ELIF},
 	{L"その他", TokenType::ELSE},
+	{L"導入", TokenType::IMPORT}
 });
 
 vector<Token> Tokenizer::getAllTokens() {
