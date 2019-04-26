@@ -35,11 +35,13 @@ public:
 
 enum class NodeType {
 	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
-	RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG
+    RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
+    VARPARAM,
 };
 const string NodeTypeStrings[] = {
-	"CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
-	"RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG"
+        "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
+        "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
+        "VARPARAM",
 };
 
 class SyntaxNode {

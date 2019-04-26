@@ -14,52 +14,57 @@
 using namespace std;
 
 string encodeUTF8(const wstring &in);
+
 wstring decodeUTF8(const string &in);
+
 bool charIsSymbolic(wchar_t c);
 
 enum TokenType {
-	LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, 
-	INDENT, DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING,
-	ASSIGN, DOT, ELIF, MINUS, IMPORT, STAR, COLON
+    LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL,
+    INDENT, DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING,
+    ASSIGN, DOT, ELIF, MINUS, IMPORT, STAR, COLON
 };
-static const char * TokenTypeStrings[] = {
-	"lparen", "rparen", "comma", "symbol", "end", "start", "space", "newl",
-	"indent", "dedent", "number", "function", "return", "if", "else", "string",
-	"assign", "dot", "elif", "minus", "import", "star", "colon"
+static const char *TokenTypeStrings[] = {
+        "lparen", "rparen", "comma", "symbol", "end", "start", "space", "newl",
+        "indent", "dedent", "number", "function", "return", "if", "else", "string",
+        "assign", "dot", "elif", "minus", "import", "star", "colon"
 };
 
 class Token {
 public:
-	Token() : type(TokenType::START), content(L""), line(0) {}
+    Token() : type(TokenType::START), content(L""), line(0) {}
 
-	Token(TokenType type, wstring _content, int line);
+    Token(TokenType type, wstring _content, int line);
 
-	TokenType type;
-	wstring content;
-	int line;
-	long number{};
+    TokenType type;
+    wstring content;
+    int line;
+    long number{};
 
-	string toString() const;
-	bool operator==(const Token& rhs) const;
+    string toString() const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Token& token);
+    bool operator==(const Token &rhs) const;
+
+    friend std::ostream &operator<<(std::ostream &os, const Token &token);
 };
 
 class Tokenizer {
 public:
-	virtual vector<Token> getAllTokens();
-	virtual Token getToken() = 0;
+    virtual vector<Token> getAllTokens();
+
+    virtual Token getToken() = 0;
 };
 
 class FileTokenizer : public Tokenizer {
-	InputSource *input;
-	int lineNumber = 1;
-	int indentLevel = 0;
-	queue<Token> nextTokens;
+    InputSource *input;
+    int lineNumber = 1;
+    int indentLevel = 0;
+    queue<Token> nextTokens;
 public:
-	explicit FileTokenizer(InputSource *input) : input(input) {
-	}
-	Token getToken() override;
+    explicit FileTokenizer(InputSource *input) : input(input) {
+    }
+
+    Token getToken() override;
 };
 
 #endif

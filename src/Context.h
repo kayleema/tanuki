@@ -6,39 +6,45 @@
 #include "Evaluate.h"
 
 class Context {
-	unordered_map<long, NumberValue *> preallocNumbers;
-	unordered_set<Value *> values;
-	unordered_set<Environment *> environments;
+    unordered_map<long, NumberValue *> preallocNumbers;
+    unordered_set<Value *> values;
+    unordered_set<Environment *> environments;
 
-	long iteration = 0;
-	long frequency = 1;
+    long iteration = 0;
+    long frequency = 1;
 
 public:
-	unordered_set<Value *> usedValues;
-	unordered_set<Environment *> usedEnvironments;
+    unordered_set<Value *> usedValues;
+    unordered_set<Environment *> usedEnvironments;
 
-	Context();
+    Context();
 
-	void mark(Value *value);
+    void mark(Value *value);
 
-	void mark(Environment *current_env);
+    void mark(Environment *current_env);
 
-	void collect(Environment *current_env);
+    void collect(Environment *current_env);
 
-	void cleanup();
+    void cleanup();
 
-	void setFrequency(long freq);
+    void setFrequency(long freq);
 
-	Value *newNoneValue();
-	NumberValue *newNumberValue(long number);
-	StringValue *newStringValue(wstring str);
-	DictionaryValue *newDictionaryValue();
-	UserFunctionValue *newUserFunctionValue(
-			vector<wstring> params, SyntaxNode *body, Environment *e);
+    Value *newNoneValue();
 
-	void trackValue(Value *value);
+    NumberValue *newNumberValue(long number);
 
-	Environment *newChildEnvironment(Environment *e);
+    StringValue *newStringValue(wstring str);
+
+    DictionaryValue *newDictionaryValue();
+
+    UserFunctionValue *newUserFunctionValue(
+            vector<wstring> params, SyntaxNode *body, Environment *e);
+
+    ArrayValue *newArrayValue();
+
+    void trackValue(Value *value);
+
+    Environment *newChildEnvironment(Environment *e);
 };
 
 #endif
