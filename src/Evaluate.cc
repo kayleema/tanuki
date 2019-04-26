@@ -67,10 +67,19 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 
 	SyntaxNode *args_tree = tail->children[0];
 	vector<Value *> args;
+	unordered_map<wstring, Value*> kwargsIn;
 	for (auto expression : args_tree->children) {
-		auto arg = eval(expression);
-		arg->refs++;
-		args.push_back(arg);
+		if (expression->type == NodeType::KWARG) {
+			auto *lhs = expression->children[0];
+			auto *rhs = expression->children[1];
+			auto arg = eval(rhs);
+			kwargsIn[lhs->content.content] = arg;
+			arg->refs++;
+		} else {
+			auto arg = eval(expression);
+			arg->refs++;
+			args.push_back(arg);
+		}
 	}
 	if (function == tailContext) {
 		for (auto arg : args) {
@@ -78,7 +87,8 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 		}
 		return new TailCallValue(args);
 	}
-	auto result = function->apply(args, this);
+	auto result = function->apply(
+		args, this, kwargsIn.size() == 0 ? nullptr : &kwargsIn);
 	auto finalResult = result;
 	result->refs++;
 
@@ -89,6 +99,9 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 
 	for (auto arg : args) {
 		arg->refs--;
+	}
+	for (auto kwarg : kwargsIn) {
+		kwarg.second->refs--;
 	}
 	result->refs--;
 	return finalResult;
@@ -153,11 +166,21 @@ Value *Environment::eval_text(SyntaxNode *tree,
 Value *Environment::eval_function(SyntaxNode *tree) {
 	std::vector<wstring> params;
 	wstring name = tree->children[0]->content.content;
+	bool hasKwParam = false;
+	wstring kwParamName;
 	for (auto param : tree->children[1]->children) {
-		params.push_back(param->content.content);
+		if (param->type == NodeType::TERMINAL) {
+			params.push_back(param->content.content);
+		} else if (param->type == NodeType::VARKWPARAM) {
+			hasKwParam = true;
+			kwParamName = param->children[0]->content.content;
+		}
 	}
 	auto body = tree->children[2];
 	auto function = context->newUserFunctionValue(params, body, this);
+	if (hasKwParam) {
+		function->setVarKeywordParam(kwParamName);
+	}
 	bindings[name] = function;
 	return context->newNoneValue();
 }

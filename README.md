@@ -78,7 +78,8 @@ productions:
 
 まだ実装されてない事
 ------------------
-* keyword arguments, argument defaults
+* keyword argument unpacking with defaults
+* variable length non-keyword arguments
 * dynamic dict lookup
 * dynamic dict set
 * short form method definition

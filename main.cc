@@ -13,7 +13,7 @@ using namespace std;
 
 void evalPinponStarter(Environment *env);
 
-int interactive(int freq);
+int interactive(long freq);
 
 int main(int argc, char **argv) 
 {
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 		cout << "使い方は間違い" << endl;
 		return 1;
 	}
-	int freq = 10000;
+	long freq = 100000;
 	bool print_ast = false;
 	bool print_lex = false;
 	for (int i = 1; i < argc; i++) {
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "-f") == 0) {
 			i++;
-			freq = atoi(argv[i]);
+			freq = atol(argv[i]);
 			cout << "Freq set to " << freq << endl;
 		}
 		if (strcmp(argv[i], "-h") == 0) {
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 			cout << "　-i：インタラクティブ・モード（REPL）" << endl;
 			cout << "　-d lex：lexerの結果を表示（ディバギング）" << endl;
 			cout << "　-d ast：parserの結果を表示（ディバギング）" << endl;
-			cout << "　-f 数字：evalの何回目の時にメモリを掃除（デフォルトは１万）" << endl;
+			cout << "　-f 数字：evalの何回目の時にメモリを掃除（デフォルトは十万）" << endl;
 			cout << "　-h：このメッセジを表示" << endl << endl;
 			return 0;
 		}
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-int interactive(int freq) {
+int interactive(long freq) {
 	Context context;
 	context.setFrequency(freq);
 	auto *env = new Environment(&context);

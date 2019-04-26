@@ -20,12 +20,12 @@ bool charIsSymbolic(wchar_t c);
 enum TokenType {
 	LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, 
 	INDENT, DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING,
-	ASSIGN, DOT, ELIF, MINUS, IMPORT
+	ASSIGN, DOT, ELIF, MINUS, IMPORT, STAR, COLON
 };
 static const char * TokenTypeStrings[] = {
 	"lparen", "rparen", "comma", "symbol", "end", "start", "space", "newl",
 	"indent", "dedent", "number", "function", "return", "if", "else", "string",
-	"assign", "dot", "elif", "minus", "import"
+	"assign", "dot", "elif", "minus", "import", "star", "colon"
 };
 
 class Token {

@@ -36,6 +36,8 @@ const wchar_t assign = L'＝';
 const wchar_t dot = L'・';
 const wchar_t newline = L'\n';
 const wchar_t minuszenkaku = L'－';
+const wchar_t star = L'＊';
+const wchar_t colon = L'：';
 
 bool charIsSymbolic(wchar_t c) {
 	return 
@@ -45,7 +47,9 @@ bool charIsSymbolic(wchar_t c) {
 		c != space &&
 		c != newline &&
 		c != assign &&
-		c != dot;
+		c != dot &&
+		c != star &&
+		c != colon;
 }
 
 bool charIsNumberic(wchar_t c) {
@@ -132,6 +136,12 @@ Token FileTokenizer::getToken() {
 	}
 	if (first == minuszenkaku) {
 		return Token(TokenType::MINUS, L"－", linenumber);
+	}
+	if (first == star) {
+		return Token(TokenType::STAR, L"＊", linenumber);
+	}
+	if (first == colon) {
+		return Token(TokenType::COLON, L"：", linenumber);
 	}
 	if (first == space) {
 		int newIndentLevel = 1;

@@ -13,7 +13,9 @@ const wchar_t *corePinponStarter =
 // Builtin Functions
 class FunctionSum : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
 		long result = 0;
 		for (auto value : args) {
 			result += value->toNumberValue()->value;
@@ -24,7 +26,9 @@ public:
 
 class FunctionDiff : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
 		long result = 0;
 		bool first = true;
 		for (auto value : args) {
@@ -41,7 +45,9 @@ public:
 
 class FunctionDiv : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
 		long result = 0;
 		bool first = true;
 		for (auto value : args) {
@@ -56,9 +62,30 @@ public:
 	};
 };
 
+class FunctionMul : public FunctionValue {
+public:
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
+		long result = 0;
+		bool first = true;
+		for (auto value : args) {
+			if (first) {
+				first = false;
+				result = value->toNumberValue()->value;
+			} else {
+				result *= value->toNumberValue()->value;
+			}
+		}
+		return env->context->newNumberValue(result);
+	};
+};
+
 class FunctionPrint : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
 		for (auto value : args) {
 			if (value->type == ValueType::NUM) {
 				cout << value->toNumberValue()->value;
@@ -75,7 +102,9 @@ public:
 
 class FunctionEqual : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
 		if(args[0]->equals(args[1])) {
 			return env->context->newNumberValue(1);
 		}
@@ -85,7 +114,9 @@ public:
 
 class FunctionCompare : public FunctionValue {
 public:
-	Value *apply(const vector<Value *> &args, Environment *env) const override {
+
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
 		if ((args[0]->type != ValueType::NUM) || 
 				(args[1]->type != ValueType::NUM)) {
 			return env->context->newNumberValue(0);
@@ -98,7 +129,8 @@ public:
 
 class FunctionNewDictionary : public FunctionValue {
 public:
-    Value *apply(const vector<Value *> &args, Environment *env) const override {
+    Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
         auto result = env->context->newDictionaryValue();
         if (args.size() > 0 && result->type == ValueType::DICT) {
             result->setParent(args[0]->toDictionaryValue());
@@ -109,7 +141,8 @@ public:
 
 class FunctionReadFile : public FunctionValue {
 public:
-    Value *apply(const vector<Value *> &args, Environment *env) const override {
+    Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
         if (args.size() != 1) {
             return env->context->newNoneValue();
         }
@@ -126,7 +159,8 @@ public:
 
 class FunctionEval : public FunctionValue {
 public:
-    Value *apply(const vector<Value *> &args, Environment *env) const override {
+    Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
         if (args.size() != 1) {
             return env->context->newNoneValue();
         }
@@ -144,7 +178,8 @@ public:
 
 class FunctionLoadExt : public FunctionValue {
 public:
-    Value *apply(const vector<Value *> &args, Environment *env) const override {
+    Value *apply(const vector<Value *> &args, Environment *env, 
+			unordered_map<wstring, Value*> *) const override {
         wstring name = args[0]->toStringValue()->value;
         loadDynamic(env, encodeUTF8(name).c_str());
         return env->context->newNoneValue();
@@ -155,6 +190,7 @@ void initModule(Environment *env) {
 	env->bind(L"足す", new FunctionSum());
 	env->bind(L"引く", new FunctionDiff());
 	env->bind(L"割り算", new FunctionDiv());
+	env->bind(L"掛ける", new FunctionMul());
 	env->bind(L"表示", new FunctionPrint());
 	env->bind(L"イコール", new FunctionEqual());
 	env->bind(L"比べ", new FunctionCompare());

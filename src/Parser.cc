@@ -128,9 +128,20 @@ SyntaxNode *Parser::run_function() {
 	result->children.push_back(params);
 	while (!accept(TokenType::RPAREN)){
 		Token param;
-		if(accept(TokenType::SYMBOL, &param)){
+		if (accept(TokenType::SYMBOL, &param)) {
 			params->children.push_back(new SyntaxNode(param));
 			accept(TokenType::COMMA);
+		}
+		if (accept(TokenType::STAR)) {
+			if (accept(TokenType::STAR)) {
+				if (accept(TokenType::SYMBOL, &param)) {
+					// varkwarg
+					auto kwargs = new SyntaxNode(NodeType::VARKWPARAM);
+					kwargs->children.push_back(new SyntaxNode(param));
+					params->children.push_back(kwargs);
+					accept(TokenType::COMMA);
+				}
+			}
 		}
 	}
 	if(!expect(TokenType::NEWL) || !expect(TokenType::INDENT)){
@@ -216,8 +227,18 @@ SyntaxNode *Parser::run_args() {
 		return node;
 	} else {
 		do {
-			SyntaxNode *arg = run_expression();
-			node->children.push_back(arg);
+			Token kwsymbol;
+			if (accept({TokenType::SYMBOL, TokenType::COLON}, {&kwsymbol, nullptr})) {
+				auto *lhs = new SyntaxNode(kwsymbol);
+				auto *rhs = run_expression();
+				auto *arg = new SyntaxNode(NodeType::KWARG);
+				arg->children.push_back(lhs);
+				arg->children.push_back(rhs);
+				node->children.push_back(arg);
+			} else {
+				auto *arg = run_expression();
+				node->children.push_back(arg);
+			}
 		} while (accept(TokenType::COMMA));
 	}
 	return node;

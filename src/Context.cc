@@ -52,6 +52,10 @@ void Context::collect(Environment *current_env) {
 			if (value->refs){
 				usedValues.insert(value);
 			} else {
+				if ( value->type == ValueType::NUM && 
+					preallocNumbers.count(((NumberValue *)value)->value)) {
+					preallocNumbers.erase(((NumberValue *)value)->value);
+				}
 				delete value;
 			}
 		} else {
@@ -75,7 +79,7 @@ void Context::cleanup() {
 	}
 }
 
-void Context::setFrequency(int freq) {
+void Context::setFrequency(long freq) {
 	frequency = freq;
 }
 
@@ -85,8 +89,12 @@ Value *Context::newNoneValue() {
 }
 
 NumberValue *Context::newNumberValue(long number) {
+	if (preallocNumbers.count(number)) {
+		return preallocNumbers[number];
+	}
 	auto result = new NumberValue(number);
 	values.insert(result);
+	preallocNumbers[number] = result;
 	return result;
 }
 
@@ -117,4 +125,12 @@ Environment *Context::newChildEnvironment(Environment *e) {
 	auto result = new Environment(e);
 	environments.insert(result);
 	return result;
+}
+
+Context::Context() {
+	for (long i = 0; i < 255; i++) {
+		auto numberValue = newNumberValue(i);
+		numberValue->refs++;
+		preallocNumbers[i] = numberValue;
+	}
 }

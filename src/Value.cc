@@ -44,16 +44,30 @@ string UserFunctionValue::toString() const {
 	return result.str();
 }
 
-Value *UserFunctionValue::apply(
-		const vector<Value *> &argsIn, Environment *caller) const {
+Value *UserFunctionValue::apply(const vector<Value *> &argsIn, 
+		Environment *caller, unordered_map<wstring, Value*> *kwargsIn) const {
 	Value *bodyReturnValue;
 	Environment *env;
 	env = parentEnv->newChildEnvironment();
 	env->caller = caller;
 	vector<Value *> args = argsIn;
 	do {
-		for (size_t i = 0; i < args.size(); i++) {
-			env->bind(params[i],args[i]);
+		if (params.size() > argsIn.size()) {
+			cout << "エラー：引数は足りません　"
+				<< "必要は" << params.size()
+				<< " 渡したは" << argsIn.size() << endl;
+		}
+		for (size_t i = 0; i < params.size(); i++) {
+			env->bind(params[i], args[i]);
+		}
+		if (hasVarKeywordArgs) {
+			auto kwArgs = env->context->newDictionaryValue();
+			if (kwargsIn) {
+				for (auto arg : *kwargsIn) {
+					kwArgs->set(arg.first, arg.second);
+				}
+			}
+			env->bind(varKeywordArgsParam, kwArgs);
 		}
 		bodyReturnValue = env->eval(body, this);
 		if (bodyReturnValue->type == ValueType::RETURN) {
@@ -69,3 +83,9 @@ Value *UserFunctionValue::apply(
 	} while(bodyReturnValue->type == ValueType::TAIL_CALL);
 	return bodyReturnValue;
 }
+
+void UserFunctionValue::setVarKeywordParam(wstring name) {
+	hasVarKeywordArgs = true;
+	varKeywordArgsParam = name;
+}
+

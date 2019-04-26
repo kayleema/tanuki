@@ -115,8 +115,8 @@ class FunctionValue : public Value {
 public:
 	FunctionValue() : Value(ValueType::FUNC) {};
 
-	virtual Value *apply(
-		const vector<Value *> &args, Environment *env) const = 0;
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+		unordered_map<wstring, Value*> *kwargsIn=nullptr) const = 0;
 
 	FunctionValueType functionType = FunctionValueType::NONE;
 };
@@ -125,20 +125,25 @@ class SyntaxNode;
 
 class UserFunctionValue : public FunctionValue {
 	vector<wstring> params;
+	bool hasVarKeywordArgs;
+	wstring varKeywordArgsParam;
 	SyntaxNode *body;
 public:
 	UserFunctionValue(vector<wstring> params, SyntaxNode *body, 
 		Environment *parentEnv)
-	 : FunctionValue(), params(params), body(body), parentEnv(parentEnv) {
+	 : FunctionValue(), params(params), hasVarKeywordArgs(false), body(body),
+	   parentEnv(parentEnv) {
 		functionType = FunctionValueType::USER_FUNCTION;
 	 };
 
 	Environment *parentEnv;
 
-	virtual Value *apply(
-		const vector<Value *> &args, Environment *env) const override;
+	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+		unordered_map<wstring, Value*> *kwargsIn=nullptr) const override;
 
 	virtual string toString() const override;
+
+	void setVarKeywordParam(wstring name);
 };
 
 

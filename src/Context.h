@@ -6,15 +6,18 @@
 #include "Evaluate.h"
 
 class Context {
+	unordered_map<long, NumberValue *> preallocNumbers;
 	unordered_set<Value *> values;
 	unordered_set<Environment *> environments;
 
-	int iteration = 0;
-	int frequency = 1;
+	long iteration = 0;
+	long frequency = 1;
 
 public:
 	unordered_set<Value *> usedValues;
 	unordered_set<Environment *> usedEnvironments;
+
+	Context();
 
 	void mark(Value *value);
 
@@ -24,7 +27,7 @@ public:
 
 	void cleanup();
 
-	void setFrequency(int freq);
+	void setFrequency(long freq);
 
 	Value *newNoneValue();
 	NumberValue *newNumberValue(long number);
