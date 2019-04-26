@@ -37,10 +37,12 @@ public:
 	TokenType type;
 	wstring content;
 	int line;
-	long number;
+	long number{};
 
 	string toString() const;
 	bool operator==(const Token& rhs) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Token& token);
 };
 
 class Tokenizer {
@@ -51,13 +53,13 @@ public:
 
 class FileTokenizer : public Tokenizer {
 	InputSource *input;
-	int linenumber = 1;
+	int lineNumber = 1;
 	int indentLevel = 0;
 	queue<Token> nextTokens;
 public:
-	FileTokenizer(InputSource *input) : input(input) {
+	explicit FileTokenizer(InputSource *input) : input(input) {
 	}
-	virtual Token getToken();
+	Token getToken() override;
 };
 
 #endif

@@ -135,7 +135,7 @@ SyntaxNode *Parser::run_function() {
 		if (accept(TokenType::STAR)) {
 			if (accept(TokenType::STAR)) {
 				if (accept(TokenType::SYMBOL, &param)) {
-					// varkwarg
+					// Variable-length Keyword Parameter
 					auto kwargs = new SyntaxNode(NodeType::VARKWPARAM);
 					kwargs->children.push_back(new SyntaxNode(param));
 					params->children.push_back(kwargs);
@@ -255,7 +255,7 @@ bool Parser::accept(TokenType type, Token *out) {
 	return false;
 }
 
-bool Parser::accept(vector<TokenType> types, vector<Token *> outs) {
+bool Parser::accept(const vector<TokenType>& types, const vector<Token *>& outs) {
 	int i = 0;
 	for (auto type : types) {
 		size_t tokenIndex = currentTokenIndex + i;
@@ -279,7 +279,7 @@ bool Parser::accept(vector<TokenType> types, vector<Token *> outs) {
 	return true;
 }
 
-bool Parser::accept(vector<TokenType> types, vector<Token *> outs, vector<TokenType> rejectTypes) {
+bool Parser::accept(const vector<TokenType>& types, const vector<Token *>& outs, const vector<TokenType>& rejectTypes) {
 	int i = 0;
 	for (auto rejectType : rejectTypes) {
 		size_t tokenIndex = currentTokenIndex + types.size() + i;

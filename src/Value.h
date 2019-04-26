@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef VALUE_H
 #define VALUE_H
 
@@ -11,7 +13,7 @@ using namespace std;
 enum class ValueType {
 	NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT, MODULE
 };
-static const string ValueTypeStrings[] = {
+const string ValueTypeStrings[] = {
 	"NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT", "MODULE"
 };
 
@@ -21,10 +23,10 @@ class DictionaryValue;
 
 class Value {
 public:
-	Value(ValueType t) : type(t) {
+	explicit Value(ValueType t) : type(t) {
 	};
 
-	virtual ~Value() {}
+	virtual ~Value() = default;
 
 	virtual bool equals(Value *rhs) const;
 
@@ -42,24 +44,24 @@ public:
 
 class NumberValue : public Value {
 public:
-	NumberValue(long n) : Value(ValueType::NUM), value(n) {};
+	explicit NumberValue(long n) : Value(ValueType::NUM), value(n) {};
 
-	virtual bool equals(Value *rhs) const override;
+	bool equals(Value *rhs) const override;
 
-	virtual string toString() const override;
+	string toString() const override;
 
-	virtual bool isTruthy() const override { return value != 0; };
+	bool isTruthy() const override { return value != 0; };
 
 	long value;
 };
 
 class StringValue : public Value {
 public:
-	StringValue(wstring str) : Value(ValueType::STRING), value(str) {};
+	explicit StringValue(wstring str) : Value(ValueType::STRING), value(std::move(str)) {};
 
-	virtual bool equals(Value *rhs) const override;
+	bool equals(Value *rhs) const override;
 
-	virtual string toString() const override;
+	string toString() const override;
 
 	wstring value;
 };
@@ -67,15 +69,15 @@ public:
 class DictionaryValue : public Value {
 
 public:
-	DictionaryValue() : Value(ValueType::DICT), parent(nullptr) {}
+	DictionaryValue();
 	unordered_map<wstring, Value*> value;
 	DictionaryValue *parent = nullptr;
 
 	void setParent(DictionaryValue *p) { parent = p; }
 
-	void set(wstring name, Value *v) { value[name] = v; }
+	void set(const wstring& name, Value *v) { value[name] = v; }
 
-	Value *get(wstring name) {
+	Value *get(const wstring& name) {
 		if (value.count(name)) {
 			return value[name];
 		} else if (parent) {
@@ -84,25 +86,25 @@ public:
 		return nullptr;
 	}
 
-	bool has(wstring name) {
+	bool has(const wstring& name) {
 		return value.count(name) || (parent && parent->has(name));
 	}
 
-	virtual string toString() const override;
+	string toString() const override;
 };
 
 // Indicates that an expression should force exit of func body eval.
 class ReturnValue : public Value {
 public:
 	Value *inner;
-	ReturnValue(Value *inner) : Value(ValueType::RETURN), inner(inner) {};
+	explicit ReturnValue(Value *inner) : Value(ValueType::RETURN), inner(inner) {};
 };
 
 class TailCallValue : public Value {
 public:
 	vector<Value*> args;
-	TailCallValue(vector<Value*> _args)
-	 : Value(ValueType::TAIL_CALL), args(_args) {};
+	explicit TailCallValue(vector<Value*> _args)
+	 : Value(ValueType::TAIL_CALL), args(std::move(_args)) {};
 };
 
 class Environment;
@@ -131,17 +133,17 @@ class UserFunctionValue : public FunctionValue {
 public:
 	UserFunctionValue(vector<wstring> params, SyntaxNode *body, 
 		Environment *parentEnv)
-	 : FunctionValue(), params(params), hasVarKeywordArgs(false), body(body),
+	 : FunctionValue(), params(std::move(params)), hasVarKeywordArgs(false), body(body),
 	   parentEnv(parentEnv) {
 		functionType = FunctionValueType::USER_FUNCTION;
 	 };
 
 	Environment *parentEnv;
 
-	virtual Value *apply(const vector<Value *> &args, Environment *env, 
+	Value *apply(const vector<Value *> &args, Environment *env,
 		unordered_map<wstring, Value*> *kwargsIn=nullptr) const override;
 
-	virtual string toString() const override;
+	string toString() const override;
 
 	void setVarKeywordParam(wstring name);
 };

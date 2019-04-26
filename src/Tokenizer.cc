@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "Tokenizer.h"
 #include <unordered_map>
 
@@ -38,6 +40,7 @@ const wchar_t newline = L'\n';
 const wchar_t minuszenkaku = L'－';
 const wchar_t star = L'＊';
 const wchar_t colon = L'：';
+const wchar_t sharp = L'＃';
 
 bool charIsSymbolic(wchar_t c) {
 	return 
@@ -49,7 +52,8 @@ bool charIsSymbolic(wchar_t c) {
 		c != assign &&
 		c != dot &&
 		c != star &&
-		c != colon;
+		c != colon &&
+		c != sharp;
 }
 
 bool charIsNumberic(wchar_t c) {
@@ -67,7 +71,7 @@ long parseNumeric(wstring s) {
 }
 
 Token::Token(TokenType type, wstring _content, int line)
-	: type(type), content(_content), line(line) {
+	: type(type), content(std::move(_content)), line(line) {
 	if (type == TokenType::NUMBER) {
 		number = parseNumeric(content);
 	}
@@ -88,8 +92,12 @@ bool Token::operator==(const Token& rhs) const{
 	return type == rhs.type && content == rhs.content && line == rhs.line;
 }
 
+std::ostream &operator<<(std::ostream &os, const Token &token) {
+    return os << token.toString();
+}
+
 // Tokenizer Implementation
-static const unordered_map<wstring, TokenType> identifiers({
+const unordered_map<wstring, TokenType> identifiers({
 	{L"関数", TokenType::FUNC},
 	{L"返す", TokenType::RETURN},
 	{L"もし", TokenType::IF},
@@ -114,34 +122,42 @@ Token FileTokenizer::getToken() {
 		nextTokens.pop();
 		return result;
 	}
-	// cout << "getting" << endl;
 	wchar_t first = input->getChar();
+	if (first == sharp) {
+        while (input->getChar() != newline) {
+            if (input->eof()) {
+                return Token(TokenType::END, L"", lineNumber);
+            }
+        }
+        lineNumber++;
+        return Token(TokenType::NEWL, L"", lineNumber);
+	}
 	if (input->eof()) {
-		return Token(TokenType::END, L"", linenumber);
+		return Token(TokenType::END, L"", lineNumber);
 	}
 	if (first == lparen) {
-		return Token(TokenType::LPAREN, L"（", linenumber);
+		return Token(TokenType::LPAREN, L"（", lineNumber);
 	}
 	if (first == rparen) {
-		return Token(TokenType::RPAREN, L"）", linenumber);
+		return Token(TokenType::RPAREN, L"）", lineNumber);
 	}
 	if (first == comma) {
-		return Token(TokenType::COMMA, L"、", linenumber);
+		return Token(TokenType::COMMA, L"、", lineNumber);
 	}
 	if (first == assign) {
-		return Token(TokenType::ASSIGN, L"＝", linenumber);
+		return Token(TokenType::ASSIGN, L"＝", lineNumber);
 	}
 	if (first == dot) {
-		return Token(TokenType::DOT, L"・", linenumber);
+		return Token(TokenType::DOT, L"・", lineNumber);
 	}
 	if (first == minuszenkaku) {
-		return Token(TokenType::MINUS, L"－", linenumber);
+		return Token(TokenType::MINUS, L"－", lineNumber);
 	}
 	if (first == star) {
-		return Token(TokenType::STAR, L"＊", linenumber);
+		return Token(TokenType::STAR, L"＊", lineNumber);
 	}
 	if (first == colon) {
-		return Token(TokenType::COLON, L"：", linenumber);
+		return Token(TokenType::COLON, L"：", lineNumber);
 	}
 	if (first == space) {
 		int newIndentLevel = 1;
@@ -157,31 +173,31 @@ Token FileTokenizer::getToken() {
 		int difference = abs(newIndentLevel - indentLevel);
 		indentLevel = newIndentLevel;
 		for (int i = 0; i < difference - 1; i++) {
-			nextTokens.push(Token(newTokenType, L"", linenumber));
+			nextTokens.push(Token(newTokenType, L"", lineNumber));
 		}
-		return Token(newTokenType, L"", linenumber);
+		return Token(newTokenType, L"", lineNumber);
 	}
 	if (first == newline) {
-		linenumber++;
+		lineNumber++;
 		if (input->peekChar() != L'　' && 
 				input->peekChar() != L'\n' && 
 				indentLevel > 0) {
 			// Dedent to zero case
 			for (int i = 0; i < (indentLevel - 1); i++) {
-				nextTokens.push(Token(TokenType::DEDENT, L"", linenumber));
+				nextTokens.push(Token(TokenType::DEDENT, L"", lineNumber));
 			}
 			indentLevel = 0;
-			nextTokens.push(Token(TokenType::NEWL, L"", linenumber));
-			return Token(TokenType::DEDENT, L"", linenumber);
+			nextTokens.push(Token(TokenType::NEWL, L"", lineNumber));
+			return Token(TokenType::DEDENT, L"", lineNumber);
 		}
-		return Token(TokenType::NEWL, L"", linenumber);
+		return Token(TokenType::NEWL, L"", lineNumber);
 	}
 	if (charIsNumberic(first)) {
 		wstring resultNumber = wstring(1, first);
 		while(charIsNumberic(input->peekChar()) && !input->eof()) {
 			resultNumber.push_back(input->getChar());
 		}
-		return Token(TokenType::NUMBER, wstring(resultNumber), linenumber);
+		return Token(TokenType::NUMBER, wstring(resultNumber), lineNumber);
 	}
 	if (first == lsquare) {
 		wstring resultString = wstring(L"");
@@ -189,14 +205,14 @@ Token FileTokenizer::getToken() {
 		while ((nextChar = input->getChar()) != rsquare) {
 			resultString.push_back(nextChar);
 			if (nextChar == newline) {
-				linenumber++;
+				lineNumber++;
 			}
 			if (input->eof()) {
 				cout << "エラー：文字列を読みながら、ファイルの終わり（ＥＯＦ）" << endl;
-				return Token(TokenType::END, L"", linenumber);
+				return Token(TokenType::END, L"", lineNumber);
 			}
 		}
-		return Token(TokenType::STRING, wstring(resultString), linenumber);
+		return Token(TokenType::STRING, wstring(resultString), lineNumber);
 	}
 	wstring resultSymbol = wstring(1, first);
 	while (charIsSymbolic(input->peekChar()) && !input->eof()) {
@@ -204,7 +220,7 @@ Token FileTokenizer::getToken() {
 	}
 	if (identifiers.count(resultSymbol)) {
 		const TokenType newTokenType = identifiers.at(resultSymbol);
-		return Token(newTokenType, wstring(resultSymbol), linenumber);
+		return Token(newTokenType, wstring(resultSymbol), lineNumber);
 	}
-	return Token(TokenType::SYMBOL, wstring(resultSymbol), linenumber);
+	return Token(TokenType::SYMBOL, wstring(resultSymbol), lineNumber);
 }

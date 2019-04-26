@@ -1,3 +1,5 @@
+#include <utility>
+
 #include <iostream>
 
 #include "Value.h"
@@ -38,6 +40,8 @@ string DictionaryValue::toString() const{
 	return result.str();
 }
 
+DictionaryValue::DictionaryValue() : Value(ValueType::DICT), parent(nullptr) {}
+
 string UserFunctionValue::toString() const {
 	ostringstream result;
 	result << "UserFunctionValue(" << "..." << ")";
@@ -54,8 +58,7 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
 	do {
 		if (params.size() > argsIn.size()) {
 			cout << "エラー：引数は足りません　"
-				<< "必要は" << params.size()
-				<< " 渡したは" << argsIn.size() << endl;
+				<< "必要は" << params.size() << " 渡したのは" << argsIn.size() << endl;
 		}
 		for (size_t i = 0; i < params.size(); i++) {
 			env->bind(params[i], args[i]);
@@ -63,7 +66,7 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
 		if (hasVarKeywordArgs) {
 			auto kwArgs = env->context->newDictionaryValue();
 			if (kwargsIn) {
-				for (auto arg : *kwargsIn) {
+				for (const auto& arg : *kwargsIn) {
 					kwArgs->set(arg.first, arg.second);
 				}
 			}
@@ -86,6 +89,6 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
 
 void UserFunctionValue::setVarKeywordParam(wstring name) {
 	hasVarKeywordArgs = true;
-	varKeywordArgsParam = name;
+	varKeywordArgsParam = std::move(name);
 }
 
