@@ -29,7 +29,7 @@ public:
 
     void setFrequency(long freq);
 
-    Value *newNoneValue();
+    static Value *newNoneValue();
 
     NumberValue *newNumberValue(long number);
 
@@ -41,8 +41,6 @@ public:
             vector<wstring> params, SyntaxNode *body, Environment *e);
 
     ArrayValue *newArrayValue();
-
-    void trackValue(Value *value);
 
     Environment *newChildEnvironment(Environment *e);
 };

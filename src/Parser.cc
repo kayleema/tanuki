@@ -262,9 +262,9 @@ bool Parser::accept(TokenType type, Token *out) {
 }
 
 bool Parser::accept(const vector<TokenType> &types, const vector<Token *> &outs) {
-    int i = 0;
+    size_t i = 0;
     for (auto type : types) {
-        size_t tokenIndex = currentTokenIndex + i;
+        size_t tokenIndex = (size_t) currentTokenIndex + i;
         if (tokenIndex >= allTokens.size()) {
             break;
         }
@@ -316,7 +316,7 @@ Token Parser::currentToken() {
 string SyntaxNode::toString(int indent) {
     ostringstream result("");
 
-    string indentation(indent, ' ');
+    string indentation((unsigned long) indent, ' ');
     result << indentation;
 
     result << NodeTypeStrings[(int) type];

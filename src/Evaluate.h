@@ -35,9 +35,9 @@ class Environment {
     Value *eval_assign(SyntaxNode *node);
 
 public:
-    Environment(Context *context);
+    explicit Environment(Context *context);
 
-    Environment(Environment *parent, Context *_context = nullptr)
+    explicit Environment(Environment *parent, Context *_context = nullptr)
             : parent(parent) {
         if (_context == nullptr) {
             if (parent->context == nullptr) {
@@ -54,9 +54,9 @@ public:
     Context *context;
     unordered_map<wstring, Value *> bindings;
 
-    Value *lookup(wstring name);
+    Value *lookup(const wstring &name);
 
-    void bind(wstring name, Value *value);
+    void bind(const wstring &name, Value *value);
 
     Value *eval(SyntaxNode *node, const FunctionValue *tailContext = nullptr);
 

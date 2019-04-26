@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "Context.h"
 
 
@@ -11,7 +13,7 @@ void Context::mark(Value *value) {
         }
         if (value->type == ValueType::DICT) {
             auto d = (DictionaryValue *) value;
-            for (auto item : d->value) {
+            for (const auto &item : d->value) {
                 mark(item.second);
             }
             if (d->parent) {
@@ -32,7 +34,7 @@ void Context::mark(Environment *current_env) {
     if (current_env->caller) {
         mark(current_env->caller);
     }
-    for (auto binding : current_env->bindings) {
+    for (const auto &binding : current_env->bindings) {
         mark(binding.second);
     }
 }
@@ -99,7 +101,7 @@ NumberValue *Context::newNumberValue(long number) {
 }
 
 StringValue *Context::newStringValue(wstring str) {
-    auto result = new StringValue(str);
+    auto result = new StringValue(std::move(str));
     values.insert(result);
     return result;
 }
@@ -112,7 +114,7 @@ DictionaryValue *Context::newDictionaryValue() {
 
 UserFunctionValue *Context::newUserFunctionValue(
         vector<wstring> params, SyntaxNode *body, Environment *e) {
-    auto result = new UserFunctionValue(params, body, e);
+    auto result = new UserFunctionValue(std::move(params), body, e);
     values.insert(result);
     return result;
 }
@@ -121,10 +123,6 @@ ArrayValue *Context::newArrayValue() {
     auto result = new ArrayValue();
     values.insert(result);
     return result;
-}
-
-void Context::trackValue(Value *value) {
-    values.insert(value);
 }
 
 Environment *Context::newChildEnvironment(Environment *e) {

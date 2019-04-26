@@ -159,7 +159,7 @@ class UserFunctionValue : public FunctionValue {
     vector<wstring> params;
     bool hasVarKeywordArgs;
     wstring varKeywordArgsParam;
-    bool hasVarArgs;
+    bool hasVarArgs{};
     wstring varArgsParam;
     SyntaxNode *body;
 public:

@@ -88,7 +88,7 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
         return new TailCallValue(args);
     }
     auto result = function->apply(
-            args, this, kwargsIn.size() == 0 ? nullptr : &kwargsIn);
+            args, this, kwargsIn.empty() ? nullptr : &kwargsIn);
     auto finalResult = result;
     result->refs++;
 
@@ -100,7 +100,7 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
     for (auto arg : args) {
         arg->refs--;
     }
-    for (auto kwarg : kwargsIn) {
+    for (const auto &kwarg : kwargsIn) {
         kwarg.second->refs--;
     }
     result->refs--;
@@ -256,7 +256,7 @@ Value *Environment::eval_assign(SyntaxNode *tree) {
     return context->newNoneValue();
 }
 
-Value *Environment::lookup(wstring name) {
+Value *Environment::lookup(const wstring &name) {
     if (bindings.count(name)) {
         return bindings[name];
     }
@@ -267,7 +267,7 @@ Value *Environment::lookup(wstring name) {
     return nullptr;
 }
 
-void Environment::bind(wstring name, Value *value) {
+void Environment::bind(const wstring &name, Value *value) {
     bindings[name] = value;
 }
 
@@ -282,7 +282,7 @@ Environment::Environment(Context *context) : context(context) {
 
 DictionaryValue *Environment::toNewDictionaryValue() {
     auto result = context->newDictionaryValue();
-    for (auto binding : bindings) {
+    for (const auto &binding : bindings) {
         result->set(binding.first, binding.second);
     }
     return result;

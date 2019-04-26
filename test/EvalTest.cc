@@ -16,7 +16,7 @@ TEST(eval, functions) {
     string treeString = expr->toString();
 
     Context context;
-    Environment *env = new Environment(&context);
+    auto *env = new Environment(&context);
     Value *v = env->eval(expr);
     NumberValue expected(9);
 

@@ -18,7 +18,7 @@ public:
 class FileInputSource : public InputSource {
     wifstream file;
 public:
-    FileInputSource(const char *filename);
+    explicit FileInputSource(const char *filename);
 
     wchar_t getChar() override;
 
@@ -33,7 +33,7 @@ class StringInputSource : public InputSource {
     const wchar_t *source;
     bool finished;
 public:
-    StringInputSource(const wchar_t *source) : source(source), finished(false) {};
+    explicit StringInputSource(const wchar_t *source) : source(source), finished(false) {};
 
     wchar_t getChar() override;
 
