@@ -6,11 +6,11 @@
 #include "Evaluate.h"
 #include "Context.h"
 
-bool Value::equals(Value *rhs) const {
+bool Value::equals(const Value *rhs) const {
     return (type == rhs->type);
 }
 
-bool NumberValue::equals(Value *rhs) const {
+bool NumberValue::equals(const Value *rhs) const {
     return Value::equals(rhs) && (value == ((NumberValue *) rhs)->value);
 }
 
@@ -20,6 +20,10 @@ string Value::toString() const {
     result << ValueTypeStrings[(int) type];
     result << ")";
     return result.str();
+}
+
+bool operator==(const Value &lhs, const Value &rhs) {
+    return lhs.equals(&rhs);
 }
 
 string NumberValue::toString() const {
@@ -32,8 +36,8 @@ string StringValue::toString() const {
     return string("string");
 }
 
-bool StringValue::equals(Value *rhs) const {
-    return Value::equals(rhs) && (value == ((StringValue *) (rhs))->value);
+bool StringValue::equals(const Value *rhs) const {
+    return Value::equals(rhs) && (value == ((const StringValue *) (rhs))->value);
 }
 
 string DictionaryValue::toString() const {

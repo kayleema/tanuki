@@ -118,7 +118,6 @@ TEST(program, fibonacci) {
     EXPECT_TRUE(expected->equals(v));
 
     v = env.eval(tree->children[2]);
-    cout << v->toString();
     expected = new NumberValue(610);
     EXPECT_TRUE(expected->equals(v));
 }
@@ -228,6 +227,10 @@ TEST(eval, call_user_function_varargs) {
     env.eval(tree);
     Value *result = env.lookup(L"あ");
 
-    cout << result->toString();
     EXPECT_EQ(result->type, ValueType::ARRAY);
+    auto arrayValue = (ArrayValue *) result;
+    EXPECT_EQ(arrayValue->length(), 3);
+    EXPECT_EQ(*arrayValue->get(0)->toNumberValue(), NumberValue(2));
+    EXPECT_EQ(*arrayValue->get(1)->toNumberValue(), NumberValue(3));
+    EXPECT_EQ(*arrayValue->get(2)->toNumberValue(), NumberValue(4));
 }

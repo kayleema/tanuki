@@ -30,7 +30,7 @@ public:
 
     virtual ~Value() = default;
 
-    virtual bool equals(Value *rhs) const;
+    virtual bool equals(const Value *rhs) const;
 
     virtual string toString() const;
 
@@ -46,11 +46,13 @@ public:
     int refs = 0;
 };
 
+bool operator==(const Value &lhs, const Value &rhs);
+
 class NumberValue : public Value {
 public:
     explicit NumberValue(long n) : Value(ValueType::NUM), value(n) {};
 
-    bool equals(Value *rhs) const override;
+    bool equals(const Value *rhs) const override;
 
     string toString() const override;
 
@@ -63,7 +65,7 @@ class StringValue : public Value {
 public:
     explicit StringValue(wstring str) : Value(ValueType::STRING), value(std::move(str)) {};
 
-    bool equals(Value *rhs) const override;
+    bool equals(const Value *rhs) const override;
 
     string toString() const override;
 
@@ -97,6 +99,7 @@ public:
 
     string toString() const override;
 };
+
 
 class ArrayValue : public Value {
     vector<Value *> value;

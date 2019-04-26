@@ -1,0 +1,44 @@
+
+window.background {
+    background-color: #333333;
+    font-family: "San Francisco", monospace;
+    font-size: 16px;
+}
+
+button {
+    color: #ffffff;
+    background-color: #333333;
+    background-image: none;
+    border-radius: 3px;
+    border: 1px solid #888888;
+    border-image: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+button:hover {
+    color: #ffffff;
+    background-color: #666666;
+    background-image: none;
+    border-radius: 3px;
+    border: 1px solid #eeeeee;
+    border-image: none;
+}
+
+textview.view {
+    background-color: #333333;
+    color: #ffffff;
+    font-family: "Menlo", monospace;
+}
+
+textview.view text {
+    background-color: #333333;
+    color: #eeeeee;
+    font-family: "Menlo", monospace;
+}
+
+entry {
+    background-color: #333333;
+    color: #ffffaa;
+    font-family: "Menlo", monospace;
+}
