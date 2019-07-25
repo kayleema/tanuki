@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 PROJECT(pinpon-interactive C)
 
 FIND_PACKAGE(PkgConfig REQUIRED)
-PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
+PKG_CHECK_MODULES(GTK3 gtk+-3.0)
 
 # Setup CMake to use GTK+, tell the compiler where to look for headers
 # and to the linker where to look for libraries
