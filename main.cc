@@ -2,7 +2,7 @@
 #include "Tokenizer.h"
 #include "Context.h"
 #include "Parser.h"
-#include "Evaluate.h"
+#include "Environment.h"
 #include "CoreFunctions.h"
 #include <fcntl.h>
 #include <sys/uio.h>
@@ -115,7 +115,8 @@ int interactive(long freq) {
 			cout << "＞：";
 		}
 		getline (cin, inputraw);
-		input = input + decodeUTF8(inputraw) + L"\n";
+        input += decodeUTF8(inputraw);
+        input += L"\n";
 		if (inputraw.find("関数") == 0 ||
 			inputraw.find("もし") == 0 ||
 			(continuation && (inputraw.length() != 0))) {

@@ -1,5 +1,5 @@
 #include "Value.h"
-#include "Evaluate.h"
+#include "Environment.h"
 #include "Context.h"
 #include "InputSource.h"
 #include "Extension.h"
@@ -96,7 +96,7 @@ public:
             }
         }
         cout << endl;
-        return env->context->newNoneValue();
+        return Context::newNoneValue();
     };
 };
 
@@ -144,7 +144,7 @@ public:
     Value *apply(const vector<Value *> &args, Environment *env,
                  unordered_map<wstring, Value *> *) const override {
         if (args.size() != 1) {
-            return env->context->newNoneValue();
+            return Context::newNoneValue();
         }
         wstring fileName = args[0]->toStringValue()->value;
         FileInputSource fileInputSource(encodeUTF8(fileName).c_str());
@@ -162,7 +162,7 @@ public:
     Value *apply(const vector<Value *> &args, Environment *env,
                  unordered_map<wstring, Value *> *) const override {
         if (args.size() != 1) {
-            return env->context->newNoneValue();
+            return Context::newNoneValue();
         }
         auto moduleEnv = env->newChildEnvironment();
         wstring text = args[0]->toStringValue()->value;
@@ -182,7 +182,7 @@ public:
                  unordered_map<wstring, Value *> *) const override {
         wstring name = args[0]->toStringValue()->value;
         loadDynamic(env, encodeUTF8(name).c_str());
-        return env->context->newNoneValue();
+        return Context::newNoneValue();
     };
 };
 

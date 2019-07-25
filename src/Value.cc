@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Value.h"
-#include "Evaluate.h"
+#include "Environment.h"
 #include "Context.h"
 
 bool Value::equals(const Value *rhs) const {

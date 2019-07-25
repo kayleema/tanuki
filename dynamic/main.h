@@ -1,7 +1,7 @@
 #ifndef PINPON_MAIN_H
 #define PINPON_MAIN_H
 
-#include "Evaluate.h"
+#include "Environment.h"
 
 extern "C" {
     void pinponLoadModule(Environment *env);
