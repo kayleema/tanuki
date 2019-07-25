@@ -142,3 +142,28 @@ TEST(tokenizer, indentation) {
             });
     EXPECT_EQ(allTokens, expected);
 }
+
+TEST(tokenizer, infix) {
+    auto stringInput = StringInputSource(
+            L"ほげ＋ふが－ぴよ＊ほげ／ぴよ"
+    );
+
+    auto testTokenizer = FileTokenizer(&stringInput);
+
+    auto allTokens = testTokenizer.getAllTokens();
+
+    auto expected = vector<Token>(
+            {
+                    Token(TokenType::SYMBOL, L"ほげ", 1),
+                    Token(TokenType::PLUS, L"＋", 1),
+                    Token(TokenType::SYMBOL, L"ふが", 1),
+                    Token(TokenType::MINUS, L"－", 1),
+                    Token(TokenType::SYMBOL, L"ぴよ", 1),
+                    Token(TokenType::STAR, L"＊", 1),
+                    Token(TokenType::SYMBOL, L"ほげ", 1),
+                    Token(TokenType::SLASH, L"／", 1),
+                    Token(TokenType::SYMBOL, L"ぴよ", 1),
+                    Token(TokenType::END, L"", 1),
+            });
+    EXPECT_EQ(allTokens, expected);
+}

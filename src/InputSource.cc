@@ -9,11 +9,18 @@ FileInputSource::FileInputSource(const char *filename) : file(filename) {
 wchar_t FileInputSource::getChar() {
     wchar_t first;
     file.get(first);
+    if (eof()) {
+        return L'\0';
+    }
     return first;
 }
 
 wchar_t FileInputSource::peekChar() {
-    return (wchar_t) file.peek();
+    wchar_t result = file.peek();
+    if (eof()) {
+        return L'\0';
+    }
+    return result;
 }
 
 bool FileInputSource::eof() {

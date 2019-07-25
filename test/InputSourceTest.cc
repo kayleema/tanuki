@@ -33,4 +33,29 @@ TEST(stringInputSource, readSingleCharacters) {
     EXPECT_TRUE(stringInput.eof());
 }
 
+TEST(stringInputSource, fileSource) {
+    auto stringInput = FileInputSource("../example/fileInputSource.pin");
+
+    EXPECT_EQ(stringInput.peekChar(), L'関');
+    EXPECT_EQ(stringInput.getChar(), L'関');
+    EXPECT_EQ(stringInput.peekChar(), L'n');
+    EXPECT_EQ(stringInput.getChar(), L'n');
+    EXPECT_EQ(stringInput.peekChar(), L'数');
+    EXPECT_FALSE(stringInput.eof());
+
+    // 最後の文字
+    EXPECT_EQ(stringInput.getChar(), L'数');
+    EXPECT_FALSE(stringInput.eof());
+
+    // 終わり
+    EXPECT_EQ(stringInput.peekChar(), L'\0');
+    EXPECT_EQ(stringInput.getChar(), L'\0');
+    EXPECT_TRUE(stringInput.eof());
+
+    // 全部読んだ後
+    EXPECT_EQ(stringInput.peekChar(), L'\0');
+    EXPECT_EQ(stringInput.getChar(), L'\0');
+    EXPECT_TRUE(stringInput.eof());
+}
+
 

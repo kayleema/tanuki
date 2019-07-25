@@ -2,6 +2,7 @@
 
 #include "Tokenizer.h"
 #include <unordered_map>
+#include <unordered_set>
 
 string encodeUTF8(const wstring &in) {
     try {
@@ -37,19 +38,54 @@ const wchar_t minuszenkaku = L'－';
 const wchar_t star = L'＊';
 const wchar_t colon = L'：';
 const wchar_t sharp = L'＃';
+const wchar_t plusSign = L'＋';
+const wchar_t slash = L'／';
+const wchar_t nullChar = L'\0';
+
+const unordered_set<wchar_t> symbolicChars(
+        {lparen,
+         rparen,
+         comma,
+         space,
+         newline,
+         assign,
+         dot,
+         star,
+         colon,
+         sharp,
+         minuszenkaku,
+         plusSign,
+         nullChar,
+         slash});
+
+const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
+        {
+                {lparen,       TokenType::LPAREN},
+                {lparen,       TokenType::LPAREN},
+                {rparen,       TokenType::RPAREN},
+                {comma,        TokenType::COMMA},
+                {assign,       TokenType::ASSIGN},
+                {dot,          TokenType::DOT},
+                {minuszenkaku, TokenType::MINUS},
+                {star,         TokenType::STAR},
+                {colon,        TokenType::COLON},
+                {plusSign,     TokenType::PLUS},
+                {slash,        TokenType::SLASH},
+        });
+
+// Tokenizer Implementation
+const unordered_map<wstring, TokenType> identifiers(
+        {
+                {L"関数",   TokenType::FUNC},
+                {L"返す",   TokenType::RETURN},
+                {L"もし",   TokenType::IF},
+                {L"他でもし", TokenType::ELIF},
+                {L"その他",  TokenType::ELSE},
+                {L"導入",   TokenType::IMPORT}
+        });
 
 bool charIsSymbolic(wchar_t c) {
-    return
-            c != lparen &&
-            c != rparen &&
-            c != comma &&
-            c != space &&
-            c != newline &&
-            c != assign &&
-            c != dot &&
-            c != star &&
-            c != colon &&
-            c != sharp;
+    return symbolicChars.count(c) == 0;
 }
 
 bool charIsNumberic(wchar_t c) {
@@ -57,7 +93,6 @@ bool charIsNumberic(wchar_t c) {
 }
 
 long parseNumeric(wstring s) {
-    // cout << encodeUTF8(s) << result << endl;
     if (s.length() == 0) {
         return 0;
     }
@@ -92,17 +127,6 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     return os << token.toString();
 }
 
-// Tokenizer Implementation
-const unordered_map<wstring, TokenType> identifiers(
-        {
-                {L"関数",   TokenType::FUNC},
-                {L"返す",   TokenType::RETURN},
-                {L"もし",   TokenType::IF},
-                {L"他でもし", TokenType::ELIF},
-                {L"その他",  TokenType::ELSE},
-                {L"導入",   TokenType::IMPORT}
-        });
-
 vector<Token> Tokenizer::getAllTokens() {
     vector<Token> result;
     Token current;
@@ -120,6 +144,13 @@ Token FileTokenizer::getToken() {
         return result;
     }
     wchar_t first = input->getChar();
+    if (input->eof()) {
+        return Token(TokenType::END, L"", lineNumber);
+    }
+    if (charToTokenTypeMap.count(first)) {
+        return Token(charToTokenTypeMap.at(first), wstring(1, first),
+                     lineNumber);
+    }
     if (first == sharp) {
         while (input->getChar() != newline) {
             if (input->eof()) {
@@ -128,33 +159,6 @@ Token FileTokenizer::getToken() {
         }
         lineNumber++;
         return Token(TokenType::NEWL, L"", lineNumber);
-    }
-    if (input->eof()) {
-        return Token(TokenType::END, L"", lineNumber);
-    }
-    if (first == lparen) {
-        return Token(TokenType::LPAREN, L"（", lineNumber);
-    }
-    if (first == rparen) {
-        return Token(TokenType::RPAREN, L"）", lineNumber);
-    }
-    if (first == comma) {
-        return Token(TokenType::COMMA, L"、", lineNumber);
-    }
-    if (first == assign) {
-        return Token(TokenType::ASSIGN, L"＝", lineNumber);
-    }
-    if (first == dot) {
-        return Token(TokenType::DOT, L"・", lineNumber);
-    }
-    if (first == minuszenkaku) {
-        return Token(TokenType::MINUS, L"－", lineNumber);
-    }
-    if (first == star) {
-        return Token(TokenType::STAR, L"＊", lineNumber);
-    }
-    if (first == colon) {
-        return Token(TokenType::COLON, L"：", lineNumber);
     }
     if (first == newline) {
         lineNumber++;
