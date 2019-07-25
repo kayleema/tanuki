@@ -156,6 +156,19 @@ Token FileTokenizer::getToken() {
     if (first == colon) {
         return Token(TokenType::COLON, L"：", lineNumber);
     }
+    if (first == newline) {
+        lineNumber++;
+        if (input->peekChar() != L'　' && input->peekChar() != L'\n' &&
+            indentLevel > 0) {
+            // Dedent to zero case
+            for (int i = 0; i < indentLevel; i++) {
+                nextTokens.push(Token(TokenType::DEDENT, L"", lineNumber));
+            }
+            indentLevel = 0;
+            return Token(TokenType::NEWL, L"", lineNumber);
+        }
+        return Token(TokenType::NEWL, L"", lineNumber);
+    }
     if (first == space) {
         int newIndentLevel = 1;
         while (input->peekChar() == L'　') {
@@ -173,21 +186,6 @@ Token FileTokenizer::getToken() {
             nextTokens.push(Token(newTokenType, L"", lineNumber));
         }
         return Token(newTokenType, L"", lineNumber);
-    }
-    if (first == newline) {
-        lineNumber++;
-        if (input->peekChar() != L'　' &&
-            input->peekChar() != L'\n' &&
-            indentLevel > 0) {
-            // Dedent to zero case
-            for (int i = 0; i < (indentLevel - 1); i++) {
-                nextTokens.push(Token(TokenType::DEDENT, L"", lineNumber));
-            }
-            indentLevel = 0;
-            nextTokens.push(Token(TokenType::NEWL, L"", lineNumber));
-            return Token(TokenType::DEDENT, L"", lineNumber);
-        }
-        return Token(TokenType::NEWL, L"", lineNumber);
     }
     if (charIsNumberic(first)) {
         wstring resultNumber = wstring(1, first);

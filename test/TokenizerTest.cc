@@ -92,3 +92,53 @@ TEST(tokenizer, comments) {
             });
     EXPECT_EQ(allTokens, expected);
 }
+
+TEST(tokenizer, indentation) {
+    auto stringInput = StringInputSource(
+            L"　　あ\n"
+            L"　　　い\n"
+            L"　　　　う\n"
+            L"　　　い\n"
+            L"　　　　う\n"
+            L"　　あ\n"
+    );
+
+    auto testTokenizer = FileTokenizer(&stringInput);
+
+    auto allTokens = testTokenizer.getAllTokens();
+
+    auto expected = vector<Token>(
+            {
+                    Token(TokenType::INDENT, L"", 1),
+                    Token(TokenType::INDENT, L"", 1),
+
+                    Token(TokenType::SYMBOL, L"あ", 1),
+                    Token(TokenType::NEWL, L"", 2),
+                    Token(TokenType::INDENT, L"", 2),
+
+                    Token(TokenType::SYMBOL, L"い", 2),
+                    Token(TokenType::NEWL, L"", 3),
+                    Token(TokenType::INDENT, L"", 3),
+
+                    Token(TokenType::SYMBOL, L"う", 3),
+                    Token(TokenType::NEWL, L"", 4),
+                    Token(TokenType::DEDENT, L"", 4),
+
+                    Token(TokenType::SYMBOL, L"い", 4),
+                    Token(TokenType::NEWL, L"", 5),
+                    Token(TokenType::INDENT, L"", 5),
+
+                    Token(TokenType::SYMBOL, L"う", 5),
+                    Token(TokenType::NEWL, L"", 6),
+                    Token(TokenType::DEDENT, L"", 6),
+                    Token(TokenType::DEDENT, L"", 6),
+
+                    Token(TokenType::SYMBOL, L"あ", 6),
+                    Token(TokenType::NEWL, L"", 7),
+
+                    Token(TokenType::DEDENT, L"", 7),
+                    Token(TokenType::DEDENT, L"", 7),
+                    Token(TokenType::END, L"", 7),
+            });
+    EXPECT_EQ(allTokens, expected);
+}
