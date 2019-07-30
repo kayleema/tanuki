@@ -3,12 +3,12 @@
 #include "Context.h"
 #include "InputSource.h"
 #include "Extension.h"
+#include "CoreFunctions.h"
 
 #include <iostream>
 
-const wchar_t *corePinponStarter = 
-#include "core.pin"
-;
+const wchar_t *corePinponStarter =
+#include "core.pin";
 
 // Builtin Functions
 class FunctionSum : public FunctionValue {
@@ -127,17 +127,20 @@ public:
     };
 };
 
-class FunctionNewDictionary : public FunctionValue {
-public:
-    Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
-        auto result = env->context->newDictionaryValue();
-        if (!args.empty() && result->type == ValueType::DICT) {
-            result->setParent(args[0]->toDictionaryValue());
+Value *FunctionNewDictionary::apply(const vector<Value *> &args,
+                                    Environment *env,
+                                    unordered_map<wstring, Value *> *kwargs) const {
+    auto result = env->context->newDictionaryValue();
+    if (!args.empty() && result->type == ValueType::DICT) {
+        result->setParent(args[0]->toDictionaryValue());
+    }
+    if (kwargs) {
+        for (auto &arg : *kwargs) {
+            result->set(arg.first, arg.second);
         }
-        return result;
-    };
-};
+    }
+    return result;
+}
 
 class FunctionReadFile : public FunctionValue {
 public:

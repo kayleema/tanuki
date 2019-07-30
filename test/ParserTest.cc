@@ -105,3 +105,96 @@ TEST(parser, user_function_varparam) {
     );
     EXPECT_EQ(expected, treeString);
 }
+
+
+TEST(parser, dot_lookup) {
+    auto stringInput = StringInputSource(
+            L"ほげ・何か・ほか"
+    );
+    auto testTokenizer = FileTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "CALL\n"
+            " TERMINAL symbol：”ほげ”、1列\n"
+            " GET\n"
+            "  TERMINAL symbol：”何か”、1列\n"
+            "  GET\n"
+            "   TERMINAL symbol：”ほか”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}
+
+TEST(parser, dot_lookup_and_assign) {
+    auto stringInput = StringInputSource(
+            L"ほげ・何か・ほか＝あ・い・う"
+    );
+    auto testTokenizer = FileTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "CALL\n"
+            " TERMINAL symbol：”ほげ”、1列\n"
+            " GET\n"
+            "  TERMINAL symbol：”何か”、1列\n"
+            "  SET\n"
+            "   TERMINAL symbol：”ほか”、1列\n"
+            "   CALL\n"
+            "    TERMINAL symbol：”あ”、1列\n"
+            "    GET\n"
+            "     TERMINAL symbol：”い”、1列\n"
+            "     GET\n"
+            "      TERMINAL symbol：”う”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}
+
+TEST(parser, dot_lookup_and_call) {
+    auto stringInput = StringInputSource(
+            L"ほげ・何か・ほか（）"
+    );
+    auto testTokenizer = FileTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "CALL\n"
+            " TERMINAL symbol：”ほげ”、1列\n"
+            " GET\n"
+            "  TERMINAL symbol：”何か”、1列\n"
+            "  GET\n"
+            "   TERMINAL symbol：”ほか”、1列\n"
+            "   CALL_TAIL\n"
+            "    ARGS\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}
+
+TEST(parser, dot_lookup_and_call_and_lookup) {
+    auto stringInput = StringInputSource(
+            L"ほげ・何か・ほか（）・あ・い・う"
+    );
+    auto testTokenizer = FileTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "CALL\n"
+            " TERMINAL symbol：”ほげ”、1列\n"
+            " GET\n"
+            "  TERMINAL symbol：”何か”、1列\n"
+            "  GET\n"
+            "   TERMINAL symbol：”ほか”、1列\n"
+            "   CALL_TAIL\n"
+            "    ARGS\n"
+            "    GET\n"
+            "     TERMINAL symbol：”あ”、1列\n"
+            "     GET\n"
+            "      TERMINAL symbol：”い”、1列\n"
+            "      GET\n"
+            "       TERMINAL symbol：”う”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}

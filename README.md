@@ -85,3 +85,10 @@ productions:
 * short form method definition
 * short form method call
 * infix operators
+
+Interactive Mode Notes
+--------------
+```
+  brew install gtk+3
+  export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/libffi/lib/pkgconfig"
+```
