@@ -47,7 +47,7 @@ public:
         } else {
             context = _context;
         }
-    };
+    }
 
     Environment *parent = nullptr;
     Environment *caller = nullptr;
