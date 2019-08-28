@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "QScrollBar"
-#include "src/Environment.h"
-#include "src/Context.h"
+#include "Environment.h"
+#include "Context.h"
+
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -15,33 +17,48 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     ui->textEdit->verticalScrollBar()->setValue(
             ui->textEdit->verticalScrollBar()->maximum());
+    ui->lineEdit->setFocus();
 
     env = new Environment(new Context());
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+    delete env;
 }
 
 void MainWindow::on_lineEdit_returnPressed() {
     std::wstring line = ui->lineEdit->text().toStdWString();
+    bool started = false;
+    if (!text.empty()) {
+        started = true;
+        text = text + L"\n";
+    }
+    text = text + line;
     ui->lineEdit->clear();
 
 
-    auto stringInput = StringInputSource(line.c_str());
-    auto testTokenizer = FileTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
-    SyntaxNode *tree = parser.run();
+    auto stringInput = StringInputSource(text.c_str());
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    tokens = testTokenizer.getAllTokens();
 
-    Value *result = env->eval(tree->children[0]);
+    ui->textEdit->append( QString::fromStdWString(text));
+    if (!isComplete(tokens)) {
+    } else {
+        auto bufferedTokenizer = BufferedTokenizer(tokens);
+        auto parser = Parser(&bufferedTokenizer);
+        SyntaxNode *tree = parser.run();
 
+        Value *result = env->eval(tree->children[0]);
 
-    QString newLine =
-            QString("＞：") + QString::fromStdWString(line).toHtmlEscaped() +
-            QString("<br/>") +
-            QString::fromStdString(result->toString()).toHtmlEscaped() +
-            QString("<br/>");
-    ui->textEdit->append(newLine);
+        ui->textEdit->append(
+                QString("結果：") + QString::fromStdString(result->toString())
+        );
+
+        tokens.clear();
+        text = L"";
+    }
     ui->textEdit->verticalScrollBar()->setValue(
-            ui->textEdit->verticalScrollBar()->maximum());
+            ui->textEdit->verticalScrollBar()->maximum()
+    );
 }

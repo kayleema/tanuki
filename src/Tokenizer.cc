@@ -127,6 +127,28 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     return os << token.toString();
 }
 
+bool isComplete(vector<Token> tokens) {
+    int openParenCount = 0;
+    int indentCount = 0;
+    bool unstartedFunction = false;
+    for (const auto &token : tokens) {
+        if (token.type == TokenType::LPAREN) {
+            openParenCount++;
+        } else if (token.type == TokenType::RPAREN) {
+            openParenCount--;
+        } else if (token.type == TokenType::FUNC) {
+            unstartedFunction = true;
+        } else if (token.type == TokenType::INDENT) {
+            unstartedFunction = false;
+            indentCount++;
+        } else if (token.type == TokenType::DEDENT) {
+            unstartedFunction = false;
+            indentCount--;
+        }
+    }
+    return !unstartedFunction && openParenCount == 0 && indentCount == 0;
+}
+
 vector<Token> Tokenizer::getAllTokens() {
     vector<Token> result;
     Token current;
@@ -137,7 +159,7 @@ vector<Token> Tokenizer::getAllTokens() {
     return result;
 }
 
-Token FileTokenizer::getToken() {
+Token InputSourceTokenizer::getToken() {
     if (!nextTokens.empty()) {
         Token result = nextTokens.front();
         nextTokens.pop();

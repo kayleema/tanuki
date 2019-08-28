@@ -48,8 +48,8 @@ win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../cmake-build-debug/relea
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../cmake-build-debug/debug/ -lpinpon_lib
 else:unix: LIBS += -L$$PWD/../cmake-build-debug/ -lpinpon_lib
 
-INCLUDEPATH += $$PWD/../
-DEPENDPATH += $$PWD/../
+INCLUDEPATH += $$PWD/../src/
+DEPENDPATH += $$PWD/../src/
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../cmake-build-debug/release/libpinpon_lib.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../cmake-build-debug/debug/libpinpon_lib.a

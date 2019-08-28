@@ -223,7 +223,7 @@ Value *Environment::eval_import(SyntaxNode *tree) {
         cout << "ERROR: could not import" << endl;
         return context->newNoneValue();
     }
-    FileTokenizer tokenizer(&fileInputSource);
+    InputSourceTokenizer tokenizer(&fileInputSource);
     Parser parser(&tokenizer);
     auto parsedTree = parser.run();
     auto importEnv = newChildEnvironment();

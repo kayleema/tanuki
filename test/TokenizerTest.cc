@@ -6,7 +6,7 @@
 
 TEST(tokenizer, simple_test) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -28,7 +28,7 @@ TEST(tokenizer, multiline) {
             L"関数、フィボナッチ（番号）\n"
             L"　返す、１２３"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -48,7 +48,7 @@ TEST(tokenizer, functions) {
     auto stringInput = StringInputSource(
             L"あ（い（）、う（））"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -75,7 +75,7 @@ TEST(tokenizer, comments) {
             L"あ（＃コメント"
     );
 
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -103,7 +103,7 @@ TEST(tokenizer, indentation) {
             L"　　あ\n"
     );
 
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -148,7 +148,7 @@ TEST(tokenizer, infix) {
             L"ほげ＋ふが－ぴよ＊ほげ／ぴよ"
     );
 
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 

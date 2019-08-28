@@ -7,7 +7,7 @@ TEST(parser, functions) {
     auto stringInput = StringInputSource(
             L"あ（い（）、４５６、う（１２３））（え）"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -37,7 +37,7 @@ TEST(parser, function_with_kwargs) {
     auto stringInput = StringInputSource(
             L"関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -63,7 +63,7 @@ TEST(parser, user_function) {
             L"関数、ほげ（引数、＊＊辞書引数）\n"
             L"　返す、１\n"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -86,7 +86,7 @@ TEST(parser, user_function_varparam) {
             L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
             L"　返す、１\n"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -111,7 +111,7 @@ TEST(parser, dot_lookup) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -130,7 +130,7 @@ TEST(parser, dot_lookup_and_assign) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか＝あ・い・う"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -155,7 +155,7 @@ TEST(parser, dot_lookup_and_call) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか（）"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -176,7 +176,7 @@ TEST(parser, dot_lookup_and_call_and_lookup) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか（）・あ・い・う"
     );
-    auto testTokenizer = FileTokenizer(&stringInput);
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();

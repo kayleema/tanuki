@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <utility>
 #include <vector>
 #include <codecvt>
 #include <clocale>
@@ -57,16 +58,31 @@ public:
     virtual Token getToken() = 0;
 };
 
-class FileTokenizer : public Tokenizer {
+class InputSourceTokenizer : public Tokenizer {
     InputSource *input;
     int lineNumber = 1;
     int indentLevel = 0;
     queue<Token> nextTokens;
 public:
-    explicit FileTokenizer(InputSource *input) : input(input) {
+    explicit InputSourceTokenizer(InputSource *input) : input(input) {
     }
 
     Token getToken() override;
 };
+
+class BufferedTokenizer : public Tokenizer {
+    int position = 0;
+    vector<Token> tokens;
+public:
+    explicit BufferedTokenizer(vector<Token> tokens) {
+        this->tokens = std::move(tokens);
+    }
+
+    Token getToken() override {
+        return tokens[position++];
+    }
+};
+
+bool isComplete(vector<Token>);
 
 #endif

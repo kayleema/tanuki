@@ -9,7 +9,8 @@
 
 const wchar_t *corePinponStarter =
 
-#include "core.pin";
+#include "core.pin"
+;
 
 // Builtin Functions
 class FunctionSum : public FunctionValue {
@@ -85,7 +86,7 @@ public:
 class FunctionPrint : public FunctionValue {
 public:
 
-    Value *apply(const vector<Value *> &args, Environment *env,
+    Value *apply(const vector<Value *> &args, Environment *,
                  unordered_map<wstring, Value *> *) const override {
         for (auto value : args) {
             if (value->type == ValueType::NUM) {
@@ -171,7 +172,7 @@ public:
         auto moduleEnv = env->newChildEnvironment();
         wstring text = args[0]->toStringValue()->value;
         StringInputSource inputSource(text.c_str());
-        FileTokenizer tokenizer(&inputSource);
+        InputSourceTokenizer tokenizer(&inputSource);
         Parser parser(&tokenizer);
         SyntaxNode *ast = parser.run();
         moduleEnv->eval(ast);

@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "src/Context.h"
-#include "src/Environment.h"
+#include "Context.h"
+#include "Environment.h"
 
 namespace Ui {
     class MainWindow;
@@ -27,6 +27,8 @@ private:
     Ui::MainWindow *ui;
 
     Environment *env;
+    vector<Token> tokens;
+    std::wstring text;
 };
 
 #endif // MAINWINDOW_H

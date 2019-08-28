@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	std::cout << "始まります" << std::endl;
 	const char *sourceFilename = argv[argc - 1];
 	auto input = FileInputSource(sourceFilename);
-	auto t = FileTokenizer(&input);
+	auto t = InputSourceTokenizer(&input);
 
 	if (print_lex) {
 		cout << "LEXER 結果:" << endl;
@@ -131,7 +131,7 @@ int interactive(long freq) {
 		}
 
 		auto source = StringInputSource(input.c_str());
-		auto tokenizer = FileTokenizer(&source);
+		auto tokenizer = InputSourceTokenizer(&source);
 		auto parser = Parser(&tokenizer);
 		SyntaxNode *tree = parser.run();
 		if (!tree || tree->children.empty()) {
@@ -148,7 +148,7 @@ int interactive(long freq) {
 
 void evalPinponStarter(Environment *env) {
 	auto source = StringInputSource(corePinponStarter);
-	auto tokenizer = FileTokenizer(&source);
+	auto tokenizer = InputSourceTokenizer(&source);
 	auto parser = Parser(&tokenizer);
 	SyntaxNode *tree = parser.run();
 	env->eval(tree);
