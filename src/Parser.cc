@@ -24,26 +24,23 @@ SyntaxNode *Parser::run_statement() {
     SyntaxNode *result;
     if ((result = run_return())) {
         return result;
-    }
-    if ((result = run_import())) {
+    } else if ((result = run_import())) {
         return result;
-    }
-    if ((result = run_if())) {
+    } else if ((result = run_if())) {
         return result;
-    }
-    if ((result = run_function())) {
+    } else if ((result = run_function())) {
         return result;
-    }
-    if ((result = run_assign())) {
+    } else if ((result = run_assign())) {
         return result;
+    } else {
+        return run_infix_expression();
     }
-    return run_expression();
 }
 
 SyntaxNode *Parser::run_if() {
     if (accept(TokenType::IF)) {
         expect(TokenType::COMMA);
-        SyntaxNode *condition = run_expression();
+        SyntaxNode *condition = run_infix_expression();
         expect(TokenType::NEWL);
         expect(TokenType::INDENT);
         SyntaxNode *body = run_text();
@@ -53,7 +50,7 @@ SyntaxNode *Parser::run_if() {
         result->children.push_back(body);
         while (accept(TokenType::ELIF)) {
             expect(TokenType::COMMA);
-            SyntaxNode *conditionElif = run_expression();
+            SyntaxNode *conditionElif = run_infix_expression();
             expect(TokenType::NEWL);
             expect(TokenType::INDENT);
             SyntaxNode *bodyElif = run_text();
@@ -76,7 +73,7 @@ SyntaxNode *Parser::run_if() {
 SyntaxNode *Parser::run_return() {
     if (accept(TokenType::RETURN)) {
         expect(TokenType::COMMA);
-        SyntaxNode *rhs = run_expression();
+        SyntaxNode *rhs = run_infix_expression();
         auto result = new SyntaxNode(NodeType::RETURN);
         result->children.push_back(rhs);
         return result;
@@ -101,7 +98,7 @@ SyntaxNode *Parser::run_import() {
 SyntaxNode *Parser::run_assign() {
     Token lhs;
     if (accept({TokenType::SYMBOL, TokenType::ASSIGN}, {&lhs, nullptr})) {
-        auto rhs = run_expression();
+        auto rhs = run_infix_expression();
         auto result = new SyntaxNode(NodeType::ASSIGN);
         result->children.push_back(new SyntaxNode(lhs));
         result->children.push_back(rhs);
@@ -158,6 +155,33 @@ SyntaxNode *Parser::run_function() {
         return nullptr;
     }
     return result;
+}
+
+SyntaxNode *Parser::run_infix_expression() {
+    return run_infix_additive_expression();
+}
+
+SyntaxNode *Parser::run_infix_additive_expression() {
+    auto result = run_expression();
+    do {
+        if (accept(TokenType::MINUS)) {
+            auto rhs = run_expression();
+            if (!rhs) {
+                cout << "error: expected rhs for minus" << endl;
+                return nullptr;
+            }
+            result = new SyntaxNode(NodeType::SUB, {result, rhs});
+        } else if (accept(TokenType::PLUS)) {
+            auto rhs = run_expression();
+            if (!rhs) {
+                cout << "error: expected rhs for plus" << endl;
+                return nullptr;
+            }
+            result = new SyntaxNode(NodeType::ADD, {result, rhs});
+        } else {
+            return result;
+        }
+    } while (true);
 }
 
 SyntaxNode *Parser::run_expression() {
@@ -218,7 +242,7 @@ SyntaxNode *Parser::run_expression_tail() {
             {nullptr, &symbol, nullptr})) {
         auto node = new SyntaxNode(NodeType::SET);
         node->children.push_back(new SyntaxNode(symbol));
-        auto rhs = run_expression();
+        auto rhs = run_infix_expression();
         if (rhs) {
             node->children.push_back(rhs);
         }
@@ -236,13 +260,13 @@ SyntaxNode *Parser::run_args() {
             Token kwsymbol;
             if (accept({TokenType::SYMBOL, TokenType::COLON}, {&kwsymbol, nullptr})) {
                 auto *lhs = new SyntaxNode(kwsymbol);
-                auto *rhs = run_expression();
+                auto *rhs = run_infix_expression();
                 auto *arg = new SyntaxNode(NodeType::KWARG);
                 arg->children.push_back(lhs);
                 arg->children.push_back(rhs);
                 node->children.push_back(arg);
             } else {
-                auto *arg = run_expression();
+                auto *arg = run_infix_expression();
                 node->children.push_back(arg);
             }
         } while (accept(TokenType::COMMA));

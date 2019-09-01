@@ -3,7 +3,8 @@
 #include "Tokenizer.h"
 #include "Parser.h"
 
-TEST(parser, functions) {
+TEST(parsing, functions) {
+
     auto stringInput = StringInputSource(
             L"あ（い（）、４５６、う（１２３））（え）"
     );
@@ -33,7 +34,7 @@ TEST(parser, functions) {
     EXPECT_EQ(expected, treeString);
 }
 
-TEST(parser, function_with_kwargs) {
+TEST(parsing, function_with_kwargs) {
     auto stringInput = StringInputSource(
             L"関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
     );
@@ -58,7 +59,7 @@ TEST(parser, function_with_kwargs) {
     EXPECT_EQ(expected, treeString);
 }
 
-TEST(parser, user_function) {
+TEST(parsing, user_function) {
     auto stringInput = StringInputSource(
             L"関数、ほげ（引数、＊＊辞書引数）\n"
             L"　返す、１\n"
@@ -81,7 +82,7 @@ TEST(parser, user_function) {
     EXPECT_EQ(expected, treeString);
 }
 
-TEST(parser, user_function_varparam) {
+TEST(parsing, user_function_varparam) {
     auto stringInput = StringInputSource(
             L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
             L"　返す、１\n"
@@ -107,7 +108,7 @@ TEST(parser, user_function_varparam) {
 }
 
 
-TEST(parser, dot_lookup) {
+TEST(parsing, dot_lookup) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか"
     );
@@ -126,7 +127,7 @@ TEST(parser, dot_lookup) {
     EXPECT_EQ(expected, treeString);
 }
 
-TEST(parser, dot_lookup_and_assign) {
+TEST(parsing, dot_lookup_and_assign) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか＝あ・い・う"
     );
@@ -151,7 +152,7 @@ TEST(parser, dot_lookup_and_assign) {
     EXPECT_EQ(expected, treeString);
 }
 
-TEST(parser, dot_lookup_and_call) {
+TEST(parsing, dot_lookup_and_call) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか（）"
     );
@@ -172,7 +173,7 @@ TEST(parser, dot_lookup_and_call) {
     EXPECT_EQ(expected, treeString);
 }
 
-TEST(parser, dot_lookup_and_call_and_lookup) {
+TEST(parsing, dot_lookup_and_call_and_lookup) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか（）・あ・い・う"
     );
@@ -195,6 +196,48 @@ TEST(parser, dot_lookup_and_call_and_lookup) {
             "      TERMINAL symbol：”い”、1列\n"
             "      GET\n"
             "       TERMINAL symbol：”う”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}
+
+TEST(parsing_infix, simple) {
+    auto stringInput = StringInputSource(
+            L"１－２＋３"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "ADD\n"
+            " SUB\n"
+            "  TERMINAL number：”１（1）”、1列\n"
+            "  TERMINAL number：”２（2）”、1列\n"
+            " TERMINAL number：”３（3）”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}
+
+TEST(parsing_infix, complex) {
+    auto stringInput = StringInputSource(
+            L"１－２＋あ（３）＋い"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "ADD\n"
+            " ADD\n"
+            "  SUB\n"
+            "   TERMINAL number：”１（1）”、1列\n"
+            "   TERMINAL number：”２（2）”、1列\n"
+            "  CALL\n"
+            "   TERMINAL symbol：”あ”、1列\n"
+            "   CALL_TAIL\n"
+            "    ARGS\n"
+            "     TERMINAL number：”３（3）”、1列\n"
+            " TERMINAL symbol：”い”、1列\n"
     );
     EXPECT_EQ(expected, treeString);
 }

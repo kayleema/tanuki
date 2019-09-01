@@ -22,6 +22,10 @@ public:
 	SyntaxNode *run_assign();
 	SyntaxNode *run_function();
 	SyntaxNode *run_expression();
+
+    SyntaxNode *run_infix_expression();
+
+    SyntaxNode *run_infix_additive_expression();
 	SyntaxNode *run_args();
 	SyntaxNode *run_expression_tail();
 
@@ -36,12 +40,12 @@ public:
 enum class NodeType {
 	CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
     RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
-    VARPARAM,
+    VARPARAM, SUB, ADD,
 };
 const string NodeTypeStrings[] = {
         "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
         "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
-        "VARPARAM",
+        "VARPARAM", "SUB", "ADD"
 };
 
 class SyntaxNode {
@@ -52,6 +56,9 @@ public:
 
 	explicit SyntaxNode(NodeType _type) : type(_type) {}
 	explicit SyntaxNode(Token _content) : type(NodeType::TERMINAL), content(std::move(_content)) {}
+
+    explicit SyntaxNode(NodeType _type, vector<SyntaxNode *> _children)
+            : type(_type), children(std::move(_children)) {}
 
 	~SyntaxNode();
 

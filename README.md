@@ -62,9 +62,12 @@ productions:
   return_value => expression
   return_value => EPSILON
 
-  expression => expression_fns + expression
-  expression => expression_fns - expression
-  expression => expression_fns
+  expression => component
+  expression => component + expression
+  expression => component - expression
+  component => factor * component
+  component => factor / component
+  factor => expression_fns  
   expression_fns => SYMBOL
   expression_fns => SYMBOL expression_fns_tail
   expression_fns => SYMBOL expression_fns_tail
