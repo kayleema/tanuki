@@ -5,6 +5,7 @@
 
 #include "Environment.h"
 
+// Manages Memory and object lifecycle
 class Context {
     unordered_map<long, NumberValue *> preallocNumbers;
     unordered_set<Value *> values;

@@ -1,9 +1,11 @@
 #include "gtest/gtest.h"
-
+#include "fakeit.hpp"
 #include "Tokenizer.h"
 #include "Parser.h"
 #include "Environment.h"
 #include "Context.h"
+
+using namespace fakeit;
 
 TEST(eval, functions) {
     auto stringInput = StringInputSource(
@@ -21,6 +23,39 @@ TEST(eval, functions) {
     NumberValue expected(9);
 
     EXPECT_TRUE(expected.equals(v));
+
+    context.cleanup();
+}
+
+TEST(eval, import_statement) {
+    Mock<Filesystem> mockFilesystem;
+    When(Method(mockFilesystem, getInputSourceForFilename)).Do(
+            [](const string &) {
+                return unique_ptr<InputSource>(new StringInputSource(
+                        L"あ＝７\n"
+                ));
+            }
+    );
+
+    auto stringInput = StringInputSource(
+            L"導入、フォルダー・フォルダー２・ファイル名"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    SyntaxNode *expr = tree->children[0];
+    string treeString = expr->toString();
+
+    Context context;
+    auto *env = new Environment(&context, &mockFilesystem.get());
+    env->bind(L"FILE", context.newStringValue(L""));
+    env->eval(expr);
+
+    auto value = env
+            ->lookup(L"ファイル名")->toDictionaryValue()
+            ->get(L"あ");
+    EXPECT_EQ(ValueType::NUM, value->type);
+    EXPECT_EQ(7, value->toNumberValue()->value);
 
     context.cleanup();
 }
@@ -205,7 +240,8 @@ TEST(eval, user_function_varargs) {
     Value *functionValue = env.lookup(L"ほげ");
 
     EXPECT_EQ(functionValue->type, ValueType::FUNC);
-    EXPECT_EQ(((FunctionValue *) functionValue)->functionType, FunctionValueType::USER_FUNCTION);
+    EXPECT_EQ(((FunctionValue *) functionValue)->functionType,
+              FunctionValueType::USER_FUNCTION);
     auto *userFunctionValue = (UserFunctionValue *) functionValue;
     EXPECT_TRUE(userFunctionValue->hasVarKeywordParam());
     EXPECT_EQ(userFunctionValue->getVarKeywordParam(), L"辞書引数");

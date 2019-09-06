@@ -218,12 +218,12 @@ Value *Environment::eval_import(SyntaxNode *tree) {
 
     string tryPath = dir + relativePath;
 
-    FileInputSource fileInputSource(tryPath.c_str());
-    if (!fileInputSource.good()) {
+    auto fileInputSource = filesystem->getInputSourceForFilename(tryPath);
+    if (!fileInputSource->good()) {
         cout << "ERROR: could not import" << endl;
         return context->newNoneValue();
     }
-    InputSourceTokenizer tokenizer(&fileInputSource);
+    InputSourceTokenizer tokenizer(fileInputSource.get());
     Parser parser(&tokenizer);
     auto parsedTree = parser.run();
     auto importEnv = newChildEnvironment();
@@ -276,7 +276,8 @@ Environment *Environment::newChildEnvironment() {
 }
 
 // Global Environment Constructor
-Environment::Environment(Context *context) : context(context) {
+Environment::Environment(Context *context, Filesystem *_filesystem)
+        : context(context), filesystem(_filesystem) {
     initModule(this);
 }
 

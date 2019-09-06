@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 
 	std::cout << "始まります" << std::endl;
 	const char *sourceFilename = argv[argc - 1];
-	auto input = FileInputSource(sourceFilename);
+    FileInputSource input(sourceFilename);
 	auto t = InputSourceTokenizer(&input);
 
 	if (print_lex) {
@@ -87,7 +87,8 @@ int main(int argc, char **argv)
 
 	Context context;
 	context.setFrequency(freq);
-	auto *env = new Environment(&context);
+    FilesystemImpl filesystem;
+    auto *env = new Environment(&context, &filesystem);
 	env->bind(
 		L"FILE",
 		context.newStringValue(decodeUTF8(sourceFilename))
