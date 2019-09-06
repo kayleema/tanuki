@@ -34,6 +34,10 @@ class Environment {
 
     Value *eval_assign(SyntaxNode *node);
 
+    Value *eval_add(SyntaxNode *node);
+
+    Value *eval_sub(SyntaxNode *node);
+
 public:
     explicit Environment(Context *context);
 

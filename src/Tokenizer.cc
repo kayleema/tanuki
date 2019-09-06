@@ -41,6 +41,9 @@ const wchar_t sharp = L'＃';
 const wchar_t plusSign = L'＋';
 const wchar_t slash = L'／';
 const wchar_t nullChar = L'\0';
+const wchar_t greaterThan = L'＞';
+const wchar_t lessThan = L'＜';
+const wchar_t notSign = L'！';
 
 const unordered_set<wchar_t> symbolicChars(
         {lparen,
@@ -56,7 +59,10 @@ const unordered_set<wchar_t> symbolicChars(
          minuszenkaku,
          plusSign,
          nullChar,
-         slash});
+         slash,
+         greaterThan,
+         notSign,
+         lessThan});
 
 const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
         {
@@ -71,6 +77,8 @@ const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
                 {colon,        TokenType::COLON},
                 {plusSign,     TokenType::PLUS},
                 {slash,        TokenType::SLASH},
+                {greaterThan,  TokenType::GT},
+                {lessThan,     TokenType::LT},
         });
 
 // Tokenizer Implementation
@@ -127,7 +135,7 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
     return os << token.toString();
 }
 
-bool isComplete(vector<Token> tokens) {
+bool isComplete(const vector<Token> &tokens) {
     int openParenCount = 0;
     int indentCount = 0;
     bool unstartedFunction = false;
@@ -168,6 +176,23 @@ Token InputSourceTokenizer::getToken() {
     wchar_t first = input->getChar();
     if (input->eof()) {
         return Token(TokenType::END, L"", lineNumber);
+    }
+    wstring comparisonChars(L"＜＞＝！");
+    if (comparisonChars.find(first) != string::npos
+        && comparisonChars.find(input->peekChar()) != std::string::npos) {
+        wstring comparison(1, first);
+        comparison.append(1, input->getChar());
+        if (comparison == L"＝＝") {
+            return Token(TokenType::EQ, L"＝＝", lineNumber);
+        } else if (comparison == L"＞＝") {
+            return Token(TokenType::GEQ, L"＞＝", lineNumber);
+        } else if (comparison == L"＜＝") {
+            return Token(TokenType::LEQ, L"＜＝", lineNumber);
+        } else if (comparison == L"！＝") {
+            return Token(TokenType::NEQ, L"！＝", lineNumber);
+        } else {
+            cout << "lexer error : invalid comparison" << endl;
+        }
     }
     if (charToTokenTypeMap.count(first)) {
         return Token(charToTokenTypeMap.at(first), wstring(1, first),

@@ -234,3 +234,20 @@ TEST(eval, call_user_function_varargs) {
     EXPECT_EQ(*arrayValue->get(1)->toNumberValue(), NumberValue(3));
     EXPECT_EQ(*arrayValue->get(2)->toNumberValue(), NumberValue(4));
 }
+
+TEST(eval, infix) {
+    auto stringInput = StringInputSource(
+            L"あ＝１＋２－４＋３\n"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    Context context;
+    Environment env(&context);
+    env.eval(tree);
+    Value *result = env.lookup(L"あ");
+
+    EXPECT_EQ(result->type, ValueType::NUM);
+    auto numValue = (NumberValue *) result;
+    EXPECT_EQ(numValue->value, 2);
+}

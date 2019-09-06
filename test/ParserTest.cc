@@ -241,3 +241,25 @@ TEST(parsing_infix, complex) {
     );
     EXPECT_EQ(expected, treeString);
 }
+
+TEST(parsing_infix, within) {
+    auto stringInput = StringInputSource(
+            L"表示（１－２＋３）"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "CALL\n"
+            " TERMINAL symbol：”表示”、1列\n"
+            " CALL_TAIL\n"
+            "  ARGS\n"
+            "   ADD\n"
+            "    SUB\n"
+            "     TERMINAL number：”１（1）”、1列\n"
+            "     TERMINAL number：”２（2）”、1列\n"
+            "    TERMINAL number：”３（3）”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}

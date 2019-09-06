@@ -30,6 +30,36 @@ Value *Environment::eval(SyntaxNode *tree,
     if (tree->type == NodeType::ASSIGN) {
         return eval_assign(tree);
     }
+    if (tree->type == NodeType::ADD) {
+        return eval_add(tree);
+    }
+    if (tree->type == NodeType::SUB) {
+        return eval_sub(tree);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_add(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(
+                lhs->toNumberValue()->value + rhs->toNumberValue()->value);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_sub(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(
+                lhs->toNumberValue()->value - rhs->toNumberValue()->value);
+    }
     return context->newNoneValue();
 }
 

@@ -167,3 +167,32 @@ TEST(tokenizer, infix) {
             });
     EXPECT_EQ(allTokens, expected);
 }
+
+TEST(tokenizer, comparison) {
+    auto stringInput = StringInputSource(
+            L"あ＝＝い＜＝う＞＝え＜お＞か！＝き"
+    );
+
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+
+    auto allTokens = testTokenizer.getAllTokens();
+
+    auto expected = vector<Token>(
+            {
+                    Token(TokenType::SYMBOL, L"あ", 1),
+                    Token(TokenType::EQ, L"＝＝", 1),
+                    Token(TokenType::SYMBOL, L"い", 1),
+                    Token(TokenType::LEQ, L"＜＝", 1),
+                    Token(TokenType::SYMBOL, L"う", 1),
+                    Token(TokenType::GEQ, L"＞＝", 1),
+                    Token(TokenType::SYMBOL, L"え", 1),
+                    Token(TokenType::LT, L"＜", 1),
+                    Token(TokenType::SYMBOL, L"お", 1),
+                    Token(TokenType::GT, L"＞", 1),
+                    Token(TokenType::SYMBOL, L"か", 1),
+                    Token(TokenType::NEQ, L"！＝", 1),
+                    Token(TokenType::SYMBOL, L"き", 1),
+                    Token(TokenType::END, L"", 1),
+            });
+    EXPECT_EQ(allTokens, expected);
+}
