@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include "Parser.h"
 #include "Value.h"
+#include "Filesystem.h"
 
 class Context;
 
@@ -39,10 +40,10 @@ class Environment {
     Value *eval_sub(SyntaxNode *node);
 
 public:
-    explicit Environment(Context *context);
+    explicit Environment(Context *context, Filesystem *_filesystem = nullptr);
 
     explicit Environment(Environment *parent, Context *_context = nullptr)
-            : parent(parent) {
+            : parent(parent), filesystem(parent->filesystem) {
         if (_context == nullptr) {
             if (parent->context == nullptr) {
                 cout << "error null parent context" << endl;
@@ -57,6 +58,7 @@ public:
     Environment *caller = nullptr;
     Context *context;
     unordered_map<wstring, Value *> bindings;
+    Filesystem *filesystem;
 
     Value *lookup(const wstring &name);
 

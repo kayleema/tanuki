@@ -7,10 +7,7 @@
 
 #include <iostream>
 
-const wchar_t *corePinponStarter =
-
 #include "core.pin"
-;
 
 // Builtin Functions
 class FunctionSum : public FunctionValue {

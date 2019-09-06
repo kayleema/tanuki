@@ -34,7 +34,7 @@ TEST(stringInputSource, readSingleCharacters) {
 }
 
 TEST(stringInputSource, fileSource) {
-    auto stringInput = FileInputSource("../example/fileInputSource.pin");
+    FileInputSource stringInput("../example/fileInputSource.pin");
 
     EXPECT_EQ(stringInput.peekChar(), L'関');
     EXPECT_EQ(stringInput.getChar(), L'関');

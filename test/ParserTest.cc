@@ -34,6 +34,23 @@ TEST(parsing, functions) {
     EXPECT_EQ(expected, treeString);
 }
 
+TEST(parsing, importing_file) {
+    auto stringInput = StringInputSource(
+            L"導入、フォルダー・フォルダー２・ファイル名"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    string treeString = tree->children[0]->toString();
+    string expected = (
+            "IMPORT\n"
+            " TERMINAL symbol：”フォルダー”、1列\n"
+            " TERMINAL symbol：”フォルダー２”、1列\n"
+            " TERMINAL symbol：”ファイル名”、1列\n"
+    );
+    EXPECT_EQ(expected, treeString);
+}
+
 TEST(parsing, function_with_kwargs) {
     auto stringInput = StringInputSource(
             L"関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
