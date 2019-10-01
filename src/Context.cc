@@ -85,6 +85,7 @@ void Context::setFrequency(long freq) {
     frequency = freq;
 }
 
+//TODO: Often accessed through instance.
 Value *Context::newNoneValue() {
     static Value staticNone(ValueType::NONE);
     return &staticNone;

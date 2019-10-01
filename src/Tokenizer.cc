@@ -46,23 +46,25 @@ const wchar_t lessThan = L'＜';
 const wchar_t notSign = L'！';
 
 const unordered_set<wchar_t> symbolicChars(
-        {lparen,
-         rparen,
-         comma,
-         space,
-         newline,
-         assign,
-         dot,
-         star,
-         colon,
-         sharp,
-         minuszenkaku,
-         plusSign,
-         nullChar,
-         slash,
-         greaterThan,
-         notSign,
-         lessThan});
+        {
+                lparen,
+                rparen,
+                comma,
+                space,
+                newline,
+                assign,
+                dot,
+                star,
+                colon,
+                sharp,
+                minuszenkaku,
+                plusSign,
+                nullChar,
+                slash,
+                greaterThan,
+                notSign,
+                lessThan
+        });
 
 const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
         {
@@ -132,7 +134,13 @@ bool Token::operator==(const Token &rhs) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Token &token) {
-    return os << token.toString();
+    return os << "Token("
+              << TokenTypeStrings[(int) token.type]
+              << ", \""
+              << encodeUTF8(token.content)
+              << "\", "
+              << token.line
+              << ")";
 }
 
 bool isComplete(const vector<Token> &tokens) {

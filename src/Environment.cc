@@ -36,6 +36,24 @@ Value *Environment::eval(SyntaxNode *tree,
     if (tree->type == NodeType::SUB) {
         return eval_sub(tree);
     }
+    if (tree->type == NodeType::EQUAL) {
+        return eval_equal(tree);
+    }
+    if (tree->type == NodeType::NEQ) {
+        return eval_not_equal(tree);
+    }
+    if (tree->type == NodeType::GT) {
+        return eval_gt(tree);
+    }
+    if (tree->type == NodeType::LT) {
+        return eval_lt(tree);
+    }
+    if (tree->type == NodeType::GTE) {
+        return eval_gte(tree);
+    }
+    if (tree->type == NodeType::LTE) {
+        return eval_lte(tree);
+    }
     return context->newNoneValue();
 }
 
@@ -59,6 +77,66 @@ Value *Environment::eval_sub(SyntaxNode *tree) {
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value - rhs->toNumberValue()->value);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_equal(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    return context->newNumberValue(lhs->equals(rhs) ? 1 : 0);
+}
+
+Value *Environment::eval_not_equal(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    return context->newNumberValue(lhs->equals(rhs) ? 0 : 1);
+}
+
+Value *Environment::eval_gt(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(lhs->toNumberValue()->value > rhs->toNumberValue()->value ? 1 : 0);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_lt(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(lhs->toNumberValue()->value < rhs->toNumberValue()->value ? 1 : 0);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_gte(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(lhs->toNumberValue()->value >= rhs->toNumberValue()->value ? 1 : 0);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_lte(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(lhs->toNumberValue()->value <= rhs->toNumberValue()->value ? 1 : 0);
     }
     return context->newNoneValue();
 }
@@ -186,7 +264,7 @@ Value *Environment::eval_text(SyntaxNode *tree,
         if (statementReturnValue->type == ValueType::RETURN ||
             statementReturnValue->type == ValueType::TAIL_CALL) {
             return statementReturnValue;
-        } else if (statementReturnValue != nullptr &&
+        } else if (statementReturnValue != nullptr && // TODO: always true
                    statementReturnValue->type != ValueType::NONE) {
         }
     }

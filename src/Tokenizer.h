@@ -48,6 +48,8 @@ public:
 
     bool operator==(const Token &rhs) const;
 
+    bool operator!=(const Token &rhs) const { return !(*this == rhs); };
+
     friend std::ostream &operator<<(std::ostream &os, const Token &token);
 };
 
