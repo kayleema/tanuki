@@ -1,7 +1,7 @@
 #include "Environment.h"
 #include "Context.h"
 #include "CoreFunctions.h"
-#include <libgen.h>
+#include "pathutils.h"
 
 Value *Environment::eval(SyntaxNode *tree,
                          const FunctionValue *tailContext) {
@@ -234,9 +234,7 @@ Value *Environment::eval_return(SyntaxNode *tree,
 
 Value *Environment::eval_import(SyntaxNode *tree) {
     auto path = encodeUTF8(lookup(L"FILE")->toStringValue()->value);
-    auto cdir = strdup(path.c_str());
-    auto dir = string(dirname(cdir));
-    free(cdir);
+    auto dir = getDirectoryForPath(path);
 
     auto relativePath = string();
     wstring dirToken;

@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 
 #include "InputSource.h"
+#include "pathutils.h"
+#include <iostream>
 
 TEST(stringInputSource, eof_is_false) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
@@ -34,7 +36,8 @@ TEST(stringInputSource, readSingleCharacters) {
 }
 
 TEST(stringInputSource, fileSource) {
-    FileInputSource stringInput("../example/fileInputSource.pin");
+    auto filename = string("example/fileInputSource.pin");
+    FileInputSource stringInput(filename.c_str());
 
     EXPECT_EQ(stringInput.peekChar(), L'関');
     EXPECT_EQ(stringInput.getChar(), L'関');
@@ -57,5 +60,3 @@ TEST(stringInputSource, fileSource) {
     EXPECT_EQ(stringInput.getChar(), L'\0');
     EXPECT_TRUE(stringInput.eof());
 }
-
-

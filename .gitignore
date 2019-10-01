@@ -5,3 +5,8 @@ tags
 .idea
 cmake-build-debug/
 *.pro.user
+vc140.pdb
+vsc_workspace.code-workspace
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json
