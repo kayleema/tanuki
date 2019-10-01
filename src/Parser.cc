@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unordered_map>
 #include "Parser.h"
 
 SyntaxNode *Parser::run() {
@@ -158,7 +159,27 @@ SyntaxNode *Parser::run_function() {
 }
 
 SyntaxNode *Parser::run_infix_expression() {
-    return run_infix_additive_expression();
+    return run_infix_comparison_expression();
+}
+
+SyntaxNode *Parser::run_infix_comparison_expression() {
+    auto lhs = run_infix_additive_expression();
+    static const std::vector<std::pair<TokenType, NodeType>> operatorToNode(
+            {
+                    {TokenType::EQ,  NodeType::EQUAL},
+                    {TokenType::NEQ, NodeType::NEQ},
+                    {TokenType::LT,  NodeType::LT},
+                    {TokenType::GT,  NodeType::GT},
+                    {TokenType::GEQ, NodeType::GTE},
+                    {TokenType::LEQ, NodeType::LTE}
+            });
+    for (const auto pair : operatorToNode) {
+        if (accept(pair.first)) {
+            auto rhs = run_infix_additive_expression();
+            return new SyntaxNode(pair.second, {lhs, rhs});
+        }
+    }
+    return lhs;
 }
 
 SyntaxNode *Parser::run_infix_additive_expression() {
@@ -218,7 +239,7 @@ SyntaxNode *Parser::run_expression_tail() {
         auto node = new SyntaxNode(NodeType::CALL_TAIL);
         auto args = run_args();
         if (!accept(TokenType::RPAREN)) {
-            cout << "error";
+            cout << "error　" << node->toString() << endl;
         }
         auto tail = run_expression_tail();
         node->children.push_back(args);
@@ -352,6 +373,41 @@ string SyntaxNode::toString(int indent) {
         result << child->toString(indent + 1);
     }
     return result.str();
+}
+
+bool SyntaxNode::operator==(const SyntaxNode &other) const {
+    if (children.size() != other.children.size() || type != other.type) {
+        return false;
+    }
+    if (type == NodeType::TERMINAL && content != other.content) {
+        return false;
+    }
+    for (std::vector<SyntaxNode *>::size_type i = 0; i != children.size(); i++) {
+        if ((*children[i]) != (*other.children[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+ostream &operator<<(ostream &out, const SyntaxNode &node) {
+    out << "SyntaxNode("
+        << NodeTypeStrings[(int) node.type]
+        << ", ";
+    if (node.type == NodeType::TERMINAL) {
+        out << node.content;
+    } else {
+        out << "{";
+        std::string separator;
+        for (const auto &child : node.children) {
+            out << separator << *child;
+            separator = ",";
+        }
+        out << "}";
+    }
+    out << ")";
+    return out;
 }
 
 SyntaxNode::~SyntaxNode() {

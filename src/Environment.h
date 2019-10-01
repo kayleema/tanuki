@@ -39,6 +39,18 @@ class Environment {
 
     Value *eval_sub(SyntaxNode *node);
 
+    Value *eval_equal(SyntaxNode *node);
+
+    Value *eval_not_equal(SyntaxNode *node);
+
+    Value *eval_gt(SyntaxNode *node);
+
+    Value *eval_lt(SyntaxNode *node);
+
+    Value *eval_gte(SyntaxNode *node);
+
+    Value *eval_lte(SyntaxNode *node);
+
 public:
     explicit Environment(Context *context, Filesystem *_filesystem = nullptr);
 

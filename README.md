@@ -41,7 +41,7 @@ Formal Grammar (incomplete)
 terminals:
 ```
   LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL, INDENT,
-  DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING, DOT
+  DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING, DOT, ...
 ```
 
 productions:
@@ -53,28 +53,27 @@ productions:
   statement => FUNC COMMA SYMBOL LPAREN param_list RPAREN NEWL INDENT text DEDENT
   statement => RETURN return_value
   statement => if_statement
-  statement => SYMBOL ASSIGN expression
-  statement => expression
+  statement => SYMBOL ASSIGN infix_expression
+  statement => infix_expression
 
   param_list => SYMBOL [COMMA SYMBOL]* | EPSILON
-  if_statement => IF COMMA expression NEWL INDENT text DEDENT
-  if_statement => IF COMMA expression NEWL INDENT text DEDENT ELSE NEWL INDENT text DEDENT
-  return_value => expression
+  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT
+  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT ELSE NEWL INDENT text DEDENT
+  return_value => infix_expression
   return_value => EPSILON
 
-  expression => component
-  expression => component + expression
-  expression => component - expression
-  component => factor * component
-  component => factor / component
-  factor => expression_fns  
-  expression_fns => SYMBOL
-  expression_fns => SYMBOL expression_fns_tail
-  expression_fns => SYMBOL expression_fns_tail
-  expression_fns => NUMBER
-  expression_fns => NUMBER expression_fns_tail
-  expression_fns_tail => LPAREN arg_list RPAREN expression_fns_tail
-  expression_fns_tail => EPSILON
+  infix_expression => infix_comparison_expression
+  infix_comparison_expression => infix_additive_expression {==,!=,>,<,>=,<=} infix_additive_expression
+  infix_additive_expression => expression {+,-} expression [ {+,-} expression ]...
+
+  expression => STRING
+  expression => SYMBOL
+  expression => SYMBOL expression_tail
+  expression => NUMBER
+  expression => NUMBER expression_tail
+
+  expression_tail => LPAREN arg_list RPAREN expression_tail
+  expression_tail => EPSILON
 
   arg_list => expression [COMMA expression]* | EPSILON
 ```
@@ -87,7 +86,7 @@ productions:
 * dynamic dict set
 * short form method definition
 * short form method call
-* infix operators
+* correct infix operators for multiplication and division
 
 Interactive Mode Notes
 --------------

@@ -287,3 +287,32 @@ TEST(eval, infix) {
     auto numValue = (NumberValue *) result;
     EXPECT_EQ(numValue->value, 2);
 }
+
+TEST(eval, infix_equality) {
+    auto stringInput = StringInputSource(
+            L"あ＝１＝＝３\n"
+            L"い＝１！＝３\n"
+            L"う＝１＞＝３\n"
+            L"え＝１＜＝３\n"
+            L"お＝１＞３\n"
+            L"か＝１＜３\n"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    Context context;
+    Environment env(&context);
+    env.eval(tree);
+    Value *result = env.lookup(L"あ");
+
+    EXPECT_EQ(result->type, ValueType::NUM);
+    auto numValue = (NumberValue *) result;
+    EXPECT_EQ(numValue->value, 0);
+    EXPECT_FALSE(numValue->isTruthy());
+
+    EXPECT_TRUE(env.lookup(L"い")->isTruthy());
+    EXPECT_FALSE(env.lookup(L"う")->isTruthy());
+    EXPECT_TRUE(env.lookup(L"え")->isTruthy());
+    EXPECT_FALSE(env.lookup(L"お")->isTruthy());
+    EXPECT_TRUE(env.lookup(L"か")->isTruthy());
+}

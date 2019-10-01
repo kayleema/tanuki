@@ -224,15 +224,15 @@ TEST(parsing_infix, simple) {
     auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
     SyntaxNode *tree = parser.run();
-    string treeString = tree->children[0]->toString();
-    string expected = (
-            "ADD\n"
-            " SUB\n"
-            "  TERMINAL number：”１（1）”、1列\n"
-            "  TERMINAL number：”２（2）”、1列\n"
-            " TERMINAL number：”３（3）”、1列\n"
-    );
-    EXPECT_EQ(expected, treeString);
+
+    auto expectedTree = SyntaxNode(NodeType::ADD, {
+            new SyntaxNode(NodeType::SUB, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            }),
+            new SyntaxNode(Token(TokenType::NUMBER, L"３", 1))
+    });
+    EXPECT_EQ(expectedTree, *tree->children[0]);
 }
 
 TEST(parsing_infix, complex) {
@@ -279,4 +279,122 @@ TEST(parsing_infix, within) {
             "    TERMINAL number：”３（3）”、1列\n"
     );
     EXPECT_EQ(expected, treeString);
+}
+
+TEST(parsing_infix, comparison) {
+    auto stringInput = StringInputSource(
+            L"表示（１＝＝２）"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::CALL, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"表示", 1)),
+            new SyntaxNode(NodeType::CALL_TAIL, {
+                    new SyntaxNode(NodeType::ARGS, {
+                            new SyntaxNode(NodeType::EQUAL, {
+                                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                            })
+                    })
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
+}
+
+TEST(parsing_infix, comparisonNotEqual) {
+    auto stringInput = StringInputSource(
+            L"あ＝１！＝２"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::ASSIGN, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(NodeType::NEQ, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
+}
+
+TEST(parsing_infix, comparisonLessThan) {
+    auto stringInput = StringInputSource(
+            L"あ＝１＜２"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::ASSIGN, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(NodeType::LT, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
+}
+
+TEST(parsing_infix, comparisonGreaterThan) {
+    auto stringInput = StringInputSource(
+            L"あ＝１＞２"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::ASSIGN, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(NodeType::GT, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
+}
+
+TEST(parsing_infix, comparisonGreaterThanEqual) {
+    auto stringInput = StringInputSource(
+            L"あ＝１＞＝２"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::ASSIGN, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(NodeType::GTE, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
+}
+
+TEST(parsing_infix, comparisonLessThanEqual) {
+    auto stringInput = StringInputSource(
+            L"あ＝１＜＝２"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::ASSIGN, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(NodeType::LTE, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
 }
