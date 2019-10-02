@@ -80,6 +80,8 @@ productions:
 
 まだ実装されてない事
 ------------------
+* assertions
+* dictionary iteration
 * keyword argument unpacking with defaults
 * variable length non-keyword arguments
 * dynamic dict lookup
@@ -87,6 +89,7 @@ productions:
 * short form method definition
 * short form method call
 * correct infix operators for multiplication and division
+* expression parenthesis with line wrapping
 
 Interactive Mode Notes
 --------------
