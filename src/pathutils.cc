@@ -1,5 +1,6 @@
 #include "pathutils.h"
 
+#include <string>
 #ifdef _WIN32
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
@@ -14,8 +15,9 @@ std::string getDirectoryForPath(const std::string &path) {
     PathRemoveFileSpecA(pa);
     return std::string(pa);
 #else
-    auto cdir = strdup(path.c_str());
-    auto dir = string(dirname(cdir));
+    char *cdir = strdup(path.c_str());
+    std::string dir(dirname(cdir));
     free(cdir);
+    return dir;
 #endif
 }

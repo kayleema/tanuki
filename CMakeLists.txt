@@ -7,6 +7,7 @@ if(WIN32)
         set(CMAKE_CXX_FLAGS_DEBUG "/EHa /MTd")
 else()
         set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra")
 endif()
 
 add_subdirectory(./googletest)
