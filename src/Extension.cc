@@ -1,13 +1,20 @@
-#include "Value.h"
-#include "Environment.h"
-#include "Context.h"
 #include "Extension.h"
-#include <dlfcn.h>
+#include "Context.h"
+#include "Environment.h"
+#include "Value.h"
 #include <iostream>
+
+
+#ifdef _WIN32
+#else
+#include <dlfcn.h>
+#endif
 
 using namespace std;
 
 void loadDynamic(Environment *env, const char *libname) {
+#ifdef _WIN32
+#else
     // libname of the form "libpinpon_dynamic.dylib"
     void *handle = dlopen(libname, RTLD_LAZY);
     if (!handle) {
@@ -21,9 +28,10 @@ void loadDynamic(Environment *env, const char *libname) {
         return;
     }
 
-    auto functionPointer = (LoadModuleFunction) symbol;
+    auto functionPointer = (LoadModuleFunction)symbol;
 
     (*functionPointer)(env);
 
     // dlclose(handle);
+#endif
 }

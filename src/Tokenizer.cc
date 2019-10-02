@@ -185,9 +185,8 @@ Token InputSourceTokenizer::getToken() {
     if (input->eof()) {
         return Token(TokenType::END, L"", lineNumber);
     }
-    wstring comparisonChars(L"＜＞＝！");
-    if (comparisonChars.find(first) != string::npos
-        && comparisonChars.find(input->peekChar()) != std::string::npos) {
+    unordered_set<wchar_t> comparisonChars({greaterThan, lessThan, assign, notSign});
+    if (comparisonChars.count(first) && comparisonChars.count(input->peekChar())) {
         wstring comparison(1, first);
         comparison.append(1, input->getChar());
         if (comparison == L"＝＝") {
