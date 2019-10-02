@@ -51,6 +51,8 @@ class Environment {
 
     Value *eval_lte(SyntaxNode *node);
 
+    Value *eval_assert(SyntaxNode *node);
+
 public:
     explicit Environment(Context *context, Filesystem *_filesystem = nullptr);
 

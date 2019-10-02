@@ -54,6 +54,9 @@ Value *Environment::eval(SyntaxNode *tree,
     if (tree->type == NodeType::LTE) {
         return eval_lte(tree);
     }
+    if (tree->type == NodeType::ASSERT) {
+        return eval_assert(tree);
+    }
     return context->newNoneValue();
 }
 
@@ -360,6 +363,15 @@ Value *Environment::eval_assign(SyntaxNode *tree) {
     wstring lhs = tree->children[0]->content.content;
     bind(lhs, eval(tree->children[1]));
     return context->newNoneValue();
+}
+
+Value *Environment::eval_assert(SyntaxNode *tree) {
+    auto rhs = eval(tree->children[0]);
+    if (!rhs->isTruthy()) {
+        cout << "アサートでエラー終了：" << tree->content.line << "行目" << endl;
+        exit(1);
+    }
+    return Context::newNoneValue();
 }
 
 Value *Environment::lookup(const wstring &name) {

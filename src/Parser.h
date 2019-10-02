@@ -26,6 +26,8 @@ public:
 
     SyntaxNode *run_if();
 
+    SyntaxNode *run_assert();
+
     SyntaxNode *run_assign();
 
     SyntaxNode *run_function();
@@ -57,12 +59,14 @@ public:
 enum class NodeType {
     CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
     RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
-    VARPARAM, SUB, ADD, EQUAL, NEQ, LT, GT, LTE, GTE
+    VARPARAM, SUB, ADD, EQUAL, NEQ, LT, GT, LTE, GTE,
+    ASSERT
 };
 const string NodeTypeStrings[] = {
         "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
         "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
-        "VARPARAM", "SUB", "ADD", "EQUAL", "NEQ", "LT", "GT", "LTE", "GTE"
+        "VARPARAM", "SUB", "ADD", "EQUAL", "NEQ", "LT", "GT", "LTE", "GTE",
+        "ASSERT"
 };
 
 class SyntaxNode {

@@ -29,6 +29,8 @@ SyntaxNode *Parser::run_statement() {
         return result;
     } else if ((result = run_if())) {
         return result;
+    } else if ((result = run_assert())) {
+        return result;
     } else if ((result = run_function())) {
         return result;
     } else if ((result = run_assign())) {
@@ -66,6 +68,20 @@ SyntaxNode *Parser::run_if() {
             result->children.push_back(bodyElse);
             expect(TokenType::DEDENT);
         }
+        return result;
+    }
+    return nullptr;
+}
+
+SyntaxNode *Parser::run_assert() {
+    Token assertToken;
+    if (accept(TokenType::ASSERT, &assertToken)) {
+        expect(TokenType::COMMA);
+        SyntaxNode *rhs = run_infix_expression();
+        auto result = new SyntaxNode(NodeType::ASSERT, {
+                rhs
+        });
+        result->content = assertToken;
         return result;
     }
     return nullptr;

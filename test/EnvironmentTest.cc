@@ -128,6 +128,7 @@ TEST(eval, if_statement) {
 }
 
 TEST(program, fibonacci) {
+    // Commented out parts are commented out so that tests run faster without optimizations enabled
     auto stringInput = StringInputSource(
             L"関数、フィボナッチ（号）\n"
             L"　もし、イコール（号、１）\n"
@@ -137,7 +138,7 @@ TEST(program, fibonacci) {
             L"　返す、足す（フィボナッチ（引く（号、１））、フィボナッチ（引く（号、２）））\n"
             L"\n"
             L"フィボナッチ（７）\n"
-            L"フィボナッチ（１４）\n"
+            // L"フィボナッチ（１４）\n"
     );
 
 
@@ -152,9 +153,9 @@ TEST(program, fibonacci) {
     Value *expected = new NumberValue(21);
     EXPECT_TRUE(expected->equals(v));
 
-    v = env.eval(tree->children[2]);
-    expected = new NumberValue(610);
-    EXPECT_TRUE(expected->equals(v));
+    // v = env.eval(tree->children[2]);
+    // expected = new NumberValue(610);
+    // EXPECT_TRUE(expected->equals(v));
 }
 
 TEST(program, string_eq) {

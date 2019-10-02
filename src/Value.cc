@@ -56,12 +56,14 @@ string UserFunctionValue::toString() const {
 
 Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
                                 Environment *caller, unordered_map<wstring, Value *> *kwargsIn) const {
-    Value *bodyReturnValue;
+    Value *bodyReturnValue = nullptr;
     Environment *env;
     env = parentEnv->newChildEnvironment();
     env->caller = caller;
     vector<Value *> args = argsIn;
     do {
+        delete bodyReturnValue;
+
         if (params.size() > argsIn.size()) {
             cout << "エラー：引数は足りません　"
                  << "必要は" << params.size() << " 渡したのは" << argsIn.size() << endl;
@@ -95,7 +97,6 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
         }
         if (bodyReturnValue->type == ValueType::TAIL_CALL) {
             args = ((TailCallValue *) bodyReturnValue)->args;
-            delete bodyReturnValue;
             env->tailReset();
         }
     } while (bodyReturnValue->type == ValueType::TAIL_CALL);

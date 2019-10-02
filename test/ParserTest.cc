@@ -398,3 +398,21 @@ TEST(parsing_infix, comparisonLessThanEqual) {
     });
     EXPECT_EQ(expected, *tree->children[0]);
 }
+
+TEST(parsing_infix, assert) {
+    auto stringInput = StringInputSource(
+            L"アサート、１＝＝２"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expected(NodeType::ASSERT, {
+            new SyntaxNode(NodeType::EQUAL, {
+                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+            })
+    });
+    EXPECT_EQ(expected, *tree->children[0]);
+}
