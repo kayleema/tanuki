@@ -141,6 +141,22 @@ Value *FunctionNewDictionary::apply(const vector<Value *> &args,
     return result;
 }
 
+Value *FunctionForEach::apply(const vector<Value *> &args,
+                              Environment *env,
+                              unordered_map<wstring, Value *> *) const {
+    if (args.size() == 2 && args[0]->type == ValueType::DICT && args[1]->type == ValueType::FUNC) {
+        auto dictionary = args[0]->toDictionaryValue();
+        auto function = (FunctionValue *) args[1];
+        for (const auto &item : dictionary->value) {
+            auto key = env->context->newStringValue(item.first);
+            auto value = item.second;
+            function->apply({key, value}, env);
+        }
+        return Context::newNoneValue();
+    }
+    return Context::newNoneValue();
+}
+
 class FunctionReadFile : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
@@ -197,6 +213,7 @@ void initModule(Environment *env) {
     env->bind(L"イコール", new FunctionEqual());
     env->bind(L"比べ", new FunctionCompare());
     env->bind(L"辞書", new FunctionNewDictionary());
+    env->bind(L"それぞれ", new FunctionForEach());
     env->bind(L"ファイル読む", new FunctionReadFile());
     env->bind(L"評価", new FunctionEval());
     env->bind(L"エキステンション", new FunctionLoadExt());

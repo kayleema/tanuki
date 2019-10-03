@@ -15,4 +15,10 @@ public:
                  unordered_map<wstring, Value *> *kwargsIn) const override;
 };
 
+class FunctionForEach : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env,
+                 unordered_map<wstring, Value *> *kwargsIn) const override;
+};
+
 #endif
