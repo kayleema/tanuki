@@ -368,7 +368,7 @@ Value *Environment::eval_assign(SyntaxNode *tree) {
 Value *Environment::eval_assert(SyntaxNode *tree) {
     auto rhs = eval(tree->children[0]);
     if (!rhs->isTruthy()) {
-        cout << "アサートでエラー終了：" << tree->content.line << "行目" << endl;
+        cout << "確認エラー終了：" << tree->content.line << "行目" << endl;
         exit(1);
     }
     return Context::newNoneValue();
