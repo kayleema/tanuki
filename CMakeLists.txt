@@ -39,7 +39,7 @@ target_link_libraries(pinpon_dynamic pinpon_lib)
 set(CTEST_OUTPUT_ON_FAILURE ON)
 enable_testing()
 add_executable(pinpon_test ${pinpon_SRC} ${pinpon_test_SRC})
-target_link_libraries(pinpon_test gtest_main)
+target_link_libraries(pinpon_test gtest)
 add_test(NAME pinpon_test COMMAND pinpon_test)
 
 #add_subdirectory(qtpinpon)
