@@ -143,7 +143,17 @@ SyntaxNode *Parser::run_function() {
     while (!accept(TokenType::RPAREN)) {
         Token param;
         if (accept(TokenType::SYMBOL, &param)) {
-            params->children.push_back(new SyntaxNode(param));
+            if (accept(TokenType::COLON)) {
+                auto rhs = run_infix_expression();
+                params->children.push_back(
+                        new SyntaxNode(NodeType::DEFAULTPARAM, {
+                                new SyntaxNode(param),
+                                rhs
+                        })
+                );
+            } else {
+                params->children.push_back(new SyntaxNode(param));
+            }
             accept(TokenType::COMMA);
         }
         if (accept(TokenType::STAR)) {
@@ -294,9 +304,9 @@ SyntaxNode *Parser::run_args() {
         return node;
     } else {
         do {
-            Token kwsymbol;
-            if (accept({TokenType::SYMBOL, TokenType::COLON}, {&kwsymbol, nullptr})) {
-                auto *lhs = new SyntaxNode(kwsymbol);
+            Token kwSymbol;
+            if (accept({TokenType::SYMBOL, TokenType::COLON}, {&kwSymbol, nullptr})) {
+                auto *lhs = new SyntaxNode(kwSymbol);
                 auto *rhs = run_infix_expression();
                 auto *arg = new SyntaxNode(NodeType::KWARG);
                 arg->children.push_back(lhs);

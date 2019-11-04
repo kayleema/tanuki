@@ -2,6 +2,7 @@
 #include "Context.h"
 #include "CoreFunctions.h"
 #include "pathutils.h"
+#include "Logger.h"
 
 Value *Environment::eval(SyntaxNode *tree,
                          const FunctionValue *tailContext) {
@@ -221,7 +222,7 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
     if (!source->has(key)) {
-        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
+//        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
     }
     auto result = source->get(key);
@@ -276,6 +277,7 @@ Value *Environment::eval_text(SyntaxNode *tree,
 
 Value *Environment::eval_function(SyntaxNode *tree) {
     std::vector<wstring> params;
+    std::unordered_map<wstring, Value *> paramsWithDefault;
     wstring name = tree->children[0]->content.content;
     bool hasKwParam = false;
     bool hasVarParam = false;
@@ -290,10 +292,16 @@ Value *Environment::eval_function(SyntaxNode *tree) {
         } else if (param->type == NodeType::VARPARAM) {
             hasVarParam = true;
             varParamName = param->children[0]->content.content;
+        } else if (param->type == NodeType::DEFAULTPARAM) {
+//            wcout << L"DEFAULTPARAM:" << param->children[0]->content.content << endl;
+            auto defaultValue = eval(param->children[1], nullptr);
+            defaultValue->refs++;
+            paramsWithDefault[param->children[0]->content.content] = defaultValue;
         }
     }
     auto body = tree->children[2];
-    auto function = context->newUserFunctionValue(params, body, this);
+    auto function = context->newUserFunctionValue(
+            params, paramsWithDefault, body, this);
     if (hasKwParam) {
         function->setVarKeywordParam(kwParamName);
     }
@@ -301,7 +309,7 @@ Value *Environment::eval_function(SyntaxNode *tree) {
         function->setVarParam(varParamName);
     }
     bindings[name] = function;
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_return(SyntaxNode *tree,
@@ -326,10 +334,12 @@ Value *Environment::eval_import(SyntaxNode *tree) {
     relativePath += string(".pin");
 
     string tryPath = dir + relativePath;
-
+    ConsoleLogger logger;
+    logger.log(L"importing:")->log(path)->logEndl();
+    logger.log(L"importing:")->log(tryPath)->logEndl();
     auto fileInputSource = filesystem->getInputSourceForFilename(tryPath);
     if (!fileInputSource->good()) {
-        cout << "ERROR: could not import" << endl;
+//        cout << "ERROR: could not import" << endl;
         return context->newNoneValue();
     }
     InputSourceTokenizer tokenizer(fileInputSource.get());
@@ -368,7 +378,7 @@ Value *Environment::eval_assign(SyntaxNode *tree) {
 Value *Environment::eval_assert(SyntaxNode *tree) {
     auto rhs = eval(tree->children[0]);
     if (!rhs->isTruthy()) {
-        cout << "アサートでエラー終了：" << tree->content.line << "行目" << endl;
+//        cout << "アサートでエラー終了：" << tree->content.line << "行目" << endl;
         exit(1);
     }
     return Context::newNoneValue();
@@ -381,7 +391,7 @@ Value *Environment::lookup(const wstring &name) {
     if (parent) {
         return parent->lookup(name);
     }
-    cout << "lookup failure" << endl;
+    ConsoleLogger().log("lookup failure for '")->log(name)->log("'")->logEndl();
     return nullptr;
 }
 

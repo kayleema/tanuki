@@ -3,6 +3,11 @@
 #include "InputSource.h"
 #include "pathutils.h"
 #include <iostream>
+#include <Tokenizer.h>
+#include <Parser.h>
+#include <Context.h>
+#include <CoreFunctions.h>
+#include <Logger.h>
 
 TEST(stringInputSource, eof_is_false) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
@@ -59,4 +64,36 @@ TEST(stringInputSource, fileSource) {
     EXPECT_EQ(stringInput.peekChar(), L'\0');
     EXPECT_EQ(stringInput.getChar(), L'\0');
     EXPECT_TRUE(stringInput.eof());
+}
+
+void evalPinponStarter(Environment *env) {
+    auto source = StringInputSource(corePinponStarter);
+    auto tokenizer = InputSourceTokenizer(&source);
+    auto parser = Parser(&tokenizer);
+    SyntaxNode *tree = parser.run();
+    env->eval(tree);
+}
+
+TEST(stringInputSource, selftest) {
+    ConsoleLogger logger;
+    ConsoleLogger::wide_mode = false;
+    logger.logLn("Starting self test");
+    auto filename = string("testpin/tests.pin");
+    FileInputSource stringInput(filename.c_str());
+    auto t = InputSourceTokenizer(&stringInput);
+    auto p = Parser(&t);
+    SyntaxNode *tree = p.run();
+    Context context;
+    context.setFrequency(10000);
+    FilesystemImpl filesystem;
+    auto *env = new Environment(&context, &filesystem);
+    env->bind(
+            L"FILE",
+            context.newStringValue(decodeUTF8("testpin/tests.pin"))
+    );
+    evalPinponStarter(env);
+    env->eval(tree);
+
+    delete tree;
+    context.cleanup();
 }

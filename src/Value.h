@@ -160,6 +160,7 @@ class SyntaxNode;
 
 class UserFunctionValue : public FunctionValue {
     vector<wstring> params;
+    unordered_map<wstring, Value *> paramsWithDefault;
     bool hasVarKeywordArgs;
     wstring varKeywordArgsParam;
     bool hasVarArgs{};
@@ -173,12 +174,23 @@ public:
         functionType = FunctionValueType::USER_FUNCTION;
     };
 
+    UserFunctionValue(vector<wstring> params, unordered_map<wstring, Value *> paramsWithDefault,
+                      SyntaxNode *body, Environment *parentEnv)
+            : FunctionValue(), params(std::move(params)), paramsWithDefault(std::move(paramsWithDefault)),
+              hasVarKeywordArgs(false), body(body), parentEnv(parentEnv) {
+        functionType = FunctionValueType::USER_FUNCTION;
+    };
+
     Environment *parentEnv;
 
     Value *apply(const vector<Value *> &args, Environment *env,
                  unordered_map<wstring, Value *> *kwargsIn = nullptr) const override;
 
     string toString() const override;
+
+    const unordered_map<wstring, Value *> &getParamsWithDefault() {
+        return paramsWithDefault;
+    }
 
     void setVarKeywordParam(wstring name);
 

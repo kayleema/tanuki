@@ -8,6 +8,8 @@
 #include <iostream>
 
 #include "core.pin"
+#include "Logger.h"
+
 
 // Builtin Functions
 class FunctionSum : public FunctionValue {
@@ -82,19 +84,28 @@ public:
 
 class FunctionPrint : public FunctionValue {
 public:
+    PinponLogger *logger;
+
+    FunctionPrint() {
+        logger = new ConsoleLogger();
+    }
+
+    ~FunctionPrint() override {
+        delete logger;
+    }
 
     Value *apply(const vector<Value *> &args, Environment *,
                  unordered_map<wstring, Value *> *) const override {
         for (auto value : args) {
             if (value->type == ValueType::NUM) {
-                cout << value->toNumberValue()->value;
+                logger->logLong(value->toNumberValue()->value);
             } else if (value->type == ValueType::STRING) {
-                cout << encodeUTF8(value->toStringValue()->value);
+                logger->log(value->toStringValue()->value);
             } else {
-                cout << value->toString();
+                logger->log(value->toString());
             }
         }
-        cout << endl;
+        logger->logEndl();
         return Context::newNoneValue();
     };
 };

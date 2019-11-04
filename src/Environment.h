@@ -60,7 +60,7 @@ public:
             : parent(parent), filesystem(parent->filesystem) {
         if (_context == nullptr) {
             if (parent->context == nullptr) {
-                cout << "error null parent context" << endl;
+//                cout << "error null parent context" << endl;
             }
             context = parent->context;
         } else {
