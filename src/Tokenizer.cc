@@ -92,7 +92,7 @@ const unordered_map<wstring, TokenType> identifiers(
                 {L"他でもし", TokenType::ELIF},
                 {L"その他",  TokenType::ELSE},
                 {L"導入",   TokenType::IMPORT},
-                {L"アサート", TokenType::ASSERT}
+                {L"確認", TokenType::ASSERT}
         });
 
 bool charIsSymbolic(wchar_t c) {

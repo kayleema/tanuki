@@ -440,7 +440,7 @@ TEST(parsing_infix, comparisonLessThanEqual) {
 
 TEST(parsing_infix, assert) {
     auto stringInput = StringInputSource(
-            L"アサート、１＝＝２"
+            L"確認、１＝＝２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);

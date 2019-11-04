@@ -199,7 +199,7 @@ TEST(tokenizer, comparison) {
 
 TEST(tokenizer, assert) {
     auto stringInput = StringInputSource(
-            L"アサート、０＝＝１"
+            L"確認、０＝＝１"
     );
 
     auto testTokenizer = InputSourceTokenizer(&stringInput);
@@ -208,7 +208,7 @@ TEST(tokenizer, assert) {
 
     auto expected = vector<Token>(
             {
-                    Token(TokenType::ASSERT, L"アサート", 1),
+                    Token(TokenType::ASSERT, L"確認", 1),
                     Token(TokenType::COMMA, L"、", 1),
                     Token(TokenType::NUMBER, L"０", 1),
                     Token(TokenType::EQ, L"＝＝", 1),
