@@ -84,7 +84,7 @@ public:
 
     void set(const wstring &name, Value *v) { value[name] = v; }
 
-    Value *get(const wstring &name) {
+    virtual Value *get(const wstring &name) {
         if (value.count(name)) {
             return value[name];
         } else if (parent) {
@@ -101,16 +101,19 @@ public:
 };
 
 
-class ArrayValue : public Value {
-    vector<Value *> value;
+class ArrayValue : public DictionaryValue {
 public:
-    explicit ArrayValue() : Value(ValueType::ARRAY) {}
+    vector<Value *> value;
+
+    explicit ArrayValue() {
+        type = ValueType::ARRAY;
+    }
 
     void set(long index, Value *v) { value[index] = v; }
 
     void push(Value *v) { value.push_back(v); }
 
-    Value *get(long index) {
+    Value *getIndex(long index) {
         if ((size_t) index < value.size()) {
             return value[index];
         }

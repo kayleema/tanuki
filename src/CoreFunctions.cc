@@ -158,10 +158,14 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
     if (args.size() == 2 && args[0]->type == ValueType::DICT && args[1]->type == ValueType::FUNC) {
         auto dictionary = args[0]->toDictionaryValue();
         auto function = (FunctionValue *) args[1];
+        // TODO: optimize
+        vector<wstring> keys;
         for (const auto &item : dictionary->value) {
-            auto key = env->context->newStringValue(item.first);
-            auto value = item.second;
-            function->apply({key, value}, env);
+            keys.push_back(item.first);
+        }
+        for (const auto &key : keys) {
+            auto value = dictionary->value[key];
+            function->apply({env->context->newStringValue(key), value}, env);
         }
         return Context::newNoneValue();
     }
@@ -215,6 +219,62 @@ public:
     };
 };
 
+class LengthFunction : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env,
+                 unordered_map<wstring, Value *> *) const override {
+        if (args[0]->type != ValueType::ARRAY) {
+            return Context::newNoneValue();
+        }
+        auto *array = (ArrayValue *) (args[0]);
+        return env->context->newNumberValue(array->length());
+    };
+};
+
+class IndexFunction : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *,
+                 unordered_map<wstring, Value *> *) const override {
+        auto *array = (ArrayValue *) (args[0]);
+        auto *index = (NumberValue *) (args[1]);
+        return array->getIndex(index->value);
+    };
+};
+
+class ArrayUpdate : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *,
+                 unordered_map<wstring, Value *> *) const override {
+        auto *array = (ArrayValue *) (args[0]);
+        auto *index = (NumberValue *) (args[1]);
+        auto newValue = args[2];
+        array->set(index->value, newValue);
+        return newValue;
+    };
+};
+
+//class ArrayInsert : public FunctionValue {
+//public:
+//    Value *apply(const vector<Value *> &args, Environment *,
+//                 unordered_map<wstring, Value *> *) const override {
+//        auto *array = (ArrayValue*)(args[0]);
+//        auto *index = (NumberValue*)(args[1]);
+//        auto newValue = args[2];
+//        array->set(index->value, newValue);
+//        return newValue;
+//    };
+//};
+
+class DictLookup : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *,
+                 unordered_map<wstring, Value *> *) const override {
+        auto *dict = args[0]->toDictionaryValue();
+        StringValue *key = args[1]->toStringValue();
+        return dict->get(key->value);
+    };
+};
+
 void initModule(Environment *env) {
     env->bind(L"足す", new FunctionSum());
     env->bind(L"引く", new FunctionDiff());
@@ -225,6 +285,10 @@ void initModule(Environment *env) {
     env->bind(L"比べ", new FunctionCompare());
     env->bind(L"辞書", new FunctionNewDictionary());
     env->bind(L"それぞれ", new FunctionForEach());
+    env->bind(L"長さ", new LengthFunction());
+    env->bind(L"配列調べ", new IndexFunction());
+    env->bind(L"配列更新", new ArrayUpdate());
+    env->bind(L"辞書調べ", new DictLookup());
     env->bind(L"ファイル読む", new FunctionReadFile());
     env->bind(L"評価", new FunctionEval());
     env->bind(L"エキステンション", new FunctionLoadExt());

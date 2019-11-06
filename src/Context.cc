@@ -24,6 +24,12 @@ void Context::mark(Value *value) {
                 mark(d->parent);
             }
         }
+        if (value->type == ValueType::ARRAY) {
+            auto array = (ArrayValue *) value;
+            for (const auto &item : array->value) {
+                mark(item);
+            }
+        }
     }
 }
 

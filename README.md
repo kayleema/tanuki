@@ -1,4 +1,4 @@
-ピンポン狸語　プログラミング言語
+狸語　プログラミング言語
 ===========================
 
 ビルド
@@ -67,14 +67,13 @@ Formal Grammar (incomplete)
 
 まだ実装されてない機能
 ------------------
-* keyword argument unpacking with defaults
-* variable length non-keyword arguments
-* dynamic dictionary lookup
-* dynamic dictionary set
+* dynamic dictionary lookup using【】brackets
+* dynamic dictionary set using【】brackets
+* correct infix operators for multiplication and division
+* expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
 * short form method definition
 * short form method call
-* correct infix operators for multiplication and division
-* expression parenthesis with line wrapping
+* escape codes in strings
 
 説明書
 -----
@@ -149,3 +148,28 @@ Formal Grammar (incomplete)
 導入、私のモジュール
 表示（私のモジュール・フィボナッチ（２０））　＃６７６５
 ```
+
+## 定義済み関数
+Basicな関数
+* 表示（表示したい事、他の事、…）
+
+データ構造
+* 辞書（キー：バリュー、キー２：バリュー２、…）→新しい辞書を作る
+* それぞれ（辞書、関数）→辞書のアイテムそれぞれ
+* 長さ（配列）→配列の長さを返す
+* 配列調べ（配列、何番目）→○番目のバリュー
+* 辞書調べ（辞書、キー）→バリュー
+* 配列更新
+
+数学：
+* 足す
+* 引く
+* 割り算
+* 掛ける
+* イコール
+* 比べ
+
+システム：
+* ファイル読む
+* 評価
+* エキステンション

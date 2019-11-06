@@ -268,9 +268,9 @@ TEST(eval, call_user_function_varargs) {
     EXPECT_EQ(result->type, ValueType::ARRAY);
     auto arrayValue = (ArrayValue *) result;
     EXPECT_EQ(arrayValue->length(), 3);
-    EXPECT_EQ(*arrayValue->get(0)->toNumberValue(), NumberValue(2));
-    EXPECT_EQ(*arrayValue->get(1)->toNumberValue(), NumberValue(3));
-    EXPECT_EQ(*arrayValue->get(2)->toNumberValue(), NumberValue(4));
+    EXPECT_EQ(*arrayValue->getIndex(0)->toNumberValue(), NumberValue(2));
+    EXPECT_EQ(*arrayValue->getIndex(1)->toNumberValue(), NumberValue(3));
+    EXPECT_EQ(*arrayValue->getIndex(2)->toNumberValue(), NumberValue(4));
 }
 
 TEST(eval, call_user_function_default) {
