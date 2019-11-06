@@ -3,7 +3,7 @@
 #include <iostream>
 #include "wchar.h"
 
-int main(int argc, wchar_t **argv) {
+int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
