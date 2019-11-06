@@ -57,39 +57,31 @@ string UserFunctionValue::toString() const {
 
 Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
                                 Environment *caller, unordered_map<wstring, Value *> *kwargsIn) const {
-//    wcout << endl << L"apply" << endl;
     Value *bodyReturnValue = nullptr;
     Environment *env;
     env = parentEnv->newChildEnvironment();
     env->caller = caller;
     vector<Value *> args = argsIn;
-//    wcout << L"eval params" << endl;
     do {
         if (bodyReturnValue != nullptr) {
             delete bodyReturnValue;
         }
-//        wcout << L"start" << endl;
 
         if (params.size() > argsIn.size()) {
             ConsoleLogger().log("エラー：引数は足りません　")
                     ->log("必要は")->logLong((long) params.size())
                     ->log(" 渡したのは")->logLong((long) argsIn.size())->logEndl();
         }
-//        wcout << L"valid"  << params.size() << endl;
+
+        // bind normal params
         for (size_t i = 0; i < params.size(); i++) {
-//            wcout << L"eval param " << i << endl;
-//            wcout.flush();
-//            wcout << L"eval param " << params[i] << endl;
-//            wcout.flush();
             env->bind(params[i], args[i]);
         }
-//        wcout << L"defaultParams" << paramsWithDefault.size() << endl;
+
+        // bind default parameters when not specified
         for (auto item : paramsWithDefault) {
             wstring left = item.first;
-//            wcout << L"default item " << left << L":" << endl;
-//            wcout << L"d" << endl;
-//            wcout.flush();
-            if (kwargsIn->count(item.first)) {
+            if (kwargsIn && kwargsIn->count(item.first)) {
                 env->bind(item.first, (*kwargsIn)[item.first]);
             } else {
                 env->bind(item.first, item.second);

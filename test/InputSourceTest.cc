@@ -84,7 +84,7 @@ TEST(stringInputSource, selftest) {
     auto p = Parser(&t);
     SyntaxNode *tree = p.run();
     Context context;
-    context.setFrequency(10000);
+    context.setFrequency(1);
     FilesystemImpl filesystem;
     auto *env = new Environment(&context, &filesystem);
     env->bind(

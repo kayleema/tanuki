@@ -274,12 +274,11 @@ TEST(eval, call_user_function_varargs) {
 }
 
 TEST(eval, call_user_function_default) {
-//    ConsoleLogger().setup();
     auto stringInput = StringInputSource(
             L"関数、ほげ（あああ：１＋２）\n"
             L"　返す、あああ\n"
             L"あ＝ほげ（あああ：５）\n"
-//            L"い＝ほげ（）\n"
+            L"い＝ほげ（）\n"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer);
@@ -288,12 +287,10 @@ TEST(eval, call_user_function_default) {
     Environment env(&context);
     env.eval(tree);
     Value *resultSpecified = env.lookup(L"あ");
-//    Value *resultDefault = env.lookup(L"い");
+    Value *resultDefault = env.lookup(L"い");
 
-//    wcout << ((UserFunctionValue*)env.lookup(L"ほげ"))
-//        ->getParamsWithDefault()[0]
     EXPECT_EQ(resultSpecified->toNumberValue()->value, 5);
-//    EXPECT_EQ(*resultDefault->toNumberValue(), NumberValue(3));
+    EXPECT_EQ(*resultDefault->toNumberValue(), NumberValue(3));
 }
 
 TEST(eval, infix) {

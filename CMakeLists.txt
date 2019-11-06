@@ -6,7 +6,7 @@ if(WIN32)
         set(CMAKE_CXX_FLAGS "/O2 /EHa /MTd /utf-8")
         set(CMAKE_CXX_FLAGS_DEBUG "/EHa /MTd /utf-8")
 else()
-        set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS "-Wall -Wextra")
         set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra")
 endif()
 
