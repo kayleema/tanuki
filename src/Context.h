@@ -41,6 +41,11 @@ public:
     UserFunctionValue *newUserFunctionValue(
             vector<wstring> params, SyntaxNode *body, Environment *e);
 
+    UserFunctionValue *newUserFunctionValue(
+            vector<wstring> params,
+            unordered_map<wstring, Value *> paramsWithDefault,
+            SyntaxNode *body, Environment *e);
+
     ArrayValue *newArrayValue();
 
     Environment *newChildEnvironment(Environment *e);

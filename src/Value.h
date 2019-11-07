@@ -84,7 +84,7 @@ public:
 
     void set(const wstring &name, Value *v) { value[name] = v; }
 
-    Value *get(const wstring &name) {
+    virtual Value *get(const wstring &name) {
         if (value.count(name)) {
             return value[name];
         } else if (parent) {
@@ -101,16 +101,19 @@ public:
 };
 
 
-class ArrayValue : public Value {
-    vector<Value *> value;
+class ArrayValue : public DictionaryValue {
 public:
-    explicit ArrayValue() : Value(ValueType::ARRAY) {}
+    vector<Value *> value;
+
+    explicit ArrayValue() {
+        type = ValueType::ARRAY;
+    }
 
     void set(long index, Value *v) { value[index] = v; }
 
     void push(Value *v) { value.push_back(v); }
 
-    Value *get(long index) {
+    Value *getIndex(long index) {
         if ((size_t) index < value.size()) {
             return value[index];
         }
@@ -160,6 +163,7 @@ class SyntaxNode;
 
 class UserFunctionValue : public FunctionValue {
     vector<wstring> params;
+    unordered_map<wstring, Value *> paramsWithDefault;
     bool hasVarKeywordArgs;
     wstring varKeywordArgsParam;
     bool hasVarArgs{};
@@ -173,12 +177,23 @@ public:
         functionType = FunctionValueType::USER_FUNCTION;
     };
 
+    UserFunctionValue(vector<wstring> params, unordered_map<wstring, Value *> paramsWithDefault,
+                      SyntaxNode *body, Environment *parentEnv)
+            : FunctionValue(), params(std::move(params)), paramsWithDefault(std::move(paramsWithDefault)),
+              hasVarKeywordArgs(false), body(body), parentEnv(parentEnv) {
+        functionType = FunctionValueType::USER_FUNCTION;
+    };
+
     Environment *parentEnv;
 
     Value *apply(const vector<Value *> &args, Environment *env,
                  unordered_map<wstring, Value *> *kwargsIn = nullptr) const override;
 
     string toString() const override;
+
+    const unordered_map<wstring, Value *> &getParamsWithDefault() {
+        return paramsWithDefault;
+    }
 
     void setVarKeywordParam(wstring name);
 

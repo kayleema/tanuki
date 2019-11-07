@@ -124,11 +124,11 @@ Token::Token(TokenType type, wstring _content, int line)
 string Token::toString() const {
     ostringstream result("");
     result << TokenTypeStrings[(int) type];
-    result << "：”" << encodeUTF8(content);
+    result << u8"：”" << encodeUTF8(content);
     if (type == TokenType::NUMBER) {
-        result << "（" << number << "）";
+        result << u8"（" << number << u8"）";
     }
-    result << "”、" << line << "列";
+    result << u8"”、" << line << u8"列";
     return result.str();
 }
 
@@ -264,7 +264,7 @@ Token InputSourceTokenizer::getToken() {
                 lineNumber++;
             }
             if (input->eof()) {
-                cout << "エラー：文字列を読みながら、ファイルの終わり（ＥＯＦ）" << endl;
+                cout << u8"エラー：文字列を読みながら、ファイルの終わり（ＥＯＦ）" << endl;
                 return Token(TokenType::END, L"", lineNumber);
             }
         }

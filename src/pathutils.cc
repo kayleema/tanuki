@@ -1,6 +1,9 @@
 #include "pathutils.h"
 
 #include <string>
+#include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 #ifdef _WIN32
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
@@ -10,10 +13,19 @@
 
 std::string getDirectoryForPath(const std::string &path) {
 #ifdef _WIN32
-    char pa[MAX_PATH] = "";
-    strcpy(pa, path.c_str());
-    PathRemoveFileSpecA(pa);
-    return std::string(pa);
+    char drive[_MAX_DRIVE];
+    char dir[_MAX_DIR];
+    char fname[_MAX_FNAME];
+    char ext[_MAX_EXT];
+
+    _splitpath( path.c_str(), drive, dir, fname, ext );
+    // printf( "Path extracted with _splitpath:\n" );
+    // printf( "  Drive: %s\n", drive );
+    // printf( "  Dir: %s\n", dir );
+    // printf( "  Filename: %s\n", fname );
+    // printf( "  Ext: %s\n", ext );
+
+    return std::string(dir);
 #else
     char *cdir = strdup(path.c_str());
     std::string dir(dirname(cdir));

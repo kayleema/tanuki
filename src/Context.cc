@@ -10,6 +10,10 @@ void Context::mark(Value *value) {
             ((FunctionValue *) value)->functionType == FunctionValueType::USER_FUNCTION) {
             auto f = (UserFunctionValue *) value;
             mark(f->parentEnv);
+            auto defaults = f->getParamsWithDefault();
+            for (const auto &defaultItem : defaults) {
+                mark(defaultItem.second);
+            }
         }
         if (value->type == ValueType::DICT) {
             auto d = (DictionaryValue *) value;
@@ -18,6 +22,12 @@ void Context::mark(Value *value) {
             }
             if (d->parent) {
                 mark(d->parent);
+            }
+        }
+        if (value->type == ValueType::ARRAY) {
+            auto array = (ArrayValue *) value;
+            for (const auto &item : array->value) {
+                mark(item);
             }
         }
     }
@@ -116,6 +126,15 @@ DictionaryValue *Context::newDictionaryValue() {
 UserFunctionValue *Context::newUserFunctionValue(
         vector<wstring> params, SyntaxNode *body, Environment *e) {
     auto result = new UserFunctionValue(std::move(params), body, e);
+    values.insert(result);
+    return result;
+}
+
+UserFunctionValue *Context::newUserFunctionValue(
+        vector<wstring> params, unordered_map<wstring, Value *> paramsWithDefault,
+        SyntaxNode *body, Environment *e) {
+    auto result = new UserFunctionValue(std::move(params),
+                                        std::move(paramsWithDefault), body, e);
     values.insert(result);
     return result;
 }

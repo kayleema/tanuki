@@ -60,13 +60,13 @@ enum class NodeType {
     CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
     RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
     VARPARAM, SUB, ADD, EQUAL, NEQ, LT, GT, LTE, GTE,
-    ASSERT
+    ASSERT, DEFAULTPARAM
 };
 const string NodeTypeStrings[] = {
         "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
         "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
         "VARPARAM", "SUB", "ADD", "EQUAL", "NEQ", "LT", "GT", "LTE", "GTE",
-        "ASSERT"
+        "ASSERT", "DEFAULTPARAM"
 };
 
 class SyntaxNode {

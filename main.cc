@@ -5,9 +5,15 @@
 #include "Environment.h"
 #include "CoreFunctions.h"
 #include <fcntl.h>
-#include <sys/uio.h>
 #include <locale.h>
 #include "Extension.h"
+#include "Logger.h"
+
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <sys/uio.h>
+#endif
 
 using namespace std;
 
@@ -15,11 +21,13 @@ void evalPinponStarter(Environment *env);
 
 int interactive(long freq);
 
-int main(int argc, char **argv) 
-{
-	setlocale(LC_ALL, "");
+int main(int argc, char **argv) {
+    ConsoleLogger log;
+    log.setup();
+
+    setlocale(LC_ALL, "");
 	if (argc < 2) {
-		cout << "使い方は間違い" << endl;
+	    log.logLn("使い方は間違い");
 		return 1;
 	}
 	long freq = 100000;
@@ -38,40 +46,43 @@ int main(int argc, char **argv)
 		if (strcmp(argv[i], "-f") == 0) {
 			i++;
 			freq = atol(argv[i]);
-			cout << "Freq set to " << freq << endl;
+            log.log("Freq set to ")
+                    ->logLong(freq)
+                    ->logEndl();
 		}
 		if (strcmp(argv[i], "-h") == 0) {
-			cout << "ＰｉｎＰｏｎプログラミング言語" << endl;
-			cout << "ーーーーーーーーーーーーーーー" << endl;
-			cout << "使い方：" << endl;
-			cout << "　./pinpon ファイル名.pin" << endl;
-			cout << endl;
-			cout << "パラメーター：" << endl;
-			cout << "　-i：インタラクティブ・モード（REPL）" << endl;
-			cout << "　-d lex：lexerの結果を表示（ディバギング）" << endl;
-			cout << "　-d ast：parserの結果を表示（ディバギング）" << endl;
-			cout << "　-f 数字：evalの何回目の時にメモリを掃除（デフォルトは十万）" << endl;
-			cout << "　-h：このメッセジを表示" << endl << endl;
+            log
+                    .log("ＰｉｎＰｏｎプログラミング言語")->logEndl()
+			        ->log("ーーーーーーーーーーーーーーー")->logEndl()
+			        ->log("使い方：")->logEndl()
+			        ->log("　./pinpon ファイル名.pin")->logEndl()
+			        ->logEndl()
+			        ->log("パラメーター：")->logEndl()
+			        ->log("　-i：インタラクティブ・モード（REPL）")->logEndl()
+			        ->log("　-d lex：lexerの結果を表示（ディバギング）")->logEndl()
+			        ->log("　-d ast：parserの結果を表示（ディバギング）")->logEndl()
+			        ->log("　-f 数字：evalの何回目の時にメモリを掃除（デフォルトは十万）")->logEndl()
+			        ->log("　-h：このメッセジを表示")->logEndl();
 			return 0;
 		}
 		if (strcmp(argv[i], "-i") == 0) {
-			cout << "インタラクティブ・モード" << endl;
+            log.log("インタラクティブ・モード")->logEndl();
 			return interactive(freq);
 		}
 	}
 
-	std::cout << "始まります" << std::endl;
 	const char *sourceFilename = argv[argc - 1];
+    log.log(L"始まります")->log(sourceFilename)->logEndl();
     FileInputSource input(sourceFilename);
 	auto t = InputSourceTokenizer(&input);
 
 	if (print_lex) {
-		cout << "LEXER 結果:" << endl;
+        log.logLn("LEXER 結果:");
 		Token current;
 		while ((current = t.getToken()).type != TokenType::END) {
-			cout << (current.toString()) << endl;
+            log.logLn(current.toString());
 		}
-		cout << endl;
+		log.logEndl();
 		return 1;
 	}
 
@@ -80,9 +91,9 @@ int main(int argc, char **argv)
 
 	if (print_ast) {
 		string treeString = tree->toString();
-		cout << "ABSTRACT SYNTAX TREE:" << endl;
-		cout << "---------------------" << endl;
-		cout << treeString << endl;
+		log.logLn("ABSTRACT SYNTAX TREE:");
+        log.logLn("---------------------");
+        log.logLn(treeString);
 	}
 
 	Context context;

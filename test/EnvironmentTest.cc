@@ -1,3 +1,4 @@
+#include <Logger.h>
 #include "gtest/gtest.h"
 #include "fakeit.hpp"
 #include "Tokenizer.h"
@@ -267,9 +268,29 @@ TEST(eval, call_user_function_varargs) {
     EXPECT_EQ(result->type, ValueType::ARRAY);
     auto arrayValue = (ArrayValue *) result;
     EXPECT_EQ(arrayValue->length(), 3);
-    EXPECT_EQ(*arrayValue->get(0)->toNumberValue(), NumberValue(2));
-    EXPECT_EQ(*arrayValue->get(1)->toNumberValue(), NumberValue(3));
-    EXPECT_EQ(*arrayValue->get(2)->toNumberValue(), NumberValue(4));
+    EXPECT_EQ(*arrayValue->getIndex(0)->toNumberValue(), NumberValue(2));
+    EXPECT_EQ(*arrayValue->getIndex(1)->toNumberValue(), NumberValue(3));
+    EXPECT_EQ(*arrayValue->getIndex(2)->toNumberValue(), NumberValue(4));
+}
+
+TEST(eval, call_user_function_default) {
+    auto stringInput = StringInputSource(
+            L"関数、ほげ（あああ：１＋２）\n"
+            L"　返す、あああ\n"
+            L"あ＝ほげ（あああ：５）\n"
+            L"い＝ほげ（）\n"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+    SyntaxNode *tree = parser.run();
+    Context context;
+    Environment env(&context);
+    env.eval(tree);
+    Value *resultSpecified = env.lookup(L"あ");
+    Value *resultDefault = env.lookup(L"い");
+
+    EXPECT_EQ(resultSpecified->toNumberValue()->value, 5);
+    EXPECT_EQ(*resultDefault->toNumberValue(), NumberValue(3));
 }
 
 TEST(eval, infix) {

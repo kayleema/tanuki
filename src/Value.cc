@@ -5,6 +5,7 @@
 #include "Value.h"
 #include "Environment.h"
 #include "Context.h"
+#include "Logger.h"
 
 bool Value::equals(const Value *rhs) const {
     return (type == rhs->type);
@@ -62,14 +63,29 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
     env->caller = caller;
     vector<Value *> args = argsIn;
     do {
-        delete bodyReturnValue;
+        if (bodyReturnValue != nullptr) {
+            delete bodyReturnValue;
+        }
 
         if (params.size() > argsIn.size()) {
-            cout << "エラー：引数は足りません　"
-                 << "必要は" << params.size() << " 渡したのは" << argsIn.size() << endl;
+            ConsoleLogger().log("エラー：引数は足りません　")
+                    ->log("必要は")->logLong((long) params.size())
+                    ->log(" 渡したのは")->logLong((long) argsIn.size())->logEndl();
         }
+
+        // bind normal params
         for (size_t i = 0; i < params.size(); i++) {
             env->bind(params[i], args[i]);
+        }
+
+        // bind default parameters when not specified
+        for (auto item : paramsWithDefault) {
+            wstring left = item.first;
+            if (kwargsIn && kwargsIn->count(item.first)) {
+                env->bind(item.first, (*kwargsIn)[item.first]);
+            } else {
+                env->bind(item.first, item.second);
+            }
         }
         if (hasVarKeywordArgs) {
             auto kwArgs = env->context->newDictionaryValue();

@@ -10,4 +10,7 @@ const wchar_t *corePinponStarter = LR"(
 関数、配列（＊引数）
 　返す、引数
 
+関数、＿（あ）
+　返す、あ
+
 )";
