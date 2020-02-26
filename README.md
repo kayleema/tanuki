@@ -37,44 +37,9 @@ Helpメッセージを表示：
   ./pinpon -h
 ```
 
-Formal Grammar (incomplete)
-----------------------
-```
-  text => NEWLINE statement
-  text => statement text
-  text => EPSILON
-
-  statement => FUNC COMMA SYMBOL LPAREN param_list RPAREN NEWL INDENT text DEDENT
-  statement => RETURN return_value
-  statement => if_statement
-  statement => SYMBOL ASSIGN infix_expression
-  statement => infix_expression
-
-  param_list => SYMBOL [COMMA SYMBOL]* | EPSILON
-  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT
-  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT ELSE NEWL INDENT text DEDENT
-  return_value => infix_expression
-  return_value => EPSILON
-
-  infix_expression => infix_comparison_expression
-  infix_comparison_expression => infix_additive_expression {==,!=,>,<,>=,<=} infix_additive_expression
-  infix_additive_expression => expression {+,-} expression [ {+,-} expression ]...
-
-  expression => STRING
-  expression => SYMBOL
-  expression => SYMBOL expression_tail
-  expression => NUMBER
-  expression => NUMBER expression_tail
-
-  expression_tail => LPAREN arg_list RPAREN expression_tail
-  expression_tail => EPSILON
-
-  arg_list => expression [COMMA expression]* | EPSILON
-```
-
 まだ実装されてない機能
 ------------------
-* dynamic dictionary lookup using【】brackets
+* dynamic dictionary lookup using【】brackets（開発中）
 * dynamic dictionary set using【】brackets
 * correct infix operators for multiplication and division
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
@@ -186,3 +151,38 @@ Basicな関数
 * ファイル読む
 * 評価
 * エキステンション
+
+Formal Grammar (incomplete)
+----------------------
+```
+  text => NEWLINE statement
+  text => statement text
+  text => EPSILON
+
+  statement => FUNC COMMA SYMBOL LPAREN param_list RPAREN NEWL INDENT text DEDENT
+  statement => RETURN return_value
+  statement => if_statement
+  statement => SYMBOL ASSIGN infix_expression
+  statement => infix_expression
+
+  param_list => SYMBOL [COMMA SYMBOL]* | EPSILON
+  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT
+  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT ELSE NEWL INDENT text DEDENT
+  return_value => infix_expression
+  return_value => EPSILON
+
+  infix_expression => infix_comparison_expression
+  infix_comparison_expression => infix_additive_expression {==,!=,>,<,>=,<=} infix_additive_expression
+  infix_additive_expression => expression {+,-} expression [ {+,-} expression ]...
+
+  expression => STRING
+  expression => SYMBOL
+  expression => SYMBOL expression_tail
+  expression => NUMBER
+  expression => NUMBER expression_tail
+
+  expression_tail => LPAREN arg_list RPAREN expression_tail
+  expression_tail => EPSILON
+
+  arg_list => expression [COMMA expression]* | EPSILON
+```

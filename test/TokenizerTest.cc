@@ -217,3 +217,26 @@ TEST(tokenizer, assert) {
             });
     EXPECT_EQ(allTokens, expected);
 }
+
+TEST(tokenizer, braces) {
+    // 隅付き格好
+    auto stringInput = StringInputSource(
+            L"鈴木さん【「名前」】"
+    );
+
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+
+    auto allTokens = testTokenizer.getAllTokens();
+
+    cout << allTokens[0] << endl;
+
+    auto expected = vector<Token>(
+            {
+                    Token(TokenType::SYMBOL, L"鈴木さん", 1),
+                    Token(TokenType::LBRACE, L"【", 1),
+                    Token(TokenType::STRING, L"名前", 1),
+                    Token(TokenType::RBRACE, L"】", 1),
+                    Token(TokenType::END, L"", 1),
+            });
+    EXPECT_EQ(allTokens, expected);
+}

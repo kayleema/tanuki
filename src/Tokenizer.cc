@@ -65,13 +65,17 @@ const unordered_set<wchar_t> symbolicChars(
                 slash,
                 greaterThan,
                 notSign,
-                lessThan
+                lessThan,
+                lbrace,
+                rbrace
         });
 
 const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
         {
                 {lparen,       TokenType::LPAREN},
                 {lparen,       TokenType::LPAREN},
+                {lbrace,       TokenType::LBRACE},
+                {rbrace,       TokenType::RBRACE},
                 {rparen,       TokenType::RPAREN},
                 {comma,        TokenType::COMMA},
                 {assign,       TokenType::ASSIGN},
