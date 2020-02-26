@@ -262,15 +262,20 @@ SyntaxNode *Parser::run_expression() {
 
 SyntaxNode *Parser::run_expression_tail() {
     if (accept(TokenType::LBRACE)) {
-        auto node = new SyntaxNode(NodeType::SUBSCRIPT);
-        auto arg = run_expression();
+        SyntaxNode *node = nullptr;
+        auto arg = run_infix_expression();
         if (!accept(TokenType::RBRACE)) {
             cout << "エラー：パーシング：「　】　」は見つけられなかった！　" << node->toString() << endl;
         }
-        auto tail = run_expression_tail();
-        node->children.push_back(arg);
-        if (tail) {
-            node->children.push_back(tail);
+        if(accept(TokenType::ASSIGN)) {
+            auto rhs = run_infix_expression();
+            node = new SyntaxNode(NodeType::SUBSCRIPT_SET, {arg, rhs});
+        } else {
+            node = new SyntaxNode(NodeType::SUBSCRIPT, {arg});
+            auto tail = run_expression_tail();
+            if (tail) {
+                node->children.push_back(tail);
+            }
         }
         return node;
     }

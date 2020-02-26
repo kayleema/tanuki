@@ -166,7 +166,9 @@ Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
     } else if (tail->type == NodeType::SET) {
         return eval_set((DictionaryValue *) first, tail);
     } else if (tail->type == NodeType::SUBSCRIPT) {
-        return eval_subscript((DictionaryValue *) first, tail);
+        return eval_subscript(first, tail);
+    } else if (tail->type == NodeType::SUBSCRIPT_SET) {
+        return eval_subscript_set(first, tail);
     } else {
         return context->newNoneValue();
     }
@@ -266,6 +268,30 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
             result->refs--;
         }
         return result;
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_subscript_set(Value *source, SyntaxNode *tree) {
+    if (source->type == ValueType::DICT) {
+        auto sourceDictionary = (DictionaryValue *) source;
+        SyntaxNode *arg = tree->children[0];
+        wstring key = ((StringValue *) eval(arg))->value;
+        if (!sourceDictionary->has(key)) {
+            return context->newNoneValue();
+        }
+        auto rhs = eval(tree->children[1]);
+        sourceDictionary->set(key, rhs);
+    } else if (source->type == ValueType::ARRAY) {
+        auto sourceArray = (ArrayValue *) source;
+        SyntaxNode *arg = tree->children[0];
+        long index = ((NumberValue *) eval(arg))->value;
+        if (sourceArray->length() <= index) {
+            cout << "添字は配列の外　添字：" << index << "　長さ：" << sourceArray->length() << endl;
+            return context->newNoneValue();
+        }
+        auto rhs = eval(tree->children[1]);
+        sourceArray->set(index, rhs);
     }
     return context->newNoneValue();
 }

@@ -66,9 +66,11 @@ void Context::collect(Environment *current_env) {
             } else {
                 if (value->type == ValueType::NUM &&
                     preallocNumbers.count(((NumberValue *) value)->value)) {
-                    preallocNumbers.erase(((NumberValue *) value)->value);
+                    // Don't deallocate numbers saved in prealloc
+                    // This used to be here: preallocNumbers.erase(((NumberValue *) value)->value);
+                } else {
+                    delete value;
                 }
-                delete value;
             }
         } else {
         }
