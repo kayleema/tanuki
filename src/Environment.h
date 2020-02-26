@@ -19,6 +19,8 @@ class Environment {
 
     Value *eval_get(DictionaryValue *source, SyntaxNode *tree);
 
+    Value *eval_subscript(Value *source, SyntaxNode *tree);
+
     Value *eval_set(DictionaryValue *source, SyntaxNode *tree);
 
     Value *eval_terminal(SyntaxNode *node);
