@@ -41,7 +41,7 @@ TEST(stringInputSource, readSingleCharacters) {
 }
 
 TEST(stringInputSource, fileSource) {
-    auto filename = string("example/fileInputSource.pin");
+    auto filename = string("../example/fileInputSource.pin");
     FileInputSource stringInput(filename.c_str());
 
     EXPECT_EQ(stringInput.peekChar(), L'関');
@@ -75,10 +75,10 @@ void evalPinponStarter(Environment *env) {
 }
 
 TEST(stringInputSource, selftest) {
+    auto filename = string("../testpin/tests.pin");
     ConsoleLogger logger;
     ConsoleLogger::wide_mode = false;
     logger.logLn("Starting self test");
-    auto filename = string("testpin/tests.pin");
     FileInputSource stringInput(filename.c_str());
     auto t = InputSourceTokenizer(&stringInput);
     auto p = Parser(&t);
@@ -89,7 +89,7 @@ TEST(stringInputSource, selftest) {
     auto *env = new Environment(&context, &filesystem);
     env->bind(
             L"FILE",
-            context.newStringValue(decodeUTF8("testpin/tests.pin"))
+            context.newStringValue(decodeUTF8(filename))
     );
     evalPinponStarter(env);
     env->eval(tree);
