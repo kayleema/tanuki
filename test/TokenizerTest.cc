@@ -228,8 +228,6 @@ TEST(tokenizer, braces) {
 
     auto allTokens = testTokenizer.getAllTokens();
 
-    cout << allTokens[0] << endl;
-
     auto expected = vector<Token>(
             {
                     Token(TokenType::SYMBOL, L"鈴木さん", 1),

@@ -109,21 +109,21 @@ TEST(parsing, user_function_varparam) {
     SyntaxNode *tree = parser.run();
 
     SyntaxNode expectedTree(NodeType::FUNC, {
-        new SyntaxNode(Token(TokenType::SYMBOL, L"ほげ", 1)),
-        new SyntaxNode(NodeType::PARAMS, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"引数", 1)),
-            new SyntaxNode(NodeType::VARPARAM, {
-                new SyntaxNode(Token(TokenType::SYMBOL, L"配列引数", 1))
+            new SyntaxNode(Token(TokenType::SYMBOL, L"ほげ", 1)),
+            new SyntaxNode(NodeType::PARAMS, {
+                    new SyntaxNode(Token(TokenType::SYMBOL, L"引数", 1)),
+                    new SyntaxNode(NodeType::VARPARAM, {
+                            new SyntaxNode(Token(TokenType::SYMBOL, L"配列引数", 1))
+                    }),
+                    new SyntaxNode(NodeType::VARKWPARAM, {
+                            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書引数", 1))
+                    })
             }),
-            new SyntaxNode(NodeType::VARKWPARAM, {
-                new SyntaxNode(Token(TokenType::SYMBOL, L"辞書引数", 1))
+            new SyntaxNode(NodeType::TEXT, {
+                    new SyntaxNode(NodeType::RETURN, {
+                            new SyntaxNode(Token(TokenType::NUMBER, L"１", 2))
+                    })
             })
-        }),
-        new SyntaxNode(NodeType::TEXT, {
-            new SyntaxNode(NodeType::RETURN, {
-                new SyntaxNode(Token(TokenType::NUMBER, L"１", 2))
-            })
-        })
     });
     EXPECT_EQ(expectedTree, *tree->children[0]);
 }
@@ -144,8 +144,8 @@ TEST(parsing, user_function_defaultparam) {
                     new SyntaxNode(NodeType::DEFAULTPARAM, {
                             new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
                             new SyntaxNode(NodeType::ADD, {
-                                new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                                new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
+                                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
                             }),
                     }),
                     new SyntaxNode(NodeType::VARPARAM, {
@@ -454,4 +454,31 @@ TEST(parsing_infix, assert) {
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
+}
+
+TEST(parsing_indexing, indexing) {
+    auto stringInput = StringInputSource(
+            L"辞書（名前：「すずき」）【「名前」】"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expectedTree(NodeType::CALL, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
+            new SyntaxNode(NodeType::CALL_TAIL, {
+                    new SyntaxNode(NodeType::ARGS, {
+                            new SyntaxNode(NodeType::KWARG, {
+                                    new SyntaxNode(Token(TokenType::SYMBOL, L"名前", 1)),
+                                    new SyntaxNode(Token(TokenType::STRING, L"すずき", 1))
+                            }),
+                    }),
+                    //TODO: Implement this
+//                    new SyntaxNode(NodeType::SUBSCRIPT, {
+//                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1))
+//                    })
+            })
+    });
+    EXPECT_EQ(expectedTree, *tree->children[0]);
 }
