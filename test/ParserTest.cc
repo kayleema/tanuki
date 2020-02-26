@@ -456,7 +456,7 @@ TEST(parsing_infix, assert) {
     EXPECT_EQ(expected, *tree->children[0]);
 }
 
-TEST(parsing_indexing, indexing) {
+TEST(parsing_subscript, subscript) {
     auto stringInput = StringInputSource(
             L"辞書（名前：「すずき」）【「名前」】"
     );
@@ -474,10 +474,39 @@ TEST(parsing_indexing, indexing) {
                                     new SyntaxNode(Token(TokenType::STRING, L"すずき", 1))
                             }),
                     }),
-                    //TODO: Implement this
-//                    new SyntaxNode(NodeType::SUBSCRIPT, {
-//                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1))
-//                    })
+                    new SyntaxNode(NodeType::SUBSCRIPT, {
+                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1))
+                    })
+            })
+    });
+    EXPECT_EQ(expectedTree, *tree->children[0]);
+}
+
+
+TEST(parsing_subscript, subscript_complex) {
+    auto stringInput = StringInputSource(
+            L"辞書（名前：「すずき」）【「名前」】・長さ"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expectedTree(NodeType::CALL, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
+            new SyntaxNode(NodeType::CALL_TAIL, {
+                    new SyntaxNode(NodeType::ARGS, {
+                            new SyntaxNode(NodeType::KWARG, {
+                                    new SyntaxNode(Token(TokenType::SYMBOL, L"名前", 1)),
+                                    new SyntaxNode(Token(TokenType::STRING, L"すずき", 1))
+                            }),
+                    }),
+                    new SyntaxNode(NodeType::SUBSCRIPT, {
+                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1)),
+                            new SyntaxNode(NodeType::GET, {
+                                new SyntaxNode(Token(TokenType::SYMBOL, L"長さ", 1))
+                            })
+                    })
             })
     });
     EXPECT_EQ(expectedTree, *tree->children[0]);

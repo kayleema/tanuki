@@ -261,6 +261,19 @@ SyntaxNode *Parser::run_expression() {
 }
 
 SyntaxNode *Parser::run_expression_tail() {
+    if (accept(TokenType::LBRACE)) {
+        auto node = new SyntaxNode(NodeType::SUBSCRIPT);
+        auto arg = run_expression();
+        if (!accept(TokenType::RBRACE)) {
+            cout << "エラー：パーシング：「　】　」は見つけられなかった！　" << node->toString() << endl;
+        }
+        auto tail = run_expression_tail();
+        node->children.push_back(arg);
+        if (tail) {
+            node->children.push_back(tail);
+        }
+        return node;
+    }
     if (accept(TokenType::LPAREN)) {
         auto node = new SyntaxNode(NodeType::CALL_TAIL);
         auto args = run_args();
