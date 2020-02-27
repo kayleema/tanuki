@@ -1,7 +1,7 @@
 ＃　https://javarevisited.blogspot.com/2011/06/top-programming-interview-questions.html
 
 ＃＃＃
-＃＃＃　第一
+＃＃＃　第一　文字列
 ＃＃＃　　回分かどうかを確認する関数を作る
 ＃＃＃
 
@@ -106,7 +106,7 @@
 ＃TODO：再帰的ではないやり方（Steinhaus–Johnson–Trotter方法)
 
 ＃＃＃
-＃＃＃　第４
+＃＃＃　第四
 ＃＃＃　　一番長い入力に入っている回文
 ＃＃＃
 
@@ -137,3 +137,27 @@
 
 確認、回文検索（「アイウエオよく行くよ」）＝＝「よく行くよ」
 確認、回文検索（「よく行くよアイウエオ」）＝＝「よく行くよ」
+確認、回文検索（「なかきよのとおのねふりのみなめさめなみのりふねのおとのよきかな」）＝＝「なかきよのとおのねふりのみなめさめなみのりふねのおとのよきかな」
+
+＃＃＃　第五
+＃＃＃　　How to find the first non repeated character of a given String?
+
+＃＃＃　第六
+＃＃＃　　How to count the occurrence of a given character in a String?
+
+＃＃＃　第七
+＃＃＃　　How to check if two String are Anagram?
+
+＃＃＃　第八
+＃＃＃　　How to convert numeric String to number?
+
+＃＃＃　第九
+＃＃＃　　How to split string
+
+
+＃＃＃
+＃＃＃　第十　配列
+＃＃＃　　配列の中に０から１００の番号が入っているけど一つは入っていません。入っていない番号を返す。
+＃＃＃
+
+
