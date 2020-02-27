@@ -472,6 +472,11 @@ SyntaxNode *Parser::run_expression_tail() {
         node->children.push_back(new SyntaxNode(symbol));
         auto tail = run_expression_tail();
         if (tail) {
+            if (tail->isError()) {
+                logInternal("エラー：ドット調べるの右のパターンで問題あった。");
+                delete node;
+                return tail;
+            }
             node->children.push_back(tail);
         }
         return node;
@@ -479,10 +484,14 @@ SyntaxNode *Parser::run_expression_tail() {
     if (accept(
             {TokenType::DOT, TokenType::SYMBOL, TokenType::ASSIGN},
             {nullptr, &symbol, nullptr})) {
-        auto node = new SyntaxNode(NodeType::SET);
-        node->children.push_back(new SyntaxNode(symbol));
+        auto node = new SyntaxNode(NodeType::SET, {new SyntaxNode(symbol)});
         auto rhs = run_infix_expression();
         if (rhs) {
+            if (rhs->isError()) {
+                logInternal("エラー：ドット設定するの右で問題ある。");
+                delete node;
+                return rhs;
+            }
             node->children.push_back(rhs);
         }
         return node;
@@ -500,150 +509,35 @@ SyntaxNode *Parser::run_args() {
             if (accept({TokenType::SYMBOL, TokenType::COLON}, {&kwSymbol, nullptr})) {
                 auto *lhs = new SyntaxNode(kwSymbol);
                 auto *rhs = run_infix_expression();
-                auto *arg = new SyntaxNode(NodeType::KWARG);
-                arg->children.push_back(lhs);
-                arg->children.push_back(rhs);
+                if (!rhs) {
+                    logInternal("エラー：関数実行引数一覧での問題。");
+                    delete lhs;
+                    delete node;
+                    return new SyntaxNode(NodeType::PARSE_ERROR);
+                } else if (rhs->isError()) {
+                    logInternal("エラー：関数実行引数一覧での問題。");
+                    delete lhs;
+                    delete node;
+                    return rhs;
+                }
+                auto *arg = new SyntaxNode(NodeType::KWARG, {lhs, rhs});
                 node->children.push_back(arg);
             } else {
                 auto *arg = run_infix_expression();
+                if (!arg) {
+                    logInternal("エラー：関数実行引数一覧での問題。");
+                    delete arg;
+                    delete node;
+                    return new SyntaxNode(NodeType::PARSE_ERROR);
+                } else if (arg->isError()) {
+                    logInternal("エラー：関数実行引数一覧での問題。");
+                    delete arg;
+                    delete node;
+                    return arg;
+                }
                 node->children.push_back(arg);
             }
         } while (accept(TokenType::COMMA));
     }
     return node;
-}
-
-// ここから PARSER CORE FUNCTIONALITY です
-
-bool Parser::accept(TokenType type, Token *out) {
-    if (currentToken().type == type) {
-        if (out) {
-            *out = currentToken();
-        }
-        currentTokenIndex++;
-        return true;
-    }
-    return false;
-}
-
-bool Parser::accept(const vector<TokenType> &types, const vector<Token *> &outs) {
-    size_t i = 0;
-    for (auto type : types) {
-        size_t tokenIndex = (size_t) currentTokenIndex + i;
-        if (tokenIndex >= allTokens.size()) {
-            break;
-        }
-        if (allTokens[tokenIndex].type != type) {
-            return false;
-        }
-        i++;
-    }
-    i = 0;
-    for (auto out : outs) {
-        if (out) {
-            *out = allTokens[currentTokenIndex + i];
-        }
-        i++;
-    }
-
-    currentTokenIndex += types.size();
-    return true;
-}
-
-bool Parser::accept(const vector<TokenType> &types, const vector<Token *> &outs, const vector<TokenType> &rejectTypes) {
-    int i = 0;
-    for (auto rejectType : rejectTypes) {
-        size_t tokenIndex = currentTokenIndex + types.size() + i;
-        if (tokenIndex >= allTokens.size()) {
-            break;
-        }
-        if (allTokens[tokenIndex].type == rejectType) {
-            return false;
-        }
-        i++;
-    }
-    return Parser::accept(types, outs);
-}
-
-bool Parser::expect(TokenType type) {
-    if (accept(type)) {
-        return true;
-    }
-    logInternal("意外なトークン：" + currentToken().toString() + "\n");
-    logInternal("  希望のトークン型は「" + string(tokenTypeToString(type)) + "」\n");
-    return false;
-}
-
-Token Parser::currentToken() {
-    return allTokens[currentTokenIndex];
-}
-
-string SyntaxNode::toString(int indent) {
-    ostringstream result("");
-
-    string indentation((unsigned long) indent, ' ');
-    result << indentation;
-
-    result << NodeTypeStrings[(int) type];
-    if (type == NodeType::TERMINAL) {
-        result << " " << content.toString();
-    }
-    result << endl;
-    for (auto child : children) {
-        result << child->toString(indent + 1);
-    }
-    return result.str();
-}
-
-bool SyntaxNode::isError() const {
-    return type == NodeType::PARSE_ERROR;
-}
-
-bool SyntaxNode::operator==(const SyntaxNode &other) const {
-    if (children.size() != other.children.size() || type != other.type) {
-        return false;
-    }
-    if (type == NodeType::TERMINAL && content != other.content) {
-        return false;
-    }
-    for (std::vector<SyntaxNode *>::size_type i = 0; i != children.size(); i++) {
-        if ((*children[i]) != (*other.children[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
-ostream &operator<<(ostream &out, const SyntaxNode &node) {
-    out << "SyntaxNode("
-        << NodeTypeStrings[(int) node.type]
-        << ", ";
-    if (node.type == NodeType::TERMINAL) {
-        out << node.content;
-    } else {
-        out << "{";
-        std::string separator;
-        for (const auto &child : node.children) {
-            out << separator << *child;
-            separator = ",";
-        }
-        out << "}";
-    }
-    out << ")";
-    return out;
-}
-
-SyntaxNode::~SyntaxNode() {
-    for (auto child : children) {
-        delete child;
-    }
-}
-
-void Parser::logInternal(string message) {
-    if (logger) {
-        logger->log(message);
-    } else {
-        cout << message;
-    }
 }
