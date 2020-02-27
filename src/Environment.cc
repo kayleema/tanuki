@@ -18,6 +18,8 @@ Value *Environment::eval(SyntaxNode *tree,
         case NodeType::ASSIGN: return eval_assign(tree);
         case NodeType::ADD: return eval_add(tree);
         case NodeType::SUB: return eval_sub(tree);
+        case NodeType::MUL: return eval_mul(tree);
+        case NodeType::DIV: return eval_div(tree);
         case NodeType::EQUAL: return eval_equal(tree);
         case NodeType::NEQ: return eval_not_equal(tree);
         case NodeType::GT: return eval_gt(tree);
@@ -49,6 +51,30 @@ Value *Environment::eval_sub(SyntaxNode *tree) {
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value - rhs->toNumberValue()->value);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_mul(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(
+                lhs->toNumberValue()->value * rhs->toNumberValue()->value);
+    }
+    return context->newNoneValue();
+}
+
+Value *Environment::eval_div(SyntaxNode *tree) {
+    auto lhs = eval(tree->children[0]);
+    lhs->refs++;
+    auto rhs = eval(tree->children[1]);
+    lhs->refs--;
+    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+        return context->newNumberValue(
+                lhs->toNumberValue()->value / rhs->toNumberValue()->value);
     }
     return context->newNoneValue();
 }

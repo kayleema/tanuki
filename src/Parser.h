@@ -42,6 +42,8 @@ public:
 
     SyntaxNode *run_infix_additive_expression();
 
+    SyntaxNode *run_infix_multiplicative_expression();
+
     SyntaxNode *run_args();
 
     SyntaxNode *run_expression_tail();
@@ -65,13 +67,15 @@ enum class NodeType {
     CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
     RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
     VARPARAM, SUB, ADD, EQUAL, NEQ, LT, GT, LTE, GTE,
-    ASSERT, DEFAULTPARAM, SUBSCRIPT, SUBSCRIPT_SET, PARSE_ERROR
+    ASSERT, DEFAULTPARAM, SUBSCRIPT, SUBSCRIPT_SET, PARSE_ERROR,
+    MUL, DIV
 };
 const string NodeTypeStrings[] = {
         "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
         "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
         "VARPARAM", "SUB", "ADD", "EQUAL", "NEQ", "LT", "GT", "LTE", "GTE",
-        "ASSERT", "DEFAULTPARAM", "SUBSCRIPT", "SUBSCRIPT_SET", "PARSE_ERROR"
+        "ASSERT", "DEFAULTPARAM", "SUBSCRIPT", "SUBSCRIPT_SET", "PARSE_ERROR",
+        "MUL", "DIV"
 };
 
 class SyntaxNode {

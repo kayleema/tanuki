@@ -329,7 +329,7 @@ SyntaxNode *Parser::run_infix_comparison_expression() {
 }
 
 SyntaxNode *Parser::run_infix_additive_expression() {
-    auto result = run_expression();
+    auto result = run_infix_multiplicative_expression();
     if (!result) {
         return result;
     } else if (result->isError()) {
@@ -338,7 +338,7 @@ SyntaxNode *Parser::run_infix_additive_expression() {
     }
     do {
         if (accept(TokenType::MINUS)) {
-            auto rhs = run_expression();
+            auto rhs = run_infix_multiplicative_expression();
             if (!rhs) {
                 logInternal("エラー：マイナスの右側に何もありません。");
                 delete result;
@@ -350,7 +350,7 @@ SyntaxNode *Parser::run_infix_additive_expression() {
             }
             result = new SyntaxNode(NodeType::SUB, {result, rhs});
         } else if (accept(TokenType::PLUS)) {
-            auto rhs = run_expression();
+            auto rhs = run_infix_multiplicative_expression();
             if (!rhs) {
                 logInternal("エラー：プラスの右側に何もありません。");
                 delete result;
@@ -361,6 +361,45 @@ SyntaxNode *Parser::run_infix_additive_expression() {
                 return rhs;
             }
             result = new SyntaxNode(NodeType::ADD, {result, rhs});
+        } else {
+            return result;
+        }
+    } while (true);
+}
+
+SyntaxNode *Parser::run_infix_multiplicative_expression() {
+    auto result = run_expression();
+    if (!result) {
+        return result;
+    } else if (result->isError()) {
+        logInternal("エラー：タイムズ型文の左側で。");
+        return result;
+    }
+    do {
+        if (accept(TokenType::STAR)) {
+            auto rhs = run_expression();
+            if (!rhs) {
+                logInternal("エラー：タイムズ（星）の右側に何もありません。");
+                delete result;
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            } else if (rhs->isError()) {
+                logInternal("エラー：タイムズ（星）の右側で問題がありました。");
+                delete result;
+                return rhs;
+            }
+            result = new SyntaxNode(NodeType::MUL, {result, rhs});
+        } else if (accept(TokenType::SLASH)) {
+            auto rhs = run_expression();
+            if (!rhs) {
+                logInternal("エラー：スラッシの右側に何もありません。");
+                delete result;
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            } else if (rhs->isError()) {
+                logInternal("エラー：スラッシの右側で問題がありました。");
+                delete result;
+                return rhs;
+            }
+            result = new SyntaxNode(NodeType::DIV, {result, rhs});
         } else {
             return result;
         }

@@ -83,6 +83,7 @@ TEST(stringInputSource, selftest) {
     auto t = InputSourceTokenizer(&stringInput);
     auto p = Parser(&t, nullptr);
     SyntaxNode *tree = p.run();
+    EXPECT_NE(tree->type, NodeType::PARSE_ERROR);
     Context context;
     context.setFrequency(1);
     FilesystemImpl filesystem;

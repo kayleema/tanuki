@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 		}
 		if (strcmp(argv[i], "-h") == 0) {
             log
-                    .log("ＰｉｎＰｏｎプログラミング言語")->logEndl()
+                    .log("狸語プログラミング言語")->logEndl()
 			        ->log("ーーーーーーーーーーーーーーー")->logEndl()
 			        ->log("使い方：")->logEndl()
 			        ->log("　./pinpon ファイル名.pin")->logEndl()

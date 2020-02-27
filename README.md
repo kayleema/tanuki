@@ -37,14 +37,6 @@ Helpメッセージを表示：
   ./pinpon -h
 ```
 
-まだ実装されてない機能
-------------------
-* correct infix operators for multiplication and division
-* expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
-* short form method definition
-* short form method call
-* escape codes in strings
-
 説明書
 -----
 ### 変数：
@@ -150,7 +142,7 @@ Basicな関数
 * 評価
 * エキステンション
 
-Formal Grammar (incomplete)
+細かい事：Formal Grammar (incomplete)
 ----------------------
 ```
   text => NEWLINE statement
@@ -184,3 +176,17 @@ Formal Grammar (incomplete)
 
   arg_list => expression [COMMA expression]* | EPSILON
 ```
+
+細かい事：まだ実装されてない機能
+------------------
+希望の技能：
+* floating point calculations
+* non-string hashtables
+* array operations
+* infix mod operator
+* expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
+* short form method definition
+* short form method call
+* escape codes in strings
+* multithreading
+* network utilities

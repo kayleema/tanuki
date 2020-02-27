@@ -43,6 +43,10 @@ class Environment {
 
     Value *eval_sub(SyntaxNode *node);
 
+    Value *eval_mul(SyntaxNode *node);
+
+    Value *eval_div(SyntaxNode *node);
+
     Value *eval_equal(SyntaxNode *node);
 
     Value *eval_not_equal(SyntaxNode *node);
