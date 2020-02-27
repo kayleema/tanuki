@@ -201,7 +201,8 @@ public:
         wstring text = args[0]->toStringValue()->value;
         StringInputSource inputSource(text.c_str());
         InputSourceTokenizer tokenizer(&inputSource);
-        Parser parser(&tokenizer);
+        ConsoleLogger logger;
+        Parser parser(&tokenizer, &logger);
         SyntaxNode *ast = parser.run();
         moduleEnv->eval(ast);
         delete ast;

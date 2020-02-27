@@ -39,7 +39,6 @@ Helpメッセージを表示：
 
 まだ実装されてない機能
 ------------------
-* dynamic dictionary set using【】brackets
 * correct infix operators for multiplication and division
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
 * short form method definition
@@ -109,7 +108,7 @@ Helpメッセージを表示：
 表示（あ【０】）
 
 ```
-墨付きかっこ
+墨付きかっこで添字表記法する事が出来る
 
 ### 導入
 ```

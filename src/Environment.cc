@@ -7,58 +7,26 @@
 Value *Environment::eval(SyntaxNode *tree,
                          const FunctionValue *tailContext) {
     context->collect(this);
-    if (tree->type == NodeType::CALL) {
-        return eval_call(tree, tailContext);
+    switch (tree->type) {
+        case NodeType::CALL: return eval_call(tree, tailContext);
+        case NodeType::TERMINAL: return eval_terminal(tree);
+        case NodeType::TEXT: return eval_text(tree, tailContext);
+        case NodeType::FUNC: return eval_function(tree);
+        case NodeType::RETURN: return eval_return(tree, tailContext);
+        case NodeType::IMPORT: return eval_import(tree);
+        case NodeType::IF: return eval_if(tree);
+        case NodeType::ASSIGN: return eval_assign(tree);
+        case NodeType::ADD: return eval_add(tree);
+        case NodeType::SUB: return eval_sub(tree);
+        case NodeType::EQUAL: return eval_equal(tree);
+        case NodeType::NEQ: return eval_not_equal(tree);
+        case NodeType::GT: return eval_gt(tree);
+        case NodeType::LT: return eval_lt(tree);
+        case NodeType::GTE: return eval_gte(tree);
+        case NodeType::LTE: return eval_lte(tree);
+        case NodeType::ASSERT: return eval_assert(tree);
+        default: return context->newNoneValue();
     }
-    if (tree->type == NodeType::TERMINAL) {
-        return eval_terminal(tree);
-    }
-    if (tree->type == NodeType::TEXT) {
-        return eval_text(tree, tailContext);
-    }
-    if (tree->type == NodeType::FUNC) {
-        return eval_function(tree);
-    }
-    if (tree->type == NodeType::RETURN) {
-        return eval_return(tree, tailContext);
-    }
-    if (tree->type == NodeType::IMPORT) {
-        return eval_import(tree);
-    }
-    if (tree->type == NodeType::IF) {
-        return eval_if(tree);
-    }
-    if (tree->type == NodeType::ASSIGN) {
-        return eval_assign(tree);
-    }
-    if (tree->type == NodeType::ADD) {
-        return eval_add(tree);
-    }
-    if (tree->type == NodeType::SUB) {
-        return eval_sub(tree);
-    }
-    if (tree->type == NodeType::EQUAL) {
-        return eval_equal(tree);
-    }
-    if (tree->type == NodeType::NEQ) {
-        return eval_not_equal(tree);
-    }
-    if (tree->type == NodeType::GT) {
-        return eval_gt(tree);
-    }
-    if (tree->type == NodeType::LT) {
-        return eval_lt(tree);
-    }
-    if (tree->type == NodeType::GTE) {
-        return eval_gte(tree);
-    }
-    if (tree->type == NodeType::LTE) {
-        return eval_lte(tree);
-    }
-    if (tree->type == NodeType::ASSERT) {
-        return eval_assert(tree);
-    }
-    return context->newNoneValue();
 }
 
 Value *Environment::eval_add(SyntaxNode *tree) {
@@ -226,7 +194,7 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
 Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
     if (!source->has(key)) {
-//        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
+        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
     }
     auto result = source->get(key);
@@ -405,7 +373,7 @@ Value *Environment::eval_import(SyntaxNode *tree) {
         return context->newNoneValue();
     }
     InputSourceTokenizer tokenizer(fileInputSource.get());
-    Parser parser(&tokenizer);
+    Parser parser(&tokenizer, &logger);
     auto parsedTree = parser.run();
     auto importEnv = newChildEnvironment();
     importEnv->bind(L"FILE", context->newStringValue(decodeUTF8(tryPath)));

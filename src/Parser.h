@@ -4,15 +4,17 @@
 #define PARSER_H
 
 #include "Tokenizer.h"
+#include "Logger.h"
 
 class SyntaxNode;
 
 class Parser {
     Tokenizer *lexer;
     vector<Token> allTokens;
+    PinponLogger *logger;
     int currentTokenIndex{};
 public:
-    explicit Parser(Tokenizer *t) : lexer(t) {}
+    explicit Parser(Tokenizer *t, PinponLogger *l) : lexer(t), logger(l) {}
 
     SyntaxNode *run();
 
@@ -54,19 +56,22 @@ public:
     bool expect(TokenType type);
 
     Token currentToken();
+
+private:
+    void logInternal(string message);
 };
 
 enum class NodeType {
     CALL, TERMINAL, ARGS, CALL_TAIL, TEXT, FUNC, PARAMS,
     RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
     VARPARAM, SUB, ADD, EQUAL, NEQ, LT, GT, LTE, GTE,
-    ASSERT, DEFAULTPARAM, SUBSCRIPT, SUBSCRIPT_SET
+    ASSERT, DEFAULTPARAM, SUBSCRIPT, SUBSCRIPT_SET, PARSE_ERROR
 };
 const string NodeTypeStrings[] = {
         "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
         "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
         "VARPARAM", "SUB", "ADD", "EQUAL", "NEQ", "LT", "GT", "LTE", "GTE",
-        "ASSERT", "DEFAULTPARAM", "SUBSCRIPT", "SUBSCRIPT_SET"
+        "ASSERT", "DEFAULTPARAM", "SUBSCRIPT", "SUBSCRIPT_SET", "PARSE_ERROR"
 };
 
 class SyntaxNode {
@@ -89,6 +94,8 @@ public:
     bool operator==(const SyntaxNode &other) const;
 
     bool operator!=(const SyntaxNode &other) const { return !(*this == other); };
+
+    bool isError() const;
 };
 
 ostream &operator<<(ostream &out, const SyntaxNode &node);

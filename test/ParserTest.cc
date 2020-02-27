@@ -2,6 +2,7 @@
 
 #include "Tokenizer.h"
 #include "Parser.h"
+#include "fakeit.hpp"
 
 TEST(parsing, functions) {
 
@@ -9,27 +10,27 @@ TEST(parsing, functions) {
             L"あ（い（）、４５６、う（１２３））（え）"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”あ”、1列\n"
+            u8" TERMINAL symbol：”あ”、1行目\n"
             u8" CALL_TAIL\n"
             u8"  ARGS\n"
             u8"   CALL\n"
-            u8"    TERMINAL symbol：”い”、1列\n"
+            u8"    TERMINAL symbol：”い”、1行目\n"
             u8"    CALL_TAIL\n"
             u8"     ARGS\n"
-            u8"   TERMINAL number：”４５６（456）”、1列\n"
+            u8"   TERMINAL number：”４５６（456）”、1行目\n"
             u8"   CALL\n"
-            u8"    TERMINAL symbol：”う”、1列\n"
+            u8"    TERMINAL symbol：”う”、1行目\n"
             u8"    CALL_TAIL\n"
             u8"     ARGS\n"
-            u8"      TERMINAL number：”１２３（123）”、1列\n"
+            u8"      TERMINAL number：”１２３（123）”、1行目\n"
             u8"  CALL_TAIL\n"
             u8"   ARGS\n"
-            u8"    TERMINAL symbol：”え”、1列\n"
+            u8"    TERMINAL symbol：”え”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -39,14 +40,14 @@ TEST(parsing, importing_file) {
             L"導入、フォルダー・フォルダー２・ファイル名"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"IMPORT\n"
-            u8" TERMINAL symbol：”フォルダー”、1列\n"
-            u8" TERMINAL symbol：”フォルダー２”、1列\n"
-            u8" TERMINAL symbol：”ファイル名”、1列\n"
+            u8" TERMINAL symbol：”フォルダー”、1行目\n"
+            u8" TERMINAL symbol：”フォルダー２”、1行目\n"
+            u8" TERMINAL symbol：”ファイル名”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -56,22 +57,22 @@ TEST(parsing, function_with_kwargs) {
             L"関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”関数名前”、1列\n"
+            u8" TERMINAL symbol：”関数名前”、1行目\n"
             u8" CALL_TAIL\n"
             u8"  ARGS\n"
-            u8"   TERMINAL symbol：”引数一”、1列\n"
-            u8"   TERMINAL symbol：”引数二”、1列\n"
+            u8"   TERMINAL symbol：”引数一”、1行目\n"
+            u8"   TERMINAL symbol：”引数二”、1行目\n"
             u8"   KWARG\n"
-            u8"    TERMINAL symbol：”キー１”、1列\n"
-            u8"    TERMINAL symbol：”バリュー１”、1列\n"
+            u8"    TERMINAL symbol：”キー１”、1行目\n"
+            u8"    TERMINAL symbol：”バリュー１”、1行目\n"
             u8"   KWARG\n"
-            u8"    TERMINAL symbol：”キー２”、1列\n"
-            u8"    TERMINAL symbol：”バリュー２”、1列\n"
+            u8"    TERMINAL symbol：”キー２”、1行目\n"
+            u8"    TERMINAL symbol：”バリュー２”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -82,19 +83,19 @@ TEST(parsing, user_function) {
             L"　返す、１\n"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"FUNC\n"
-            u8" TERMINAL symbol：”ほげ”、1列\n"
+            u8" TERMINAL symbol：”ほげ”、1行目\n"
             u8" PARAMS\n"
-            u8"  TERMINAL symbol：”引数”、1列\n"
+            u8"  TERMINAL symbol：”引数”、1行目\n"
             u8"  VARKWPARAM\n"
-            u8"   TERMINAL symbol：”辞書引数”、1列\n"
+            u8"   TERMINAL symbol：”辞書引数”、1行目\n"
             u8" TEXT\n"
             u8"  RETURN\n"
-            u8"   TERMINAL number：”１（1）”、2列\n"
+            u8"   TERMINAL number：”１（1）”、2行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -105,7 +106,7 @@ TEST(parsing, user_function_varparam) {
             L"　返す、１\n"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
 
     SyntaxNode expectedTree(NodeType::FUNC, {
@@ -134,7 +135,7 @@ TEST(parsing, user_function_defaultparam) {
             L"　返す、１\n"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
 
     SyntaxNode expectedTree(NodeType::FUNC, {
@@ -169,16 +170,16 @@ TEST(parsing, dot_lookup) {
             L"ほげ・何か・ほか"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”ほげ”、1列\n"
+            u8" TERMINAL symbol：”ほげ”、1行目\n"
             u8" GET\n"
-            u8"  TERMINAL symbol：”何か”、1列\n"
+            u8"  TERMINAL symbol：”何か”、1行目\n"
             u8"  GET\n"
-            u8"   TERMINAL symbol：”ほか”、1列\n"
+            u8"   TERMINAL symbol：”ほか”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -188,22 +189,22 @@ TEST(parsing, dot_lookup_and_assign) {
             L"ほげ・何か・ほか＝あ・い・う"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”ほげ”、1列\n"
+            u8" TERMINAL symbol：”ほげ”、1行目\n"
             u8" GET\n"
-            u8"  TERMINAL symbol：”何か”、1列\n"
+            u8"  TERMINAL symbol：”何か”、1行目\n"
             u8"  SET\n"
-            u8"   TERMINAL symbol：”ほか”、1列\n"
+            u8"   TERMINAL symbol：”ほか”、1行目\n"
             u8"   CALL\n"
-            u8"    TERMINAL symbol：”あ”、1列\n"
+            u8"    TERMINAL symbol：”あ”、1行目\n"
             u8"    GET\n"
-            u8"     TERMINAL symbol：”い”、1列\n"
+            u8"     TERMINAL symbol：”い”、1行目\n"
             u8"     GET\n"
-            u8"      TERMINAL symbol：”う”、1列\n"
+            u8"      TERMINAL symbol：”う”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -213,16 +214,16 @@ TEST(parsing, dot_lookup_and_call) {
             L"ほげ・何か・ほか（）"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”ほげ”、1列\n"
+            u8" TERMINAL symbol：”ほげ”、1行目\n"
             u8" GET\n"
-            u8"  TERMINAL symbol：”何か”、1列\n"
+            u8"  TERMINAL symbol：”何か”、1行目\n"
             u8"  GET\n"
-            u8"   TERMINAL symbol：”ほか”、1列\n"
+            u8"   TERMINAL symbol：”ほか”、1行目\n"
             u8"   CALL_TAIL\n"
             u8"    ARGS\n"
     );
@@ -234,24 +235,24 @@ TEST(parsing, dot_lookup_and_call_and_lookup) {
             L"ほげ・何か・ほか（）・あ・い・う"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”ほげ”、1列\n"
+            u8" TERMINAL symbol：”ほげ”、1行目\n"
             u8" GET\n"
-            u8"  TERMINAL symbol：”何か”、1列\n"
+            u8"  TERMINAL symbol：”何か”、1行目\n"
             u8"  GET\n"
-            u8"   TERMINAL symbol：”ほか”、1列\n"
+            u8"   TERMINAL symbol：”ほか”、1行目\n"
             u8"   CALL_TAIL\n"
             u8"    ARGS\n"
             u8"    GET\n"
-            u8"     TERMINAL symbol：”あ”、1列\n"
+            u8"     TERMINAL symbol：”あ”、1行目\n"
             u8"     GET\n"
-            u8"      TERMINAL symbol：”い”、1列\n"
+            u8"      TERMINAL symbol：”い”、1行目\n"
             u8"      GET\n"
-            u8"       TERMINAL symbol：”う”、1列\n"
+            u8"       TERMINAL symbol：”う”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -261,7 +262,7 @@ TEST(parsing_infix, simple) {
             L"１－２＋３"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
 
     auto expectedTree = SyntaxNode(NodeType::ADD, {
@@ -279,21 +280,21 @@ TEST(parsing_infix, complex) {
             L"１－２＋あ（３）＋い"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"ADD\n"
             u8" ADD\n"
             u8"  SUB\n"
-            u8"   TERMINAL number：”１（1）”、1列\n"
-            u8"   TERMINAL number：”２（2）”、1列\n"
+            u8"   TERMINAL number：”１（1）”、1行目\n"
+            u8"   TERMINAL number：”２（2）”、1行目\n"
             u8"  CALL\n"
-            u8"   TERMINAL symbol：”あ”、1列\n"
+            u8"   TERMINAL symbol：”あ”、1行目\n"
             u8"   CALL_TAIL\n"
             u8"    ARGS\n"
-            u8"     TERMINAL number：”３（3）”、1列\n"
-            u8" TERMINAL symbol：”い”、1列\n"
+            u8"     TERMINAL number：”３（3）”、1行目\n"
+            u8" TERMINAL symbol：”い”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -303,19 +304,19 @@ TEST(parsing_infix, within) {
             L"表示（１－２＋３）"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
-            u8" TERMINAL symbol：”表示”、1列\n"
+            u8" TERMINAL symbol：”表示”、1行目\n"
             u8" CALL_TAIL\n"
             u8"  ARGS\n"
             u8"   ADD\n"
             u8"    SUB\n"
-            u8"     TERMINAL number：”１（1）”、1列\n"
-            u8"     TERMINAL number：”２（2）”、1列\n"
-            u8"    TERMINAL number：”３（3）”、1列\n"
+            u8"     TERMINAL number：”１（1）”、1行目\n"
+            u8"     TERMINAL number：”２（2）”、1行目\n"
+            u8"    TERMINAL number：”３（3）”、1行目\n"
     );
     EXPECT_EQ(expected, treeString);
 }
@@ -325,7 +326,7 @@ TEST(parsing_infix, comparison) {
             L"表示（１＝＝２）"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -348,7 +349,7 @@ TEST(parsing_infix, comparisonNotEqual) {
             L"あ＝１！＝２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -367,7 +368,7 @@ TEST(parsing_infix, comparisonLessThan) {
             L"あ＝１＜２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -386,7 +387,7 @@ TEST(parsing_infix, comparisonGreaterThan) {
             L"あ＝１＞２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -405,7 +406,7 @@ TEST(parsing_infix, comparisonGreaterThanEqual) {
             L"あ＝１＞＝２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -424,7 +425,7 @@ TEST(parsing_infix, comparisonLessThanEqual) {
             L"あ＝１＜＝２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -443,7 +444,7 @@ TEST(parsing_infix, assert) {
             L"確認、１＝＝２"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -461,7 +462,7 @@ TEST(parsing_subscript, subscript) {
             L"辞書（名前：「すずき」）【「名前」】"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -488,7 +489,7 @@ TEST(parsing_subscript, subscript_complex) {
             L"辞書（名前：「すずき」）【「名前」】・長さ"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -517,7 +518,7 @@ TEST(parsing_subscript, subscript_set) {
             L"辞書（名前：「すずき」）【「名前」】＝「田中」"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    auto parser = Parser(&testTokenizer);
+    auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
 
@@ -537,4 +538,23 @@ TEST(parsing_subscript, subscript_set) {
             })
     });
     EXPECT_EQ(expectedTree, *tree->children[0]);
+}
+
+using namespace fakeit;
+
+TEST(parsing, parse_error) {
+    auto stringInput = StringInputSource(
+            L"導入＋１"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    fakeit::Mock<PinponLogger> logger;
+    When(OverloadedMethod(logger, log, PinponLogger * (string))).AlwaysReturn(&logger.get());
+    auto parser = Parser(&testTokenizer, &logger.get());
+    SyntaxNode *tree = parser.run();
+
+    EXPECT_EQ(tree->type, NodeType::PARSE_ERROR);
+    Verify(
+            OverloadedMethod(logger, log, PinponLogger * (string))
+            .Using("意外なトークン：plus：”＋”、1行目\n")
+    );
 }

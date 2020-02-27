@@ -34,6 +34,8 @@ static const char *TokenTypeStrings[] = {
         "rbrace"
 };
 
+const char* tokenTypeToString(TokenType type);
+
 class Token {
 public:
     Token() : type(TokenType::START), content(L""), line(0) {}

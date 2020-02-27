@@ -16,6 +16,9 @@ SyntaxNode *Parser::run_text() {
         SyntaxNode *statement = run_statement();
         if (!statement) {
             return result;
+        } else if (statement->isError()) {
+            delete result;
+            return statement;
         }
         result->children.push_back(statement);
     } while (true);
@@ -23,9 +26,9 @@ SyntaxNode *Parser::run_text() {
 
 SyntaxNode *Parser::run_statement() {
     SyntaxNode *result;
-    if ((result = run_return())) {
+    if ((result = run_import())) {
         return result;
-    } else if ((result = run_import())) {
+    } else if ((result = run_return())) {
         return result;
     } else if ((result = run_if())) {
         return result;
@@ -38,6 +41,26 @@ SyntaxNode *Parser::run_statement() {
     } else {
         return run_infix_expression();
     }
+}
+
+SyntaxNode *Parser::run_import() {
+    if (accept(TokenType::IMPORT)) {
+        auto result = new SyntaxNode(NodeType::IMPORT);
+        if (!expect(TokenType::COMMA)) {
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        do {
+            Token part;
+            accept(TokenType::SYMBOL, &part);
+            result->children.push_back(new SyntaxNode(part));
+        } while (accept(TokenType::DOT));
+        if (result->children.empty()) {
+            logInternal("エラー：導入は不完全\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        return result;
+    }
+    return nullptr;
 }
 
 SyntaxNode *Parser::run_if() {
@@ -93,20 +116,6 @@ SyntaxNode *Parser::run_return() {
         SyntaxNode *rhs = run_infix_expression();
         auto result = new SyntaxNode(NodeType::RETURN);
         result->children.push_back(rhs);
-        return result;
-    }
-    return nullptr;
-}
-
-SyntaxNode *Parser::run_import() {
-    if (accept(TokenType::IMPORT)) {
-        auto result = new SyntaxNode(NodeType::IMPORT);
-        expect(TokenType::COMMA);
-        do {
-            Token part;
-            accept(TokenType::SYMBOL, &part);
-            result->children.push_back(new SyntaxNode(part));
-        } while (accept(TokenType::DOT));
         return result;
     }
     return nullptr;
@@ -267,7 +276,7 @@ SyntaxNode *Parser::run_expression_tail() {
         if (!accept(TokenType::RBRACE)) {
             cout << "エラー：パーシング：「　】　」は見つけられなかった！　" << node->toString() << endl;
         }
-        if(accept(TokenType::ASSIGN)) {
+        if (accept(TokenType::ASSIGN)) {
             auto rhs = run_infix_expression();
             node = new SyntaxNode(NodeType::SUBSCRIPT_SET, {arg, rhs});
         } else {
@@ -393,8 +402,8 @@ bool Parser::expect(TokenType type) {
     if (accept(type)) {
         return true;
     }
-    cout << "unexpected " << currentToken().toString() << endl;
-    cout << "  expected " << Token(type, L"", -1).toString() << endl;
+    logInternal("意外なトークン：" + currentToken().toString() + "\n");
+    logInternal("  希望のトークン型は「" + string(tokenTypeToString(type)) + "」\n");
     return false;
 }
 
@@ -417,6 +426,10 @@ string SyntaxNode::toString(int indent) {
         result << child->toString(indent + 1);
     }
     return result.str();
+}
+
+bool SyntaxNode::isError() const {
+    return type == NodeType::PARSE_ERROR;
 }
 
 bool SyntaxNode::operator==(const SyntaxNode &other) const {
@@ -457,5 +470,13 @@ ostream &operator<<(ostream &out, const SyntaxNode &node) {
 SyntaxNode::~SyntaxNode() {
     for (auto child : children) {
         delete child;
+    }
+}
+
+void Parser::logInternal(string message) {
+    if (logger) {
+        logger->log(message);
+    } else {
+        cout << message;
     }
 }

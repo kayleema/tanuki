@@ -118,6 +118,10 @@ long parseNumeric(wstring s) {
     return result + parseNumeric(s) * 10;
 }
 
+const char* tokenTypeToString(TokenType type) {
+    return TokenTypeStrings[(int) type];
+}
+
 Token::Token(TokenType type, wstring _content, int line)
         : type(type), content(std::move(_content)), line(line) {
     if (type == TokenType::NUMBER) {
@@ -132,7 +136,7 @@ string Token::toString() const {
     if (type == TokenType::NUMBER) {
         result << u8"（" << number << u8"）";
     }
-    result << u8"”、" << line << u8"列";
+    result << u8"”、" << line << u8"行目";
     return result.str();
 }
 
