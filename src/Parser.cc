@@ -34,9 +34,9 @@ SyntaxNode *Parser::run_statement() {
         return result;
     } else if ((result = run_assert())) {
         return result;
-    } else if ((result = run_function())) {
-        return result;
     } else if ((result = run_assign())) {
+        return result;
+    } else if ((result = run_function())) {
         return result;
     } else {
         return run_infix_expression();
@@ -168,11 +168,16 @@ SyntaxNode *Parser::run_if() {
 SyntaxNode *Parser::run_assert() {
     Token assertToken;
     if (accept(TokenType::ASSERT, &assertToken)) {
-        expect(TokenType::COMMA);
+        if (!expect(TokenType::COMMA)) {
+            logInternal("エラー：確認文の後は「、」\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
         SyntaxNode *rhs = run_infix_expression();
-        auto result = new SyntaxNode(NodeType::ASSERT, {
-                rhs
-        });
+        if (rhs->isError()) {
+            logInternal("エラー：確認文の中に問題があります\n");
+            return rhs;
+        }
+        auto result = new SyntaxNode(NodeType::ASSERT, {rhs});
         result->content = assertToken;
         return result;
     }
@@ -183,10 +188,13 @@ SyntaxNode *Parser::run_assign() {
     Token lhs;
     if (accept({TokenType::SYMBOL, TokenType::ASSIGN}, {&lhs, nullptr})) {
         auto rhs = run_infix_expression();
-        auto result = new SyntaxNode(NodeType::ASSIGN);
-        result->children.push_back(new SyntaxNode(lhs));
-        result->children.push_back(rhs);
-        return result;
+        if (rhs->isError()) {
+            logInternal("エラー：変数設定文の右側に問題\n");
+            return rhs;
+        }
+        return new SyntaxNode(NodeType::ASSIGN, {
+                new SyntaxNode(lhs), rhs
+        });
     }
     return nullptr;
 }
@@ -196,14 +204,19 @@ SyntaxNode *Parser::run_function() {
         return nullptr;
     }
     if (!expect(TokenType::COMMA)) {
-        return nullptr;
+        logInternal("エラー：関数作成文の中に問題があります。\n");
+        return new SyntaxNode(NodeType::PARSE_ERROR);
     }
     Token name;
-    accept(TokenType::SYMBOL, &name);
-    auto result = new SyntaxNode(NodeType::FUNC);
-    result->children.push_back(new SyntaxNode(name));
+    if (!accept(TokenType::SYMBOL, &name)) {
+        logInternal("エラー：関数作成文の中に関数名がありません。\n");
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    auto result = new SyntaxNode(NodeType::FUNC, {new SyntaxNode(name)});
     if (!expect(TokenType::LPAREN)) {
-        return nullptr;
+        logInternal("エラー：関数作成文の一行目で「（」を見つけられません。\n");
+        delete result;
+        return new SyntaxNode(NodeType::PARSE_ERROR);
     }
     auto params = new SyntaxNode(NodeType::PARAMS);
     result->children.push_back(params);
@@ -212,6 +225,11 @@ SyntaxNode *Parser::run_function() {
         if (accept(TokenType::SYMBOL, &param)) {
             if (accept(TokenType::COLON)) {
                 auto rhs = run_infix_expression();
+                if (rhs->isError()) {
+                    logInternal("エラー：関数作成文のキーワード引数の「：」の右側。\n");
+                    delete result;
+                    return rhs;
+                }
                 params->children.push_back(
                         new SyntaxNode(NodeType::DEFAULTPARAM, {
                                 new SyntaxNode(param),
@@ -222,15 +240,17 @@ SyntaxNode *Parser::run_function() {
                 params->children.push_back(new SyntaxNode(param));
             }
             accept(TokenType::COMMA);
-        }
-        if (accept(TokenType::STAR)) {
+        } else if (accept(TokenType::STAR)) {
             if (accept(TokenType::STAR)) {
                 if (accept(TokenType::SYMBOL, &param)) {
                     // Variable-length Keyword Parameter
-                    auto kwargs = new SyntaxNode(NodeType::VARKWPARAM);
-                    kwargs->children.push_back(new SyntaxNode(param));
+                    auto kwargs = new SyntaxNode(NodeType::VARKWPARAM, {new SyntaxNode(param)});
                     params->children.push_back(kwargs);
                     accept(TokenType::COMMA);
+                } else {
+                    logInternal("エラー：関数作成文のVariable-length Keyword Parameterの問題。\n");
+                    delete result;
+                    return new SyntaxNode(NodeType::PARSE_ERROR);
                 }
             } else if (accept(TokenType::SYMBOL, &param)) {
                 // Variable-length  Parameter
@@ -238,15 +258,33 @@ SyntaxNode *Parser::run_function() {
                 varparam->children.push_back(new SyntaxNode(param));
                 params->children.push_back(varparam);
                 accept(TokenType::COMMA);
+            } else {
+                logInternal("エラー：関数作成文の星の右に何もありません。\n");
+                delete result;
+                return new SyntaxNode(NodeType::PARSE_ERROR);
             }
+        } else {
+            logInternal("エラー：関数作成文の引数一覧の中に変なトークン。\n");
+            delete result;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
         }
     }
     if (!expect(TokenType::NEWL) || !expect(TokenType::INDENT)) {
-        return nullptr;
+        logInternal("エラー：関数作成文の一行目の後でindentが必要。\n");
+        delete result;
+        return new SyntaxNode(NodeType::PARSE_ERROR);
     }
-    result->children.push_back(run_text());
+    auto body = run_text();
+    result->children.push_back(body);
+    if (body->isError()) {
+        logInternal("エラー：関数作成文の中身で問題がありました。\n");
+        delete result;
+        return body;
+    }
     if (!expect(TokenType::DEDENT)) {
-        return nullptr;
+        logInternal("エラー：関数作成文の後でunindentが必要。\n");
+        delete result;
+        return new SyntaxNode(NodeType::PARSE_ERROR);
     }
     return result;
 }
@@ -257,6 +295,12 @@ SyntaxNode *Parser::run_infix_expression() {
 
 SyntaxNode *Parser::run_infix_comparison_expression() {
     auto lhs = run_infix_additive_expression();
+    if (!lhs) {
+        return lhs;
+    } else if (lhs->isError()) {
+        logInternal("エラー：比べ文の左側のなか。");
+        return lhs;
+    }
     static const std::vector<std::pair<TokenType, NodeType>> operatorToNode(
             {
                     {TokenType::EQ,  NodeType::EQUAL},
@@ -269,6 +313,15 @@ SyntaxNode *Parser::run_infix_comparison_expression() {
     for (const auto pair : operatorToNode) {
         if (accept(pair.first)) {
             auto rhs = run_infix_additive_expression();
+            if (!rhs) {
+                logInternal("エラー：比べ文の右側のなか。");
+                delete lhs;
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            } else if (rhs->isError()) {
+                logInternal("エラー：比べ文の右側のなか。");
+                delete lhs;
+                return rhs;
+            }
             return new SyntaxNode(pair.second, {lhs, rhs});
         }
     }
@@ -277,19 +330,35 @@ SyntaxNode *Parser::run_infix_comparison_expression() {
 
 SyntaxNode *Parser::run_infix_additive_expression() {
     auto result = run_expression();
+    if (!result) {
+        return result;
+    } else if (result->isError()) {
+        logInternal("エラー：プラス型文の左側で。");
+        return result;
+    }
     do {
         if (accept(TokenType::MINUS)) {
             auto rhs = run_expression();
             if (!rhs) {
-                cout << "error: expected rhs for minus" << endl;
-                return nullptr;
+                logInternal("エラー：マイナスの右側に何もありません。");
+                delete result;
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            } else if (rhs->isError()) {
+                logInternal("エラー：マイナスの右側で問題がありました。");
+                delete result;
+                return rhs;
             }
             result = new SyntaxNode(NodeType::SUB, {result, rhs});
         } else if (accept(TokenType::PLUS)) {
             auto rhs = run_expression();
             if (!rhs) {
-                cout << "error: expected rhs for plus" << endl;
-                return nullptr;
+                logInternal("エラー：プラスの右側に何もありません。");
+                delete result;
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            } else if (rhs->isError()) {
+                logInternal("エラー：プラスの右側で問題がありました。");
+                delete result;
+                return rhs;
             }
             result = new SyntaxNode(NodeType::ADD, {result, rhs});
         } else {
