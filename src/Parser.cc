@@ -63,37 +63,106 @@ SyntaxNode *Parser::run_import() {
     return nullptr;
 }
 
-SyntaxNode *Parser::run_if() {
-    if (accept(TokenType::IF)) {
-        expect(TokenType::COMMA);
-        SyntaxNode *condition = run_infix_expression();
-        expect(TokenType::NEWL);
-        expect(TokenType::INDENT);
-        SyntaxNode *body = run_text();
-        expect(TokenType::DEDENT);
-        auto result = new SyntaxNode(NodeType::IF);
-        result->children.push_back(condition);
-        result->children.push_back(body);
-        while (accept(TokenType::ELIF)) {
-            expect(TokenType::COMMA);
-            SyntaxNode *conditionElif = run_infix_expression();
-            expect(TokenType::NEWL);
-            expect(TokenType::INDENT);
-            SyntaxNode *bodyElif = run_text();
-            expect(TokenType::DEDENT);
-            result->children.push_back(conditionElif);
-            result->children.push_back(bodyElif);
+SyntaxNode *Parser::run_return() {
+    if (accept(TokenType::RETURN)) {
+        if (!expect(TokenType::COMMA)) {
+            logInternal("エラー：返す文は不完全\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
         }
-        if (accept(TokenType::ELSE)) {
-            expect(TokenType::NEWL);
-            expect(TokenType::INDENT);
-            SyntaxNode *bodyElse = run_text();
-            result->children.push_back(bodyElse);
-            expect(TokenType::DEDENT);
+        SyntaxNode *rhs = run_infix_expression();
+        if (rhs->isError()) {
+            logInternal("エラー：返す文の右側をパース出来ません\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        } else if (rhs) {
+            return new SyntaxNode(NodeType::RETURN, {rhs});
+        } else {
+            return new SyntaxNode(NodeType::RETURN);
         }
-        return result;
     }
     return nullptr;
+}
+
+SyntaxNode *Parser::run_if() {
+    if (!accept(TokenType::IF)) {
+        return nullptr;
+    }
+    if (!expect(TokenType::COMMA)) {
+        logInternal("エラー：もし文不完全\n");
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    SyntaxNode *condition = run_infix_expression();
+    if (!condition || condition->isError()) {
+        logInternal("エラー：もし文の右側の引数をパース出来ない。\n");
+        return condition;
+    }
+    if (!expect(TokenType::NEWL) || !expect(TokenType::INDENT)) {
+        logInternal("エラー：もし文の一行目の後でnewlineやindentなどはありません。\n");
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    SyntaxNode *body = run_text();
+    if (body->isError()) {
+        logInternal("エラー：もし文の中に問題が起きました。\n");
+        return body;
+    }
+    if (!expect(TokenType::DEDENT)) {
+        logInternal("エラー：もし文の中身の後でunindentは必要です。\n");
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    auto result = new SyntaxNode(NodeType::IF, {condition, body});
+
+    // Elif part
+    while (accept(TokenType::ELIF)) {
+        if (!expect(TokenType::COMMA)) {
+            logInternal("エラー：もし文の「あるいは」の右側で「、」は必要です。\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        SyntaxNode *conditionElif = run_infix_expression();
+        if (conditionElif->isError()) {
+            logInternal("エラー：もし文の「あるいは」の引数の中に問題があります。\n");
+            delete result;
+            return conditionElif;
+        }
+        if (!expect(TokenType::NEWL) || !expect(TokenType::INDENT)) {
+            logInternal("エラー：もし文の「あるいは」の引数の中に問題があります。\n");
+            delete result;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        SyntaxNode *bodyElif = run_text();
+        if (bodyElif->isError()) {
+            logInternal("エラー：もし文の「あるいは」部分の内側（ボディー）に問題があります。\n");
+            delete result;
+            return bodyElif;
+        }
+        if (!expect(TokenType::DEDENT)) {
+            logInternal("エラー：もし文の「あるいは」部分の中身の後でunindentは必要です。\n");
+            delete result;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        result->children.push_back(conditionElif);
+        result->children.push_back(bodyElif);
+    }
+
+    // Else part
+    if (accept(TokenType::ELSE)) {
+        if (!expect(TokenType::NEWL) || !expect(TokenType::INDENT)) {
+            logInternal("エラー：もし文の「その他部分」の一行目の後でnewlineやindentなどはありません。\n");
+            delete result;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        SyntaxNode *bodyElse = run_text();
+        if (bodyElse->isError()) {
+            logInternal("エラー：もし文の「その他」部分の内側（ボディー）に問題があります。\n");
+            delete result;
+            return bodyElse;
+        }
+        result->children.push_back(bodyElse);
+        if (!expect(TokenType::DEDENT)) {
+            logInternal("エラー：もし文の「その他」部分の中身の後でunindentは必要です。\n");
+            delete result;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+    }
+    return result;
 }
 
 SyntaxNode *Parser::run_assert() {
@@ -105,17 +174,6 @@ SyntaxNode *Parser::run_assert() {
                 rhs
         });
         result->content = assertToken;
-        return result;
-    }
-    return nullptr;
-}
-
-SyntaxNode *Parser::run_return() {
-    if (accept(TokenType::RETURN)) {
-        expect(TokenType::COMMA);
-        SyntaxNode *rhs = run_infix_expression();
-        auto result = new SyntaxNode(NodeType::RETURN);
-        result->children.push_back(rhs);
         return result;
     }
     return nullptr;
