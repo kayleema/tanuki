@@ -8,26 +8,48 @@ Value *Environment::eval(SyntaxNode *tree,
                          const FunctionValue *tailContext) {
     context->collect(this);
     switch (tree->type) {
-        case NodeType::CALL: return eval_call(tree, tailContext);
-        case NodeType::TERMINAL: return eval_terminal(tree);
-        case NodeType::TEXT: return eval_text(tree, tailContext);
-        case NodeType::FUNC: return eval_function(tree);
-        case NodeType::RETURN: return eval_return(tree, tailContext);
-        case NodeType::IMPORT: return eval_import(tree);
-        case NodeType::IF: return eval_if(tree);
-        case NodeType::ASSIGN: return eval_assign(tree);
-        case NodeType::ADD: return eval_add(tree);
-        case NodeType::SUB: return eval_sub(tree);
-        case NodeType::MUL: return eval_mul(tree);
-        case NodeType::DIV: return eval_div(tree);
-        case NodeType::EQUAL: return eval_equal(tree);
-        case NodeType::NEQ: return eval_not_equal(tree);
-        case NodeType::GT: return eval_gt(tree);
-        case NodeType::LT: return eval_lt(tree);
-        case NodeType::GTE: return eval_gte(tree);
-        case NodeType::LTE: return eval_lte(tree);
-        case NodeType::ASSERT: return eval_assert(tree);
-        default: return context->newNoneValue();
+        case NodeType::CALL:
+            return eval_call(tree, tailContext);
+        case NodeType::TERMINAL:
+            return eval_terminal(tree);
+        case NodeType::TEXT:
+            return eval_text(tree, tailContext);
+        case NodeType::FUNC:
+            return eval_function(tree);
+        case NodeType::RETURN:
+            return eval_return(tree, tailContext);
+        case NodeType::IMPORT:
+            return eval_import(tree);
+        case NodeType::EXTERNAL:
+            return eval_nonlocal(tree);
+        case NodeType::IF:
+            return eval_if(tree);
+        case NodeType::ASSIGN:
+            return eval_assign(tree);
+        case NodeType::ADD:
+            return eval_add(tree);
+        case NodeType::SUB:
+            return eval_sub(tree);
+        case NodeType::MUL:
+            return eval_mul(tree);
+        case NodeType::DIV:
+            return eval_div(tree);
+        case NodeType::EQUAL:
+            return eval_equal(tree);
+        case NodeType::NEQ:
+            return eval_not_equal(tree);
+        case NodeType::GT:
+            return eval_gt(tree);
+        case NodeType::LT:
+            return eval_lt(tree);
+        case NodeType::GTE:
+            return eval_gte(tree);
+        case NodeType::LTE:
+            return eval_lte(tree);
+        case NodeType::ASSERT:
+            return eval_assert(tree);
+        default:
+            return context->newNoneValue();
     }
 }
 
@@ -39,6 +61,8 @@ Value *Environment::eval_add(SyntaxNode *tree) {
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value + rhs->toNumberValue()->value);
+    } else if (lhs->type == ValueType::STRING && rhs->type == ValueType::STRING) {
+        return context->newStringValue(lhs->toStringValue()->value + rhs->toStringValue()->value);
     }
     return context->newNoneValue();
 }
@@ -262,6 +286,21 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
             result->refs--;
         }
         return result;
+    } else if (source->type == ValueType::STRING) {
+        auto sourceString = (StringValue *) source;
+        SyntaxNode *arg = tree->children[0];
+        long index = ((NumberValue *) eval(arg))->value;
+        if (sourceString->value.length() <= index) {
+            cout << "添字は文字列の外　添字：" << index << "　長さ：" << sourceString->value.length() << endl;
+            return context->newNoneValue();
+        }
+        Value *result = context->newStringValue(wstring(1,sourceString->value[index]));
+        if (tree->children.size() == 2) {
+            result->refs++;
+            result = eval_tail(result, tree->children[1]);
+            result->refs--;
+        }
+        return result;
     }
     return context->newNoneValue();
 }
@@ -409,6 +448,13 @@ Value *Environment::eval_import(SyntaxNode *tree) {
     return context->newNoneValue();
 }
 
+Value *Environment::eval_nonlocal(SyntaxNode *tree) {
+    for (auto &child : tree->children) {
+        nonlocals.insert(child->content.content);
+    }
+    return context->newNoneValue();
+}
+
 Value *Environment::eval_if(SyntaxNode *tree) {
     for (size_t i = 0; i < tree->children.size(); i += 2) {
         if (i == tree->children.size() - 1) {
@@ -451,8 +497,16 @@ Value *Environment::lookup(const wstring &name) {
     return nullptr;
 }
 
-void Environment::bind(const wstring &name, Value *value) {
-    bindings[name] = value;
+void Environment::bind(const wstring &name, Value *value, bool recursive) {
+    if ((recursive && bindings.find(name) == bindings.end()) || (nonlocals.find(name) != nonlocals.end())) {
+        if (parent) {
+            parent->bind(name, value, true);
+        } else {
+            ConsoleLogger().log("reached top stack frame for nonlocal '")->log(name)->log("'")->logEndl();
+        }
+    } else {
+        bindings[name] = value;
+    }
 }
 
 Environment *Environment::newChildEnvironment() {

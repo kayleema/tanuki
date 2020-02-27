@@ -26,6 +26,8 @@ public:
 
     SyntaxNode *run_import();
 
+    SyntaxNode *run_nonlocal();
+
     SyntaxNode *run_if();
 
     SyntaxNode *run_assert();
@@ -68,14 +70,14 @@ enum class NodeType {
     RETURN, IF, ASSIGN, GET, SET, IMPORT, VARKWPARAM, KWARG,
     VARPARAM, SUB, ADD, EQUAL, NEQ, LT, GT, LTE, GTE,
     ASSERT, DEFAULTPARAM, SUBSCRIPT, SUBSCRIPT_SET, PARSE_ERROR,
-    MUL, DIV
+    MUL, DIV, EXTERNAL
 };
 const string NodeTypeStrings[] = {
         "CALL", "TERMINAL", "ARGS", "CALL_TAIL", "TEXT", "FUNC", "PARAMS",
         "RETURN", "IF", "ASSIGN", "GET", "SET", "IMPORT", "VARKWPARAM", "KWARG",
         "VARPARAM", "SUB", "ADD", "EQUAL", "NEQ", "LT", "GT", "LTE", "GTE",
         "ASSERT", "DEFAULTPARAM", "SUBSCRIPT", "SUBSCRIPT_SET", "PARSE_ERROR",
-        "MUL", "DIV"
+        "MUL", "DIV", "EXTERNAL"
 };
 
 class SyntaxNode {

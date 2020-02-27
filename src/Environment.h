@@ -35,6 +35,8 @@ class Environment {
 
     Value *eval_import(SyntaxNode *node);
 
+    Value *eval_nonlocal(SyntaxNode *node);
+
     Value *eval_if(SyntaxNode *node);
 
     Value *eval_assign(SyntaxNode *node);
@@ -80,11 +82,12 @@ public:
     Environment *caller = nullptr;
     Context *context;
     unordered_map<wstring, Value *> bindings;
+    unordered_set<wstring> nonlocals;
     Filesystem *filesystem;
 
     Value *lookup(const wstring &name);
 
-    void bind(const wstring &name, Value *value);
+    void bind(const wstring &name, Value *value, bool recursive=false);
 
     Value *eval(SyntaxNode *node, const FunctionValue *tailContext = nullptr);
 

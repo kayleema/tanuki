@@ -540,6 +540,21 @@ TEST(parsing_subscript, subscript_set) {
     EXPECT_EQ(expectedTree, *tree->children[0]);
 }
 
+TEST(parsing_nonlocal, external_sotogawa) {
+    auto stringInput = StringInputSource(
+            L"外側、私の変数名"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    Parser parser(&testTokenizer, new ConsoleLogger);
+
+    SyntaxNode *tree = parser.run();
+
+    SyntaxNode expectedTree(NodeType::EXTERNAL, {
+            new SyntaxNode(Token(TokenType::SYMBOL, L"私の変数名", 1)),
+    });
+    EXPECT_EQ(expectedTree, *tree->children[0]);
+}
+
 using namespace fakeit;
 
 TEST(parsing, parse_error) {

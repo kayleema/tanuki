@@ -238,3 +238,22 @@ TEST(tokenizer, braces) {
             });
     EXPECT_EQ(allTokens, expected);
 }
+
+TEST(tokenizer, nonlocal_external) {
+    // 隅付き格好
+    auto stringInput = StringInputSource(
+            L"外側、私の変数名"
+    );
+
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto allTokens = testTokenizer.getAllTokens();
+
+    auto expected = vector<Token>(
+            {
+                    Token(TokenType::EXTERN, L"外側", 1),
+                    Token(TokenType::COMMA, L"、", 1),
+                    Token(TokenType::SYMBOL, L"私の変数名", 1),
+                    Token(TokenType::END, L"", 1),
+            });
+    EXPECT_EQ(allTokens, expected);
+}

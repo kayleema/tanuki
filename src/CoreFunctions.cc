@@ -155,19 +155,38 @@ Value *FunctionNewDictionary::apply(const vector<Value *> &args,
 Value *FunctionForEach::apply(const vector<Value *> &args,
                               Environment *env,
                               unordered_map<wstring, Value *> *) const {
-    if (args.size() == 2 && args[0]->type == ValueType::DICT && args[1]->type == ValueType::FUNC) {
-        auto dictionary = args[0]->toDictionaryValue();
-        auto function = (FunctionValue *) args[1];
-        // TODO: optimize
-        vector<wstring> keys;
-        for (const auto &item : dictionary->value) {
-            keys.push_back(item.first);
+    if (args.size() == 2 && args[1]->type == ValueType::FUNC) {
+        if (args[0]->type == ValueType::DICT) {
+            auto dictionary = args[0]->toDictionaryValue();
+            auto function = (FunctionValue *) args[1];
+            vector<wstring> keys;
+            for (const auto &item : dictionary->value) {
+                keys.push_back(item.first);
+            }
+            for (const auto &key : keys) {
+                auto value = dictionary->value[key];
+                function->apply({env->context->newStringValue(key), value}, env);
+            }
+            return Context::newNoneValue();
+        } else if (args[0]->type == ValueType::STRING) {
+            auto s = args[0]->toStringValue();
+            auto function = (FunctionValue *) args[1];
+            vector<wstring> keys;
+            for (wchar_t &c : s->value) {
+                keys.emplace_back(1, c);
+            }
+            for (const auto &key : keys) {
+                function->apply({env->context->newStringValue(key)}, env);
+            }
+            return Context::newNoneValue();
+        } else if (args[0]->type == ValueType::NUM) {
+            auto limit = args[0]->toNumberValue()->value;
+            auto function = (FunctionValue *) args[1];
+            for (long i = 0; i < limit; i++) {
+                function->apply({env->context->newNumberValue(i)}, env);
+            }
+            return Context::newNoneValue();
         }
-        for (const auto &key : keys) {
-            auto value = dictionary->value[key];
-            function->apply({env->context->newStringValue(key), value}, env);
-        }
-        return Context::newNoneValue();
     }
     return Context::newNoneValue();
 }
@@ -224,11 +243,14 @@ class LengthFunction : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
                  unordered_map<wstring, Value *> *) const override {
-        if (args[0]->type != ValueType::ARRAY) {
+        if (args[0]->type == ValueType::ARRAY) {
+            auto *array = (ArrayValue *) (args[0]);
+            return env->context->newNumberValue(array->length());
+        } else if (args[0]->type == ValueType::STRING) {
+            return env->context->newNumberValue(args[0]->toStringValue()->value.length());
+        } else {
             return Context::newNoneValue();
         }
-        auto *array = (ArrayValue *) (args[0]);
-        return env->context->newNumberValue(array->length());
     };
 };
 
@@ -285,6 +307,7 @@ void initModule(Environment *env) {
     env->bind(L"イコール", new FunctionEqual());
     env->bind(L"比べ", new FunctionCompare());
     env->bind(L"辞書", new FunctionNewDictionary());
+    env->bind(L"新種類", new FunctionNewDictionary());
     env->bind(L"それぞれ", new FunctionForEach());
     env->bind(L"長さ", new LengthFunction());
     env->bind(L"配列調べ", new IndexFunction());

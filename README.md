@@ -180,6 +180,7 @@ Basicな関数
 細かい事：まだ実装されてない機能
 ------------------
 希望の技能：
+* nonlocal variable rebinding
 * floating point calculations
 * non-string hashtables
 * array operations

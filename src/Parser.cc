@@ -28,6 +28,8 @@ SyntaxNode *Parser::run_statement() {
     SyntaxNode *result;
     if ((result = run_import())) {
         return result;
+    } else if ((result = run_nonlocal())) {
+        return result;
     } else if ((result = run_return())) {
         return result;
     } else if ((result = run_if())) {
@@ -56,6 +58,26 @@ SyntaxNode *Parser::run_import() {
         } while (accept(TokenType::DOT));
         if (result->children.empty()) {
             logInternal("エラー：導入は不完全\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        return result;
+    }
+    return nullptr;
+}
+
+SyntaxNode *Parser::run_nonlocal() {
+    if (accept(TokenType::EXTERN)) {
+        auto result = new SyntaxNode(NodeType::EXTERNAL);
+        if (!expect(TokenType::COMMA)) {
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        do {
+            Token part;
+            accept(TokenType::SYMBOL, &part);
+            result->children.push_back(new SyntaxNode(part));
+        } while (accept(TokenType::COMMA));
+        if (result->children.empty()) {
+            logInternal("エラー：外側文は不完全\n");
             return new SyntaxNode(NodeType::PARSE_ERROR);
         }
         return result;

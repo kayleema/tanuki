@@ -24,14 +24,15 @@ enum TokenType {
     LPAREN, RPAREN, COMMA, SYMBOL, END, START, SPACE, NEWL,
     INDENT, DEDENT, NUMBER, FUNC, RETURN, IF, ELSE, STRING,
     ASSIGN, DOT, ELIF, MINUS, IMPORT, STAR, COLON, PLUS,
-    SLASH, EQ, LEQ, GEQ, LT, GT, NEQ, ASSERT, LBRACE, RBRACE
+    SLASH, EQ, LEQ, GEQ, LT, GT, NEQ, ASSERT, LBRACE, RBRACE,
+    EXTERN
 };
 static const char *TokenTypeStrings[] = {
         "lparen", "rparen", "comma", "symbol", "end", "start", "space", "newl",
         "indent", "dedent", "number", "function", "return", "if", "else", "string",
         "assign", "dot", "elif", "minus", "import", "star", "colon", "plus",
         "slash", "eq", "leq", "geq", "lt", "gt", "neq", "assert", "lbrace",
-        "rbrace"
+        "rbrace", "extern"
 };
 
 const char* tokenTypeToString(TokenType type);
