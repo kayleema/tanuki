@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
+// Needed for GCC
+#include <locale>
+
 string encodeUTF8(const wstring &in) {
     try {
         std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;

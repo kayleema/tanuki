@@ -2,6 +2,7 @@
 
 #include "Tokenizer.h"
 #include "Parser.h"
+#include "Logger.h"
 #include "fakeit.hpp"
 
 TEST(parsing, functions) {
@@ -562,7 +563,7 @@ TEST(parsing, parse_error) {
             L"導入＋１"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
-    fakeit::Mock<PinponLogger> logger;
+    Mock<PinponLogger> logger;
     When(OverloadedMethod(logger, log, PinponLogger * (string))).AlwaysReturn(&logger.get());
     auto parser = Parser(&testTokenizer, &logger.get());
     SyntaxNode *tree = parser.run();

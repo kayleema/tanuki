@@ -8,6 +8,18 @@
   git submodule update
 ```
 
+狸語の必要なライブラリ
+--------------
+* C++11 compatible compiler
+* cmake
+* fakeit (git submodule に入っている)
+* googletest (git submodule に入っている)
+* websocketpp (git submodule に入っている)
+
+### ピカ狸のGUIのためだけの必要なライブラリ
+* asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. Linuxの場合は：`sudo apt-get install libasio-dev`
+* npmやnodeなど… Linuxの場合は：`sudo apt-get install npm`
+
 ビルド
 -----------
 ```
@@ -19,12 +31,25 @@
 
 テストする
 ---------
+`build`のディレクトリの中から
 ```
+  cmake ..
   make pinpon_test && ./pinpon_test
 ```
-`.pin`ファイルに入っているテストを実行する：
+
+`tests.pin`ファイルに入っているテストを実行する：
 ```
+  cmake ..
   make pinpon && ./pinpon ../testpin/tests.pin
+```
+
+GCCで`pinpon_test`をビルドする時に`cmake -DCMAKE_BUILD_TYPE=Debug ..`しないといけない。
+fakeitのライブラリはGCCの`-O2`以上サポートしないだからです。
+
+`codingquestions.pin`ファイルに入っているテストを実行する：
+```
+  cmake ..
+  make pinpon && ./pinpon ../testpin/codingquestions.pin
 ```
 
 呼び方

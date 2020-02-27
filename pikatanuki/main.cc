@@ -53,9 +53,10 @@ public:
         string inputRaw = msg->get_payload();
         wstring input = decodeUTF8(inputRaw);
 
+        ConsoleLogger log;
         auto source = StringInputSource(input.c_str());
         auto tokenizer = InputSourceTokenizer(&source);
-        auto parser = Parser(&tokenizer);
+        auto parser = Parser(&tokenizer, &log);
         SyntaxNode *tree = parser.run();
         auto result = environment->eval(tree->children[0]);
 

@@ -1,0 +1,36 @@
+{
+    "name": "pin",
+    "displayName": "pin",
+    "description": "TanukiGo",
+    "version": "0.0.1",
+    "publisher": "tanuki1",
+    "engines": {
+        "vscode": "^1.42.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "pin",
+                "aliases": [
+                    "Tanukigo",
+                    "pin"
+                ],
+                "extensions": [
+                    ".pin",
+                    ".tan"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "pin",
+                "scopeName": "source.tanuki",
+                "path": "./syntaxes/pin.tmLanguage.json"
+            }
+        ]
+    }
+}

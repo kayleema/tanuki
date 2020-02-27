@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(PinponProject)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -31,16 +31,22 @@ file(GLOB dynamic_SRC
         )
 
 add_executable(pinpon main.cc ${pinpon_SRC})
+target_link_libraries(pinpon dl)
 
 add_library(pinpon_lib ${pinpon_SRC})
+target_link_libraries(pinpon_lib dl)
 
-add_library(pinpon_dynamic SHARED ${dynamic_SRC})
-target_link_libraries(pinpon_dynamic pinpon_lib)
+add_library(pinpon_dynamic SHARED ${dynamic_SRC} ${pinpon_SRC})
 
 set(CTEST_OUTPUT_ON_FAILURE ON)
 enable_testing()
 add_executable(pinpon_test ${pinpon_SRC} ${pinpon_test_SRC})
-target_link_libraries(pinpon_test gtest)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        # using GCC
+        set_target_properties ( pinpon_test PROPERTIES COMPILE_FLAGS " -O1" )
+endif()
+target_link_libraries(pinpon_test gtest dl)
 add_test(NAME pinpon_test COMMAND pinpon_test)
 
 add_subdirectory(pikatanuki)
+

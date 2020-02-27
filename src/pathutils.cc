@@ -1,6 +1,7 @@
 #include "pathutils.h"
 
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>

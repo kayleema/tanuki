@@ -1,0 +1,73 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Tanukigo",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#constants"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#paren-expression"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.pin",
+				"match": "\\b(もし|その他|関数|返す|確認|外側)"
+			},{
+				"name": "keyword.control.import",
+				"match": "\\b(導入)\\b"
+			},{
+				"name": "keyword",
+				"match": "(＋|・|−|＞|＜|＝＝|＝)"
+			},{
+				"name": "support.function",
+				"match": "\\b(表示|長さ|それぞれ|配列|辞書)\\b"
+			}]
+		},
+		"constants": {
+			"patterns": [{
+				"name": "constant.numeric",
+				"match": "\\b([１２３４５６７８９０]+)\\b"
+			}]
+		},
+		"comments": {
+			"name": "comment",
+			"begin": "＃",
+			"end": "(?=^)"
+		},
+		"strings": {
+			"name": "string.quoted.double.pin",
+			"begin": "「",
+			"end": "」",
+			"patterns": [
+				{
+					"name": "constant.character.escape.pin",
+					"match": "\\\\."
+				}
+			]
+		},
+		"paren-expression": {
+		  "begin": "\\（",
+		  "end": "\\）",
+		  "beginCaptures": {
+			"0": { "name": "punctuation.paren.open" }
+		  },
+		  "endCaptures": {
+			"0": { "name": "punctuation.paren.close" }
+		  },
+		  "name": "expression.group",
+		  "patterns": [{ "include": "#expression" }]
+		}
+	},
+	"scopeName": "source.tanuki"
+}
