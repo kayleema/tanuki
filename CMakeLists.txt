@@ -14,6 +14,7 @@ add_subdirectory(./googletest)
 add_subdirectory(./fakeit)
 
 include_directories("src/")
+include_directories("websocketpp/")
 include_directories("fakeit/single_header/gtest")
 
 file(GLOB pinpon_SRC
@@ -42,4 +43,4 @@ add_executable(pinpon_test ${pinpon_SRC} ${pinpon_test_SRC})
 target_link_libraries(pinpon_test gtest)
 add_test(NAME pinpon_test COMMAND pinpon_test)
 
-#add_subdirectory(qtpinpon)
+add_subdirectory(pikatanuki)
