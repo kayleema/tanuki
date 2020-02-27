@@ -375,10 +375,10 @@ SyntaxNode *Parser::run_expression() {
     if (accept(TokenType::SYMBOL, &start)) {
         auto tail = run_expression_tail();
         if (tail) {
-            auto result = new SyntaxNode(NodeType::CALL);
-            result->children.push_back(new SyntaxNode(start));
-            result->children.push_back(tail);
-            return result;
+            if (tail->isError()) {
+                return tail;
+            }
+            return new SyntaxNode(NodeType::CALL, {new SyntaxNode(start), tail});
         } else {
             return new SyntaxNode(start);
         }
@@ -390,8 +390,10 @@ SyntaxNode *Parser::run_expression() {
         if (accept(TokenType::NUMBER, &start)) {
             start.number = -start.number;
             return new SyntaxNode(start);
+        } else {
+            logInternal("エラー：役に立たないマイナスがあります。");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
         }
-        return nullptr;
     }
     return nullptr;
 }
@@ -400,30 +402,66 @@ SyntaxNode *Parser::run_expression_tail() {
     if (accept(TokenType::LBRACE)) {
         SyntaxNode *node = nullptr;
         auto arg = run_infix_expression();
+        if (!arg) {
+            logInternal("エラー：【】ブレースの引数の中に問題がありました。");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        } else if (arg->isError()) {
+            logInternal("エラー：【】ブレースの引数の中に問題がありました。");
+            return arg;
+        }
         if (!accept(TokenType::RBRACE)) {
-            cout << "エラー：パーシング：「　】　」は見つけられなかった！　" << node->toString() << endl;
+            logInternal("エラー：【】ブレースの引数の中に問題がありました。");
+            delete arg;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
         }
         if (accept(TokenType::ASSIGN)) {
             auto rhs = run_infix_expression();
-            node = new SyntaxNode(NodeType::SUBSCRIPT_SET, {arg, rhs});
+            if (!rhs) {
+                logInternal("エラー：【】ブレースの右側の問題がありました。");
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            } else if (rhs->isError()) {
+                logInternal("エラー：【】ブレースの右側の問題がありました。");
+                return rhs;
+            }
+            return new SyntaxNode(NodeType::SUBSCRIPT_SET, {arg, rhs});
         } else {
             node = new SyntaxNode(NodeType::SUBSCRIPT, {arg});
             auto tail = run_expression_tail();
             if (tail) {
+                if (tail->isError()) {
+                    logInternal("エラー：【】ブレースの右側の他のパターンの問題がありました。");
+                    delete node;
+                    return tail;
+                }
                 node->children.push_back(tail);
             }
+            return node;
         }
-        return node;
     }
     if (accept(TokenType::LPAREN)) {
         auto node = new SyntaxNode(NodeType::CALL_TAIL);
         auto args = run_args();
+        if (!args) {
+            delete node;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        } else if (args->isError()) {
+            logInternal("エラー：関数実行分の渡し方の問題。");
+            delete node;
+            return args;
+        }
         if (!accept(TokenType::RPAREN)) {
-            cout << "error　" << node->toString() << endl;
+            logInternal("エラー：関数実行分で右かっこがありません。" + node->toString());
+            delete node;
+            return new SyntaxNode(NodeType::PARSE_ERROR);
         }
         auto tail = run_expression_tail();
         node->children.push_back(args);
         if (tail) {
+            if (tail->isError()) {
+                logInternal("エラー：関数実行分の右側。");
+                delete node;
+                return tail;
+            }
             node->children.push_back(tail);
         }
         return node;
@@ -474,6 +512,8 @@ SyntaxNode *Parser::run_args() {
     }
     return node;
 }
+
+// ここから PARSER CORE FUNCTIONALITY です
 
 bool Parser::accept(TokenType type, Token *out) {
     if (currentToken().type == type) {

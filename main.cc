@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	auto p = Parser(&t);
+	auto p = Parser(&t, &log);
 	SyntaxNode *tree = p.run();
 
 	if (print_ast) {
@@ -113,6 +113,7 @@ int main(int argc, char **argv) {
 }
 
 int interactive(long freq) {
+    ConsoleLogger log;
 	Context context;
 	context.setFrequency(freq);
 	auto *env = new Environment(&context);
@@ -144,7 +145,7 @@ int interactive(long freq) {
 
 		auto source = StringInputSource(input.c_str());
 		auto tokenizer = InputSourceTokenizer(&source);
-		auto parser = Parser(&tokenizer);
+		auto parser = Parser(&tokenizer, &log);
 		SyntaxNode *tree = parser.run();
 		if (!tree || tree->children.empty()) {
 			cout << "parser fail" << endl;
@@ -159,9 +160,10 @@ int interactive(long freq) {
 }
 
 void evalPinponStarter(Environment *env) {
+    ConsoleLogger log;
 	auto source = StringInputSource(corePinponStarter);
 	auto tokenizer = InputSourceTokenizer(&source);
-	auto parser = Parser(&tokenizer);
+	auto parser = Parser(&tokenizer, &log);
 	SyntaxNode *tree = parser.run();
 	env->eval(tree);
 }
