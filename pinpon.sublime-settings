@@ -1,0 +1,6 @@
+{
+    "clang": {
+        "include_dirs": ["$project_path/build/googletest-src/googletest/include"]
+    },
+    "common_flags": ["-I$project_path/build/googletest-src/googletest/include"]
+}

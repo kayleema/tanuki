@@ -1,0 +1,328 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"CA",
+				"CALL_TAIL"
+			],
+			[
+				"numb",
+				"numberValue"
+			],
+			[
+				"has",
+				"hasKwParam"
+			],
+			[
+				"kw",
+				"kwParamName"
+			],
+			[
+				"kwar",
+				"kwargsIn"
+			],
+			[
+				"to",
+				"toNewDictionaryValue"
+			],
+			[
+				"sourc",
+				"sourceFilename"
+			],
+			[
+				"sour",
+				"sourceFilename"
+			],
+			[
+				"eval",
+				"evalPinponStarter"
+			],
+			[
+				"Value",
+				"ValueType"
+			],
+			[
+				"freq",
+				"frequency"
+			],
+			[
+				"tail",
+				"tailContext"
+			],
+			[
+				"Token",
+				"TokenType"
+			],
+			[
+				"unorder",
+				"unordered_map\tstandard header (since c++11)"
+			],
+			[
+				"line",
+				"linenumber"
+			],
+			[
+				"push",
+				"push_back"
+			],
+			[
+				"res",
+				"resultSymbol"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "Packages/Default/Syntax Tests.sublime-build",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Default/Syntax Tests.sublime-build",
+					""
+				],
+				[
+					"Packages/Default/Syntax Tests.sublime-build",
+					"All Syntaxes"
+				],
+				[
+					"Packages/Default/Syntax Tests.sublime-build",
+					"Performance"
+				],
+				[
+					"Packages/Default/Syntax Tests.sublime-build",
+					"Regex Compatibility"
+				]
+			],
+			[
+				"Packages/Default/Syntax Tests.sublime-build",
+				"All Syntaxes"
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"Package Control: Clang",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 150.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/kaylee/pinpon",
+		"/Users/kaylee/pinpon/build",
+		"/Users/kaylee/pinpon/build/googletest-download",
+		"/Users/kaylee/pinpon/test"
+	],
+	"file_history":
+	[
+		"/Users/kaylee/pinpon/pinpon.sublime-project",
+		"/Users/kaylee/pinpon/pinpon.sublime-settings",
+		"/Users/kaylee/pinpon/test/ParserTest.cc",
+		"/Users/kaylee/pinpon/CMakeLists.txt",
+		"/Users/kaylee/pinpon/src/Parser.h",
+		"/Users/kaylee/pinpon/src/Tokenizer.h",
+		"/Users/kaylee/pinpon/src/Parser.cc",
+		"/Users/kaylee/pinpon/example/もし.pin",
+		"/Users/kaylee/pinpon/example/tail.pin",
+		"/Users/kaylee/pinpon/src/Value.cc",
+		"/Users/kaylee/pinpon/example/import.pin",
+		"/Users/kaylee/pinpon/src/core.pin",
+		"/Users/kaylee/pinpon/src/Value.h",
+		"/Users/kaylee/pinpon/example/例文.pin",
+		"/Users/kaylee/pinpon/main.cc",
+		"/Users/kaylee/pinpon/src/Extension.cc",
+		"/Users/kaylee/pinpon/dynamic/main.h",
+		"/Users/kaylee/pinpon/dynamic/main.cc",
+		"/Users/kaylee/pinpon/src/CoreFunctions.cc",
+		"/Users/kaylee/pinpon/src/Tokenizer.cc",
+		"/Users/kaylee/pinpon/src/Evaluate.cc",
+		"/Users/kaylee/pinpon/example/kwargs.pin",
+		"/Users/kaylee/pinpon/README.md",
+		"/Users/kaylee/pinpon/src/InputSource.h",
+		"/Users/kaylee/Library/Application Support/Sublime Text 3/Packages/User/pinpon.sublime-syntax",
+		"/Users/kaylee/pinpon/src/Evaluate.h",
+		"/Users/kaylee/pinpon/example/辞書例文.pin",
+		"/Users/kaylee/pinpon/src/Context.h",
+		"/Users/kaylee/pinpon/test/TokenizerTest.cc",
+		"/Users/kaylee/pinpon/example/辞書.pin",
+		"/Users/kaylee/pinpon/src/Context.cc",
+		"/Users/kaylee/pinpon/example/obj.pin",
+		"/Users/kaylee/pinpon/src/CoreFunctions.h",
+		"/Users/kaylee/pinpon/test/EvalTest.cc",
+		"/Users/kaylee/pinpon/pinpon.sublime-syntax",
+		"/Users/kaylee/pinpon/src/InputSource.cc",
+		"/Users/kaylee/pinpon/example/dict.pin",
+		"/Users/kaylee/pinpon/example/文字.pin",
+		"/Users/kaylee/pinpon/example/hof.pin",
+		"/Users/kaylee/pinpon/example/var.pin",
+		"/Users/kaylee/pinpon/example/env.pin",
+		"/Users/kaylee/pinpon/example/関数.pin",
+		"/Users/kaylee/pinpon/example/無限ループ.pin",
+		"/Users/kaylee/pinpon/example/ユーザー関数.pin",
+		"/Users/kaylee/pinpon/example/tailop.pin",
+		"/Users/kaylee/Library/Application Support/Sublime Text 3/Cache/Python/Python.sublime-syntax.cache",
+		"/Users/kaylee/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/kaylee/Library/Application Support/Sublime Text 3/Packages/User/pinpon.yaml"
+	],
+	"find":
+	{
+		"height": 26.0
+	},
+	"find_in_files":
+	{
+		"height": 101.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"gtest"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 180.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "cmake",
+	"project": "pinpon.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 208.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
