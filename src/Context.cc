@@ -51,6 +51,23 @@ void Context::mark(Environment *current_env) {
     }
 }
 
+void Context::markTempRefs() {
+    for (auto &ref : tempReferences) {
+        mark(ref);
+    }
+}
+
+void Context::tempRefIncrement(Value *value){
+    tempReferences.insert(value);
+}
+
+void Context::tempRefDecrement(Value *value){
+    auto it = tempReferences.find(value);
+    if (it != tempReferences.end()) {
+        // TODO: Garbage collector bug with extra decrements that don't match increments.
+        tempReferences.erase(it);
+    }
+}
 
 void Context::collect(Environment *current_env) {
     iteration++;
@@ -61,6 +78,7 @@ void Context::collect(Environment *current_env) {
     usedValues.clear();
     usedEnvironments.clear();
     mark(current_env);
+    markTempRefs();
     for (auto *value : values) {
         if (!usedValues.count(value)) {
             if (value->refs) {

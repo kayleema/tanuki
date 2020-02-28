@@ -10,6 +10,7 @@ class Context {
     unordered_map<long, NumberValue *> preallocNumbers;
     unordered_set<Value *> values;
     unordered_set<Environment *> environments;
+    unordered_multiset<Value *> tempReferences;
 
     long iteration = 0;
     long frequency = 1;
@@ -20,9 +21,15 @@ public:
 
     Context();
 
+    void tempRefIncrement(Value *value);
+
+    void tempRefDecrement(Value *value);
+
     void mark(Value *value);
 
     void mark(Environment *current_env);
+
+    void markTempRefs();
 
     void collect(Environment *current_env);
 

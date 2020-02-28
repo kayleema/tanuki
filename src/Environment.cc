@@ -55,9 +55,9 @@ Value *Environment::eval(SyntaxNode *tree,
 
 Value *Environment::eval_add(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value + rhs->toNumberValue()->value);
@@ -76,9 +76,9 @@ Value *Environment::eval_add(SyntaxNode *tree) {
 
 Value *Environment::eval_sub(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value - rhs->toNumberValue()->value);
@@ -88,9 +88,9 @@ Value *Environment::eval_sub(SyntaxNode *tree) {
 
 Value *Environment::eval_mul(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value * rhs->toNumberValue()->value);
@@ -100,9 +100,9 @@ Value *Environment::eval_mul(SyntaxNode *tree) {
 
 Value *Environment::eval_div(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value / rhs->toNumberValue()->value);
@@ -112,25 +112,25 @@ Value *Environment::eval_div(SyntaxNode *tree) {
 
 Value *Environment::eval_equal(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     return context->newNumberValue(lhs->equals(rhs) ? 1 : 0);
 }
 
 Value *Environment::eval_not_equal(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     return context->newNumberValue(lhs->equals(rhs) ? 0 : 1);
 }
 
 Value *Environment::eval_gt(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(lhs->toNumberValue()->value > rhs->toNumberValue()->value ? 1 : 0);
     }
@@ -139,9 +139,9 @@ Value *Environment::eval_gt(SyntaxNode *tree) {
 
 Value *Environment::eval_lt(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(lhs->toNumberValue()->value < rhs->toNumberValue()->value ? 1 : 0);
     }
@@ -150,9 +150,9 @@ Value *Environment::eval_lt(SyntaxNode *tree) {
 
 Value *Environment::eval_gte(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(lhs->toNumberValue()->value >= rhs->toNumberValue()->value ? 1 : 0);
     }
@@ -161,9 +161,9 @@ Value *Environment::eval_gte(SyntaxNode *tree) {
 
 Value *Environment::eval_lte(SyntaxNode *tree) {
     auto lhs = eval(tree->children[0]);
-    lhs->refs++;
+    context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
-    lhs->refs--;
+    context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(lhs->toNumberValue()->value <= rhs->toNumberValue()->value ? 1 : 0);
     }
@@ -173,12 +173,12 @@ Value *Environment::eval_lte(SyntaxNode *tree) {
 Value *Environment::eval_call(SyntaxNode *tree,
                               const FunctionValue *tailContext) {
     Value *first = eval(tree->children[0]);
-    first->refs++;
+    context->tempRefIncrement(first);
     SyntaxNode *tail = tree->children[1];
 
     Value *result = eval_tail(first, tail, tailContext);
 
-    first->refs--;
+    context->tempRefDecrement(first);
     return result;
 }
 
@@ -216,24 +216,23 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
             auto arg = eval(rhs);
             kwargsIn[lhs->content.content] = arg;
             // TODO: Garbage collector bug generally with refs++
-
-            arg->refs++;
+            context->tempRefIncrement(arg);
         } else {
             auto arg = eval(expression);
-            arg->refs++;
+            context->tempRefIncrement(arg);
             args.push_back(arg);
         }
     }
     if (function == tailContext) {
         for (auto arg : args) {
-            arg->refs--;
+            context->tempRefDecrement(arg);
         }
         return new TailCallValue(args);
     }
     auto result = function->apply(
             args, this, kwargsIn.empty() ? nullptr : &kwargsIn);
     auto finalResult = result;
-    result->refs++;
+    context->tempRefIncrement(result);
 
     if (tail->children.size() == 2) {
         auto nextTail = tail->children[1];
@@ -241,12 +240,12 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
     }
 
     for (auto arg : args) {
-        arg->refs--;
+        context->tempRefDecrement(arg);
     }
     for (const auto &kwarg : kwargsIn) {
-        kwarg.second->refs--;
+        context->tempRefDecrement(kwarg.second);
     }
-    result->refs--;
+    context->tempRefDecrement(result);
     return finalResult;
 }
 
@@ -257,11 +256,11 @@ Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
         return context->newNoneValue();
     }
     auto result = source->get(key);
-    result->refs++;
+    context->tempRefIncrement(result);
     if (tree->children.size() == 2) {
         result = eval_tail(result, tree->children[1]);
     }
-    result->refs--;
+    context->tempRefDecrement(result);
     return result;
 }
 
@@ -275,9 +274,9 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         }
         auto result = sourceDictionary->get(key);
         if (tree->children.size() == 2) {
-            result->refs++;
+            context->tempRefIncrement(result);
             result = eval_tail(result, tree->children[1]);
-            result->refs--;
+            context->tempRefDecrement(result);
         }
         return result;
     } else if (source->type == ValueType::ARRAY) {
@@ -290,9 +289,9 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         }
         auto result = sourceArray->getIndex(index);
         if (tree->children.size() == 2) {
-            result->refs++;
+            context->tempRefIncrement(result);
             result = eval_tail(result, tree->children[1]);
-            result->refs--;
+            context->tempRefDecrement(result);
         }
         return result;
     } else if (source->type == ValueType::STRING) {
@@ -305,9 +304,9 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         }
         Value *result = context->newStringValue(wstring(1,sourceString->value[index]));
         if (tree->children.size() == 2) {
-            result->refs++;
+            context->tempRefIncrement(result);
             result = eval_tail(result, tree->children[1]);
-            result->refs--;
+            context->tempRefDecrement(result);
         }
         return result;
     }
@@ -396,7 +395,7 @@ Value *Environment::eval_function(SyntaxNode *tree) {
         } else if (param->type == NodeType::DEFAULTPARAM) {
 //            wcout << L"DEFAULTPARAM:" << param->children[0]->content.content << endl;
             auto defaultValue = eval(param->children[1], nullptr);
-            defaultValue->refs++;
+            context->tempRefIncrement(defaultValue);
             paramsWithDefault[param->children[0]->content.content] = defaultValue;
         }
     }
