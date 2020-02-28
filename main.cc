@@ -20,8 +20,6 @@ using namespace std;
 
 void evalPinponStarter(Environment *env);
 
-int interactive(long freq);
-
 int main(int argc, char **argv) {
     ConsoleLogger log;
     log.setup();
@@ -59,16 +57,11 @@ int main(int argc, char **argv) {
 			        ->log("　./pinpon ファイル名.pin")->logEndl()
 			        ->logEndl()
 			        ->log("パラメーター：")->logEndl()
-			        ->log("　-i：インタラクティブ・モード（REPL）")->logEndl()
 			        ->log("　-d lex：lexerの結果を表示（ディバギング）")->logEndl()
 			        ->log("　-d ast：parserの結果を表示（ディバギング）")->logEndl()
 			        ->log("　-f 数字：evalの何回目の時にメモリを掃除（デフォルトは十万）")->logEndl()
 			        ->log("　-h：このメッセジを表示")->logEndl();
 			return 0;
-		}
-		if (strcmp(argv[i], "-i") == 0) {
-            log.log("インタラクティブ・モード")->logEndl();
-			return interactive(freq);
 		}
 	}
 
@@ -111,53 +104,6 @@ int main(int argc, char **argv) {
 	delete tree;
 	context.cleanup();
     return 0;
-}
-
-int interactive(long freq) {
-    ConsoleLogger log;
-	Context context;
-	context.setFrequency(freq);
-	auto *env = new Environment(&context);
-	evalPinponStarter(env);
-	string inputraw;
-	wstring input;
-	bool continuation = false;
-	while (true) {
-		if(continuation) {
-			cout << "｜：";
-		} else {
-			cout << "＞：";
-		}
-		getline (cin, inputraw);
-        input += decodeUTF8(inputraw);
-        input += L"\n";
-		if (inputraw.find("関数") == 0 ||
-			inputraw.find("もし") == 0 ||
-			(continuation && (inputraw.length() != 0))) {
-			continuation = true;
-			continue;
-		} else if (continuation) {
-			continuation = false;
-		}
-
-		if (inputraw == "終わり") {
-			return 0;
-		}
-
-		auto source = StringInputSource(input.c_str());
-		auto tokenizer = InputSourceTokenizer(&source);
-		auto parser = Parser(&tokenizer, &log);
-		SyntaxNode *tree = parser.run();
-		if (!tree || tree->children.empty()) {
-			cout << "parser fail" << endl;
-			input = L"";
-			continue;
-		}
-		Value *result = env->eval(tree->children[0]);
-		cout << result->toString() << endl;
-
-		input = L"";
-	}
 }
 
 void evalPinponStarter(Environment *env) {

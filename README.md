@@ -17,7 +17,8 @@
 * websocketpp (git submodule に入っている)
 
 ### ピカ狸のGUIのためだけの必要なライブラリ
-* asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. Linuxの場合は：`sudo apt-get install libasio-dev`
+* asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
+「https://think-async.com/」からインストール出来ます。Linuxの場合は：`sudo apt-get install libasio-dev`
 * npmやnodeなど… Linuxの場合は：`sudo apt-get install npm`
 
 ビルド
@@ -205,10 +206,9 @@ Basicな関数
 細かい事：まだ実装されてない機能
 ------------------
 希望の技能：
-* nonlocal variable rebinding
 * floating point calculations
-* non-string hashtables
-* array operations
+* non-string key hashtables
+* more array operations
 * infix mod operator
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
 * short form method definition

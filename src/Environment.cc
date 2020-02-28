@@ -290,7 +290,7 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         auto sourceString = (StringValue *) source;
         SyntaxNode *arg = tree->children[0];
         long index = ((NumberValue *) eval(arg))->value;
-        if (sourceString->value.length() <= index) {
+        if ((long)sourceString->value.length() <= index) {
             cout << "添字は文字列の外　添字：" << index << "　長さ：" << sourceString->value.length() << endl;
             return context->newNoneValue();
         }
