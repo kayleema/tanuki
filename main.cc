@@ -88,6 +88,8 @@ int main(int argc, char **argv) {
 		log.logLn("ABSTRACT SYNTAX TREE:");
         log.logLn("---------------------");
         log.logLn(treeString);
+		delete tree;
+		return 1;
 	}
 
 	Context context;

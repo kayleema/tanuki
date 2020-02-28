@@ -63,6 +63,13 @@ Value *Environment::eval_add(SyntaxNode *tree) {
                 lhs->toNumberValue()->value + rhs->toNumberValue()->value);
     } else if (lhs->type == ValueType::STRING && rhs->type == ValueType::STRING) {
         return context->newStringValue(lhs->toStringValue()->value + rhs->toStringValue()->value);
+    } else if (lhs->type == ValueType::ARRAY && rhs->type == ValueType::ARRAY) {
+        auto result = context->newArrayValue();
+        auto a = ((ArrayValue *)lhs)->value;
+        auto b = ((ArrayValue *)rhs)->value;
+        result->value.insert(result->value.end(), a.begin(), a.end());
+        result->value.insert(result->value.end(), b.begin(), b.end());
+        return result;
     }
     return context->newNoneValue();
 }
@@ -208,6 +215,8 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
             auto *rhs = expression->children[1];
             auto arg = eval(rhs);
             kwargsIn[lhs->content.content] = arg;
+            // TODO: Garbage collector bug generally with refs++
+
             arg->refs++;
         } else {
             auto arg = eval(expression);
@@ -310,9 +319,6 @@ Value *Environment::eval_subscript_set(Value *source, SyntaxNode *tree) {
         auto sourceDictionary = (DictionaryValue *) source;
         SyntaxNode *arg = tree->children[0];
         wstring key = ((StringValue *) eval(arg))->value;
-        if (!sourceDictionary->has(key)) {
-            return context->newNoneValue();
-        }
         auto rhs = eval(tree->children[1]);
         sourceDictionary->set(key, rhs);
     } else if (source->type == ValueType::ARRAY) {

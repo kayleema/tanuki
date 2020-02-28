@@ -26,7 +26,7 @@ public:
 
     ~FileInputSource() override = default;
 
-    wchar_t getChar() override;
+    virtual wchar_t getChar() override;
 
     wchar_t peekChar() override;
 

@@ -32,38 +32,70 @@ export default class App extends React.Component {
         this.socket.onclose = this.onSocketClose.bind(this);
     }
 
+    executeCommand() {
+        this.socket.send(this.state.inputString)
+        this.setState(state => ({
+            inputString: ""
+        }));
+    }
+
     render() {
         return (
             <div className="App">
                 <div className="outArea">
                     <div className="statusArea">{this.state.connection}</div>
-                    <div className="outAreaItem">狸語 リアイブ実行</div>
-                    <div className="outAreaItem">スタート</div>
+                    <div className="outAreaItem outAreaItemInfo">ピカ狸　ライブ実行</div>
                     {this.state.textContent.map((item, index) => (
-                        <div key={index} className="outAreaItem">
-                            {item}
-                        </div>
+                        this.renderItem(item, index)
                     ))}
-                    <input
-                        className="Text"
+                    <textarea
+                        className={"Text " + (this.state.inputString.includes("\n") ? "multi" : "")}
                         placeholder="入力してください"
                         onKeyDown={(e) => {
                             if (e.keyCode === 229) {
                                 return;
                             }
                             if (e.key === "Enter") {
-                                this.socket.send(this.state.inputString)
-                                this.setState(state => ({
-                                    inputString: ""
-                                }));
+                                if (
+                                    !(this.state.inputString.startsWith("関数、") ||
+                                        this.state.inputString.startsWith("もし") ||
+                                        this.state.inputString.startsWith("あるいは") ||
+                                        this.state.inputString.startsWith("その他")) ||
+                                    e.getModifierState("Shift")
+                                ) {
+                                    this.executeCommand();
+                                    e.preventDefault();
+                                }
                             }
                         }}
                         value={this.state.inputString}
                         onChange={(e) => this.setState({inputString: e.target.value})}
                     />
+                    {this.state.inputString.includes("\n") && (
+                        <div className={"outAreaItem smalltext"}>実行はSHIFT＋ENTER</div>
+                    )}
                 </div>
             </div>
         );
+    }
+
+    renderItem(item, index) {
+        if(item.startsWith("》")) {
+            return (
+                <div key={index} className="outAreaItem outAreaItemResult">
+                    {item.split("\n").map((line) => (
+                        <div>{line}</div>
+                    ))}
+                </div>
+            )
+        }
+        return (
+            <div key={index} className="outAreaItem">
+                {item.split("\n").map((line) => (
+                    <div>{line}</div>
+                ))}
+            </div>
+        )
     }
 }
 

@@ -45,7 +45,9 @@ void Context::mark(Environment *current_env) {
         mark(current_env->caller);
     }
     for (const auto &binding : current_env->bindings) {
-        mark(binding.second);
+        if (binding.second->type != ValueType::NONE) {
+            mark(binding.second);
+        }
     }
 }
 
@@ -68,6 +70,8 @@ void Context::collect(Environment *current_env) {
                     preallocNumbers.count(((NumberValue *) value)->value)) {
                     // Don't deallocate numbers saved in prealloc
                     // This used to be here: preallocNumbers.erase(((NumberValue *) value)->value);
+                } else if (value->type == ValueType::NONE) {
+                    // Don't deallocate none type;
                 } else {
                     delete value;
                 }

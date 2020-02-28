@@ -73,7 +73,7 @@ public:
     explicit InputSourceTokenizer(InputSource *input) : input(input) {
     }
 
-    Token getToken() override;
+    virtual Token getToken() override;
 };
 
 class BufferedTokenizer : public Tokenizer {
@@ -84,7 +84,7 @@ public:
         this->tokens = std::move(tokens);
     }
 
-    Token getToken() override {
+    virtual Token getToken() override {
         return tokens[position++];
     }
 };

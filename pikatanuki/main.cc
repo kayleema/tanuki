@@ -15,7 +15,7 @@ class utility_server {
 public:
     Context *context;
     Environment *environment;
-    std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>> connectionset;
+    std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>> connectionSet;
 
     utility_server() {
         // Set logging settings
@@ -64,12 +64,12 @@ public:
     }
 
     void open_handler(websocketpp::connection_hdl hdl) {
-        connectionset.insert(hdl);
+        connectionSet.insert(hdl);
     }
 
     void close_handler(websocketpp::connection_hdl hdl) {
         std::cout << "closehandled" << std::endl;
-        connectionset.erase(hdl);
+        connectionSet.erase(hdl);
     }
 
     void run() {
@@ -87,7 +87,7 @@ public:
     void stop() {
         std::cout << "closing active connections..." << std::endl;
         m_endpoint.stop_listening();
-        for (auto c : connectionset) {
+        for (auto c : connectionSet) {
             std::cout << "close..." << std::endl;
             m_endpoint.close(c, websocketpp::close::status::going_away, "bye");
         }

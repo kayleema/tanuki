@@ -168,6 +168,19 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
                 function->apply({env->context->newStringValue(key), value}, env);
             }
             return Context::newNoneValue();
+        } else if (args[0]->type == ValueType::ARRAY) {
+            auto array = (ArrayValue*)args[0];
+            auto function = (FunctionValue *) args[1];
+            vector<Value*> keys;
+            for (const auto &item : array->value) {
+                keys.push_back(item);
+                item->refs++;
+            }
+            for (const auto &key : keys) {
+                function->apply({key}, env);
+                key->refs--;
+            }
+            return Context::newNoneValue();
         } else if (args[0]->type == ValueType::STRING) {
             auto s = args[0]->toStringValue();
             auto function = (FunctionValue *) args[1];
@@ -298,6 +311,16 @@ public:
     };
 };
 
+class ModFunction : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env,
+                 unordered_map<wstring, Value *> *) const override {
+        auto *arg1 = args[0];
+        auto *arg2 = args[1];
+        return env->context->newNumberValue(arg1->toNumberValue()->value % arg2->toNumberValue()->value);
+    };
+};
+
 void initModule(Environment *env) {
     env->bind(L"足す", new FunctionSum());
     env->bind(L"引く", new FunctionDiff());
@@ -306,6 +329,7 @@ void initModule(Environment *env) {
     env->bind(L"表示", new FunctionPrint());
     env->bind(L"イコール", new FunctionEqual());
     env->bind(L"比べ", new FunctionCompare());
+    env->bind(L"剰余", new ModFunction());
     env->bind(L"辞書", new FunctionNewDictionary());
     env->bind(L"新種類", new FunctionNewDictionary());
     env->bind(L"それぞれ", new FunctionForEach());

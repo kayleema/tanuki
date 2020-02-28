@@ -17,6 +17,7 @@ SyntaxNode *Parser::run_text() {
         if (!statement) {
             return result;
         } else if (statement->isError()) {
+            logInternal("エラー：ボディーの中に問題\n");
             delete result;
             return statement;
         }
@@ -27,22 +28,20 @@ SyntaxNode *Parser::run_text() {
 SyntaxNode *Parser::run_statement() {
     SyntaxNode *result;
     if ((result = run_import())) {
-        return result;
     } else if ((result = run_nonlocal())) {
-        return result;
     } else if ((result = run_return())) {
-        return result;
     } else if ((result = run_if())) {
-        return result;
     } else if ((result = run_assert())) {
-        return result;
     } else if ((result = run_assign())) {
-        return result;
     } else if ((result = run_function())) {
-        return result;
+    } else if ((result = run_infix_expression())) {
     } else {
-        return run_infix_expression();
+        return nullptr;
     }
+    if (result->isError()) {
+        logInternal("エラー：statementのなかにエラー\n");
+    }
+    return result;
 }
 
 SyntaxNode *Parser::run_import() {
@@ -297,12 +296,12 @@ SyntaxNode *Parser::run_function() {
         return new SyntaxNode(NodeType::PARSE_ERROR);
     }
     auto body = run_text();
-    result->children.push_back(body);
     if (body->isError()) {
         logInternal("エラー：関数作成文の中身で問題がありました。\n");
         delete result;
         return body;
     }
+    result->children.push_back(body);
     if (!expect(TokenType::DEDENT)) {
         logInternal("エラー：関数作成文の後でunindentが必要。\n");
         delete result;
@@ -431,7 +430,15 @@ SyntaxNode *Parser::run_infix_multiplicative_expression() {
 SyntaxNode *Parser::run_expression() {
     Token start;
     if (accept(TokenType::STRING, &start)) {
-        return new SyntaxNode(start);
+        auto tail = run_expression_tail();
+        if (tail) {
+            if (tail->isError()) {
+                return tail;
+            }
+            return new SyntaxNode(NodeType::CALL, {new SyntaxNode(start), tail});
+        } else {
+            return new SyntaxNode(start);
+        }
     }
     if (accept(TokenType::SYMBOL, &start)) {
         auto tail = run_expression_tail();
