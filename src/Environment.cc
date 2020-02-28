@@ -289,9 +289,7 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         }
         auto result = sourceArray->getIndex(index);
         if (tree->children.size() == 2) {
-            context->tempRefIncrement(result);
             result = eval_tail(result, tree->children[1]);
-            context->tempRefDecrement(result);
         }
         return result;
     } else if (source->type == ValueType::STRING) {

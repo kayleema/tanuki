@@ -64,8 +64,9 @@ void Context::tempRefIncrement(Value *value){
 void Context::tempRefDecrement(Value *value){
     auto it = tempReferences.find(value);
     if (it != tempReferences.end()) {
-        // TODO: Garbage collector bug with extra decrements that don't match increments.
         tempReferences.erase(it);
+    } else {
+        cout << "エラー：ワーニング：仮のメモリーが二倍作上" << endl;
     }
 }
 
