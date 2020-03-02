@@ -151,7 +151,7 @@ public:
 class Environment;
 
 enum class FunctionValueType {
-    NONE, USER_FUNCTION
+    NONE, USER_FUNCTION, BOUND_FUNCTION
 };
 
 class FunctionValue : public Value {
@@ -213,5 +213,18 @@ public:
     const wstring getVarParam() const { return varArgsParam; };
 };
 
+class BoundFunctionValue : public FunctionValue {
+public:
+    FunctionValue *function;
+    Value *jibun;
+
+    BoundFunctionValue(FunctionValue *function, Value *jibun)
+            : FunctionValue(), function(function), jibun(jibun) {
+        functionType = FunctionValueType::BOUND_FUNCTION;
+    };
+
+    Value *apply(const vector<Value *> &args, Environment *env,
+                 unordered_map<wstring, Value *> *kwargsIn = nullptr) const override;
+};
 
 #endif

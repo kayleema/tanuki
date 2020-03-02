@@ -49,6 +49,7 @@ const wchar_t nullChar = L'\0';
 const wchar_t greaterThan = L'＞';
 const wchar_t lessThan = L'＜';
 const wchar_t notSign = L'！';
+const wchar_t nami = L'〜';
 
 const unordered_set<wchar_t> symbolicChars(
         {
@@ -70,7 +71,8 @@ const unordered_set<wchar_t> symbolicChars(
                 notSign,
                 lessThan,
                 lbrace,
-                rbrace
+                rbrace,
+                nami
         });
 
 const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
@@ -90,6 +92,7 @@ const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
                 {slash,        TokenType::SLASH},
                 {greaterThan,  TokenType::GT},
                 {lessThan,     TokenType::LT},
+                {nami,         TokenType::NAMI},
         });
 
 // Tokenizer Implementation

@@ -549,6 +549,20 @@ SyntaxNode *Parser::run_expression_tail() {
         }
         return node;
     }
+    if (accept({TokenType::NAMI, TokenType::SYMBOL}, {nullptr, &symbol}, {TokenType::ASSIGN})) {
+        auto node = new SyntaxNode(NodeType::GET_BIND);
+        node->children.push_back(new SyntaxNode(symbol));
+        auto tail = run_expression_tail();
+        if (tail) {
+            if (tail->isError()) {
+                logInternal("エラー：波ダッシュ調べるの右のパターンで問題あった。");
+                delete node;
+                return tail;
+            }
+            node->children.push_back(tail);
+        }
+        return node;
+    }
     if (accept(
             {TokenType::DOT, TokenType::SYMBOL, TokenType::ASSIGN},
             {nullptr, &symbol, nullptr})) {

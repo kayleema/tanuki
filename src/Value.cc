@@ -134,3 +134,11 @@ string ArrayValue::toString() const {
     ss << "Array(長さ=" << length() << ")";
     return ss.str();
 }
+
+Value *BoundFunctionValue::apply(const vector<Value *> &args, Environment *env,
+                                 unordered_map<wstring, Value *> *kwargsIn) const {
+    vector<Value *> newArgs;
+    newArgs.push_back(jibun);
+    newArgs.insert(newArgs.end(), args.begin(), args.end());
+    return function->apply(newArgs, env, kwargsIn);
+}

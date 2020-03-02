@@ -15,6 +15,12 @@ void Context::mark(Value *value) {
                 mark(defaultItem.second);
             }
         }
+        if (value->type == ValueType::FUNC &&
+            ((FunctionValue *) value)->functionType == FunctionValueType::BOUND_FUNCTION) {
+            auto f = dynamic_cast<BoundFunctionValue*> (value);
+            mark(f->function);
+            mark(f->jibun);
+        }
         if ((value->type == ValueType::DICT) || (value->type == ValueType::ARRAY)) {
             auto d = static_cast<DictionaryValue*>(value);
             for (const auto &item : d->value) {
@@ -160,6 +166,12 @@ UserFunctionValue *Context::newUserFunctionValue(
         SyntaxNode *body, Environment *e) {
     auto result = new UserFunctionValue(std::move(params),
                                         std::move(paramsWithDefault), body, e);
+    values.insert(result);
+    return result;
+}
+
+FunctionValue *Context::newBoundFunctionValue(FunctionValue *function, Value *jibun) {
+    auto result = new BoundFunctionValue(function, jibun);
     values.insert(result);
     return result;
 }

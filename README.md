@@ -206,13 +206,12 @@ Basicな関数
 細かい事：まだ実装されてない機能
 ------------------
 希望の技能：
-* floating point calculations
-* non-string key hashtables
-* more array operations
+* フローティングポイントのタイプ。floating point calculations
+* キーは文字列以外のハッシュテーブル。hashtables with non-string key
 * infix mod operator
-* expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no new lines are allowed in the middle of a statement)
-* short form method definition
-* short form method call
-* escape codes in strings
+* expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no 
+new lines are allowed in the middle of a statement)
+* メソード短い（波ダッシュ）作り方。short form method definition
+* 文字列の中のエスケープコード。escape codes in strings
 * multithreading
 * network utilities

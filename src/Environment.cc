@@ -185,9 +185,11 @@ Value *Environment::eval_call(SyntaxNode *tree,
 Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
                               const FunctionValue *tailContext) {
     if (tail->type == NodeType::CALL_TAIL) {
-        return eval_calltail((FunctionValue *) first, tail, tailContext);
+        return eval_calltail(static_cast<FunctionValue *> (first), tail, tailContext);
     } else if (tail->type == NodeType::GET) {
         return eval_get(static_cast<DictionaryValue *>(first), tail);
+    } else if (tail->type == NodeType::GET_BIND) {
+        return eval_get_bind(static_cast<DictionaryValue *>(first), tail);
     } else if (tail->type == NodeType::SET) {
         return eval_set((DictionaryValue *) first, tail);
     } else if (tail->type == NodeType::SUBSCRIPT) {
@@ -215,7 +217,6 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
             auto *rhs = expression->children[1];
             auto arg = eval(rhs);
             kwargsIn[lhs->content.content] = arg;
-            // TODO: Garbage collector bug generally with refs++
             context->tempRefIncrement(arg);
         } else {
             auto arg = eval(expression);
@@ -261,6 +262,29 @@ Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
     if (tree->children.size() == 2) {
         result = eval_tail(result, tree->children[1]);
     }
+    context->tempRefDecrement(getResult);
+    return result;
+}
+
+Value *Environment::eval_get_bind(DictionaryValue *source, SyntaxNode *tree) {
+    wstring key = tree->children[0]->content.content;
+    if (!source->has(key)) {
+        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
+        return context->newNoneValue();
+    }
+    auto getResult = source->get(key);
+    if (getResult->type != ValueType::FUNC) {
+        cout << "エラー：波線の右側のタイプは関数ではありません。バインドはできません。" << endl;
+        return context->newNoneValue();
+    }
+    context->tempRefIncrement(getResult);
+    auto boundGetResult = context->newBoundFunctionValue(dynamic_cast<FunctionValue *>(getResult), source);
+    context->tempRefIncrement(boundGetResult);
+    Value *result = boundGetResult;
+    if (tree->children.size() == 2) {
+        result = eval_tail(result, tree->children[1]);
+    }
+    context->tempRefDecrement(boundGetResult);
     context->tempRefDecrement(getResult);
     return result;
 }

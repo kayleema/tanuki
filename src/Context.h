@@ -53,6 +53,8 @@ public:
             unordered_map<wstring, Value *> paramsWithDefault,
             SyntaxNode *body, Environment *e);
 
+    FunctionValue *newBoundFunctionValue(FunctionValue *function, Value *jibun);
+
     ArrayValue *newArrayValue();
 
     Environment *newChildEnvironment(Environment *e);
