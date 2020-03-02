@@ -101,7 +101,7 @@ const unordered_map<wstring, TokenType> identifiers(
                 {L"関数",   TokenType::FUNC},
                 {L"返す",   TokenType::RETURN},
                 {L"もし",   TokenType::IF},
-                {L"他でもし", TokenType::ELIF},
+                {L"あるいは", TokenType::ELIF},
                 {L"その他",  TokenType::ELSE},
                 {L"導入",   TokenType::IMPORT},
                 {L"確認", TokenType::ASSERT},

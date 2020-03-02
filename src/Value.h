@@ -8,6 +8,8 @@
 #include <vector>
 #include <unordered_map>
 
+class Environment;
+
 using namespace std;
 
 enum class ValueType {
@@ -42,6 +44,8 @@ public:
 
     virtual bool isTruthy() const { return true; };
 
+    virtual DictionaryValue *getLookupSource(Environment *env);
+
     ValueType type;
     int refs = 0;
 };
@@ -58,6 +62,8 @@ public:
 
     bool isTruthy() const override { return value != 0; };
 
+    DictionaryValue *getLookupSource(Environment *env) override;
+
     long value;
 };
 
@@ -68,6 +74,8 @@ public:
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
+
+    DictionaryValue *getLookupSource(Environment *env) override;
 
     wstring value;
 };
@@ -81,6 +89,8 @@ public:
     DictionaryValue *parent = nullptr;
 
     void setParent(DictionaryValue *p) { parent = p; }
+
+    DictionaryValue *getLookupSource(Environment *env) override;
 
     void set(const wstring &name, Value *v) { value[name] = v; }
 
@@ -148,8 +158,6 @@ public:
             : Value(ValueType::TAIL_CALL), args(std::move(_args)) {};
 };
 
-class Environment;
-
 enum class FunctionValueType {
     NONE, USER_FUNCTION, BOUND_FUNCTION
 };
@@ -162,6 +170,8 @@ public:
                          unordered_map<wstring, Value *> *kwargsIn = nullptr) const = 0;
 
     FunctionValueType functionType = FunctionValueType::NONE;
+
+    DictionaryValue *getLookupSource(Environment *env) override;
 };
 
 class SyntaxNode;

@@ -187,9 +187,9 @@ Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
     if (tail->type == NodeType::CALL_TAIL) {
         return eval_calltail(static_cast<FunctionValue *> (first), tail, tailContext);
     } else if (tail->type == NodeType::GET) {
-        return eval_get(static_cast<DictionaryValue *>(first), tail);
+        return eval_get(first, tail);
     } else if (tail->type == NodeType::GET_BIND) {
-        return eval_get_bind(static_cast<DictionaryValue *>(first), tail);
+        return eval_get_bind(first, tail);
     } else if (tail->type == NodeType::SET) {
         return eval_set((DictionaryValue *) first, tail);
     } else if (tail->type == NodeType::SUBSCRIPT) {
@@ -250,13 +250,14 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
     return finalResult;
 }
 
-Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
+Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
-    if (!source->has(key)) {
+    DictionaryValue *lookupSource = source->getLookupSource(this);
+    if (!lookupSource->has(key)) {
         cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
     }
-    auto getResult = source->get(key);
+    auto getResult = lookupSource->get(key);
     context->tempRefIncrement(getResult);
     auto result = getResult;
     if (tree->children.size() == 2) {
@@ -266,13 +267,14 @@ Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
     return result;
 }
 
-Value *Environment::eval_get_bind(DictionaryValue *source, SyntaxNode *tree) {
+Value *Environment::eval_get_bind(Value *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
-    if (!source->has(key)) {
+    DictionaryValue *lookupSource = source->getLookupSource(this);
+    if (!lookupSource->has(key)) {
         cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
     }
-    auto getResult = source->get(key);
+    auto getResult = lookupSource->get(key);
     if (getResult->type != ValueType::FUNC) {
         cout << "エラー：波線の右側のタイプは関数ではありません。バインドはできません。" << endl;
         return context->newNoneValue();

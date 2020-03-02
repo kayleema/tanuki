@@ -8,8 +8,11 @@
 #include <set>
 #include <signal.h>
 #include "Context.h"
+#include "CoreFunctions.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
+
+void evalPinponStarter(Environment *env);
 
 class utility_server {
 public:
@@ -45,6 +48,7 @@ public:
         context = new Context();
         context->setFrequency(10);
         environment = new Environment(context);
+        evalPinponStarter(environment);
     }
 
     void echo_handler(websocketpp::connection_hdl hdl, server::message_ptr msg) {
@@ -111,4 +115,14 @@ int main() {
     signal(SIGTERM, shutdownInterrupt);
     s.run();
     return 0;
+}
+
+
+void evalPinponStarter(Environment *env) {
+    ConsoleLogger log;
+    auto source = StringInputSource(corePinponStarter);
+    auto tokenizer = InputSourceTokenizer(&source);
+    auto parser = Parser(&tokenizer, &log);
+    SyntaxNode *tree = parser.run();
+    env->eval(tree);
 }

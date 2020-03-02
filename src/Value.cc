@@ -11,6 +11,26 @@ bool Value::equals(const Value *rhs) const {
     return (type == rhs->type);
 }
 
+DictionaryValue *Value::getLookupSource(Environment *) {
+    return nullptr;
+}
+
+DictionaryValue *NumberValue::getLookupSource(Environment *env) {
+    return dynamic_cast<DictionaryValue *>(env->lookup(L"番号型"));
+}
+
+DictionaryValue *StringValue::getLookupSource(Environment *env) {
+    return dynamic_cast<DictionaryValue *>(env->lookup(L"文字列型"));
+}
+
+DictionaryValue *DictionaryValue::getLookupSource(Environment *) {
+    return this;
+}
+
+DictionaryValue *FunctionValue::getLookupSource(Environment *env) {
+    return dynamic_cast<DictionaryValue *>(env->lookup(L"関数型"));
+}
+
 bool NumberValue::equals(const Value *rhs) const {
     return Value::equals(rhs) && (value == ((NumberValue *) rhs)->value);
 }
