@@ -205,7 +205,7 @@ Basicな関数
 
 細かい事：まだ実装されてない機能
 ------------------
-希望の技能：
+希望の機能：
 * フローティングポイントのタイプ。floating point calculations
 * キーは文字列以外のハッシュテーブル。hashtables with non-string key
 * infix mod operator
@@ -215,3 +215,14 @@ new lines are allowed in the middle of a statement)
 * 文字列の中のエスケープコード。escape codes in strings
 * multithreading
 * network utilities
+
+###希望の機能：簡単に関数を作って渡す
+```
+あ＝配列（１、２、３、４）
+あ〜それぞれ（）：（アイテム）
+　表示（アイテム）
+
+い＝あ〜マップ（）：（アイテム）
+　返す、アイテム＊２
+確認、い【１】＝＝４
+```
