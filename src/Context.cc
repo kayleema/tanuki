@@ -66,7 +66,7 @@ void Context::tempRefDecrement(Value *value){
     if (it != tempReferences.end()) {
         tempReferences.erase(it);
     } else {
-        cout << "エラー：ワーニング：仮のメモリーが二倍作上" << endl;
+        cout << "エラー：ワーニング：仮のメモリーが二倍消されました。" << endl;
     }
 }
 
