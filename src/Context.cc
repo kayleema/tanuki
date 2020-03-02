@@ -15,8 +15,8 @@ void Context::mark(Value *value) {
                 mark(defaultItem.second);
             }
         }
-        if (value->type == ValueType::DICT) {
-            auto d = (DictionaryValue *) value;
+        if ((value->type == ValueType::DICT) || (value->type == ValueType::ARRAY)) {
+            auto d = static_cast<DictionaryValue*>(value);
             for (const auto &item : d->value) {
                 mark(item.second);
             }

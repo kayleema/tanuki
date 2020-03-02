@@ -93,7 +93,7 @@ public:
         return nullptr;
     }
 
-    bool has(const wstring &name) {
+    virtual bool has(const wstring &name) {
         return value.count(name) || (parent && parent->has(name));
     }
 
@@ -107,9 +107,14 @@ public:
 
     explicit ArrayValue() {
         type = ValueType::ARRAY;
+        parent = nullptr;
     }
 
     void set(long index, Value *v) { value[index] = v; }
+
+    bool has(const wstring &name) override {
+        return (parent && parent->has(name));
+    }
 
     void push(Value *v) { value.push_back(v); }
 

@@ -65,8 +65,8 @@ Value *Environment::eval_add(SyntaxNode *tree) {
         return context->newStringValue(lhs->toStringValue()->value + rhs->toStringValue()->value);
     } else if (lhs->type == ValueType::ARRAY && rhs->type == ValueType::ARRAY) {
         auto result = context->newArrayValue();
-        auto a = ((ArrayValue *)lhs)->value;
-        auto b = ((ArrayValue *)rhs)->value;
+        auto a = ((ArrayValue *) lhs)->value;
+        auto b = ((ArrayValue *) rhs)->value;
         result->value.insert(result->value.end(), a.begin(), a.end());
         result->value.insert(result->value.end(), b.begin(), b.end());
         return result;
@@ -187,7 +187,7 @@ Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
     if (tail->type == NodeType::CALL_TAIL) {
         return eval_calltail((FunctionValue *) first, tail, tailContext);
     } else if (tail->type == NodeType::GET) {
-        return eval_get((DictionaryValue *) first, tail);
+        return eval_get(static_cast<DictionaryValue *>(first), tail);
     } else if (tail->type == NodeType::SET) {
         return eval_set((DictionaryValue *) first, tail);
     } else if (tail->type == NodeType::SUBSCRIPT) {
@@ -297,11 +297,11 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         auto sourceString = (StringValue *) source;
         SyntaxNode *arg = tree->children[0];
         long index = ((NumberValue *) eval(arg))->value;
-        if ((long)sourceString->value.length() <= index) {
+        if ((long) sourceString->value.length() <= index) {
             cout << "添字は文字列の外　添字：" << index << "　長さ：" << sourceString->value.length() << endl;
             return context->newNoneValue();
         }
-        Value *result = context->newStringValue(wstring(1,sourceString->value[index]));
+        Value *result = context->newStringValue(wstring(1, sourceString->value[index]));
         if (tree->children.size() == 2) {
             context->tempRefIncrement(result);
             result = eval_tail(result, tree->children[1]);
@@ -434,11 +434,12 @@ Value *Environment::eval_import(SyntaxNode *tree) {
 
     string tryPath = dir + relativePath;
     ConsoleLogger logger;
-    logger.log(L"importing:")->log(path)->logEndl();
-    logger.log(L"importing:")->log(tryPath)->logEndl();
+    logger.log(L"importing from:「")->log(path)
+            ->log(L"」 path:「")->log(tryPath)
+            ->log(L"」 as:「")->log(dirToken)->log("」")->logEndl();
     auto fileInputSource = filesystem->getInputSourceForFilename(tryPath);
     if (!fileInputSource->good()) {
-//        cout << "ERROR: could not import" << endl;
+        logger.log("ERROR: could not import")->logEndl();
         return context->newNoneValue();
     }
     InputSourceTokenizer tokenizer(fileInputSource.get());

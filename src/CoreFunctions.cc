@@ -169,9 +169,9 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
             }
             return Context::newNoneValue();
         } else if (args[0]->type == ValueType::ARRAY) {
-            auto array = (ArrayValue*)args[0];
+            auto array = (ArrayValue *) args[0];
             auto function = (FunctionValue *) args[1];
-            vector<Value*> keys;
+            vector<Value *> keys;
             for (const auto &item : array->value) {
                 keys.push_back(item);
                 item->refs++;
@@ -289,6 +289,20 @@ public:
     };
 };
 
+class ArrayAdd : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *e,
+                 unordered_map<wstring, Value *> *) const override {
+        if (args[0]->type != ValueType::ARRAY ) {
+            return e->context->newNoneValue();
+        }
+        auto *array = (ArrayValue *) (args[0]);
+        auto *newValue = args[1];
+        array->push(newValue);
+        return array;
+    };
+};
+
 //class ArrayInsert : public FunctionValue {
 //public:
 //    Value *apply(const vector<Value *> &args, Environment *,
@@ -321,6 +335,24 @@ public:
     };
 };
 
+class FunctionSetParent : public FunctionValue {
+public:
+    Value *apply(const vector<Value *> &args, Environment *env,
+                 unordered_map<wstring, Value *> *) const override {
+        auto *arg0 = args[0];
+        auto *arg1 = args[1];
+        if (!(arg0->type == ValueType::ARRAY || arg0->type == ValueType::DICT) ||
+            !(arg1->type == ValueType::DICT)) {
+            // TODO: log error
+            return env->context->newNoneValue();
+        }
+        DictionaryValue *dict = static_cast<DictionaryValue *> (arg0);
+        DictionaryValue *parentDict = static_cast<DictionaryValue *> (arg1);
+        dict->setParent(parentDict);
+        return env->context->newNoneValue();
+    };
+};
+
 void initModule(Environment *env) {
     env->bind(L"足す", new FunctionSum());
     env->bind(L"引く", new FunctionDiff());
@@ -332,10 +364,12 @@ void initModule(Environment *env) {
     env->bind(L"剰余", new ModFunction());
     env->bind(L"辞書", new FunctionNewDictionary());
     env->bind(L"新種類", new FunctionNewDictionary());
+    env->bind(L"親設定する", new FunctionSetParent());
     env->bind(L"それぞれ", new FunctionForEach());
     env->bind(L"長さ", new LengthFunction());
     env->bind(L"配列調べ", new IndexFunction());
     env->bind(L"配列更新", new ArrayUpdate());
+    env->bind(L"配列追加", new ArrayAdd());
     env->bind(L"辞書調べ", new DictLookup());
     env->bind(L"ファイル読む", new FunctionReadFile());
     env->bind(L"評価", new FunctionEval());
