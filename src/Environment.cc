@@ -255,12 +255,13 @@ Value *Environment::eval_get(DictionaryValue *source, SyntaxNode *tree) {
         cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
     }
-    auto result = source->get(key);
-    context->tempRefIncrement(result);
+    auto getResult = source->get(key);
+    context->tempRefIncrement(getResult);
+    auto result = getResult;
     if (tree->children.size() == 2) {
         result = eval_tail(result, tree->children[1]);
     }
-    context->tempRefDecrement(result);
+    context->tempRefDecrement(getResult);
     return result;
 }
 
