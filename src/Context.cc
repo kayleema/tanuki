@@ -17,12 +17,12 @@ void Context::mark(Value *value) {
         }
         if (value->type == ValueType::FUNC &&
             ((FunctionValue *) value)->functionType == FunctionValueType::BOUND_FUNCTION) {
-            auto f = dynamic_cast<BoundFunctionValue*> (value);
+            auto f = dynamic_cast<BoundFunctionValue *> (value);
             mark(f->function);
             mark(f->jibun);
         }
         if ((value->type == ValueType::DICT) || (value->type == ValueType::ARRAY)) {
-            auto d = static_cast<DictionaryValue*>(value);
+            auto d = static_cast<DictionaryValue *>(value);
             for (const auto &item : d->value) {
                 mark(item.second);
             }
@@ -63,11 +63,11 @@ void Context::markTempRefs() {
     }
 }
 
-void Context::tempRefIncrement(Value *value){
+void Context::tempRefIncrement(Value *value) {
     tempReferences.insert(value);
 }
 
-void Context::tempRefDecrement(Value *value){
+void Context::tempRefDecrement(Value *value) {
     auto it = tempReferences.find(value);
     if (it != tempReferences.end()) {
         tempReferences.erase(it);
@@ -88,18 +88,11 @@ void Context::collect(Environment *current_env) {
     markTempRefs();
     for (auto *value : values) {
         if (!usedValues.count(value)) {
-            if (value->refs) {
+            if (value->refs ||
+                (value->type == ValueType::NUM && preallocNumbers.count(((NumberValue *) value)->value)) ||
+                (value->type == ValueType::NONE)) {
                 usedValues.insert(value);
             } else {
-                if (value->type == ValueType::NUM &&
-                    preallocNumbers.count(((NumberValue *) value)->value)) {
-                    // Don't deallocate numbers saved in prealloc
-                    // This used to be here: preallocNumbers.erase(((NumberValue *) value)->value);
-                } else if (value->type == ValueType::NONE) {
-                    // Don't deallocate none type;
-                } else {
-                    delete value;
-                }
             }
         } else {
         }
@@ -115,6 +108,10 @@ void Context::collect(Environment *current_env) {
 
 void Context::cleanup() {
     for (auto value : values) {
+        if (value->type == ValueType::NONE) {
+            // None is the only statically allocated type
+            continue;
+        }
         delete value;
     }
     for (auto environment : environments) {
