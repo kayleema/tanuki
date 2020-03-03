@@ -207,7 +207,6 @@ Basicな関数
 ------------------
 希望の機能：
 * フローティングポイントのタイプ。floating point calculations
-* キーは文字列以外のハッシュテーブル。hashtables with non-string key
 * infix mod operator
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no 
 new lines are allowed in the middle of a statement)
@@ -215,6 +214,7 @@ new lines are allowed in the middle of a statement)
 * 文字列の中のエスケープコード。escape codes in strings
 * multithreading
 * network utilities
+* `－変数名`
 
 ###希望の機能：簡単に関数を作って渡す
 ```

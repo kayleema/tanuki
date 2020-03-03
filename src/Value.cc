@@ -88,9 +88,12 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
         }
 
         if (params.size() > argsIn.size()) {
+            // TODO: also log original function name
             ConsoleLogger().log("エラー：引数は足りません　")
                     ->log("必要は")->logLong((long) params.size())
-                    ->log(" 渡したのは")->logLong((long) argsIn.size())->logEndl();
+                    ->log(" 渡したのは")->logLong((long) argsIn.size())
+                    ->logEndl();
+            return env->context->newNoneValue();
         }
 
         // bind normal params
