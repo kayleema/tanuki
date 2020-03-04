@@ -190,7 +190,7 @@ Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
     } else if (tail->type == NodeType::GET_BIND) {
         return eval_get_bind(first, tail);
     } else if (tail->type == NodeType::SET) {
-        return eval_set((DictionaryValue *) first, tail);
+        return eval_set(first, tail);
     } else if (tail->type == NodeType::SUBSCRIPT) {
         return eval_subscript(first, tail);
     } else if (tail->type == NodeType::SUBSCRIPT_SET) {
@@ -379,10 +379,15 @@ Value *Environment::eval_subscript_set(Value *source, SyntaxNode *tree) {
     return context->newNoneValue();
 }
 
-Value *Environment::eval_set(DictionaryValue *source, SyntaxNode *tree) {
+Value *Environment::eval_set(Value *source, SyntaxNode *tree) {
+    if (source->type != ValueType::DICT) {
+        cout << "実行エラー：「・ ＝」のときに「＝」の左側はSET出来ない型です。" << endl;
+        return context->newNoneValue();
+    }
+    DictionaryValue *sourceDict = static_cast<DictionaryValue*>(source);
     wstring key = tree->children[0]->content.content;
     auto rhs = eval(tree->children[1]);
-    source->set(key, rhs);
+    sourceDict->set(key, rhs);
     return context->newNoneValue();
 }
 
