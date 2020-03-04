@@ -55,7 +55,7 @@ public:
 
     FunctionValue *newBoundFunctionValue(FunctionValue *function, Value *jibun);
 
-    ArrayValue *newArrayValue();
+    ArrayValue *newArrayValue(Environment *env);
 
     Environment *newChildEnvironment(Environment *e);
 };

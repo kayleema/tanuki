@@ -107,6 +107,8 @@ public:
         return value.count(name) || (parent && parent->has(name));
     }
 
+    bool equals(const Value *rhs) const override;
+
     string toString() const override;
 };
 
@@ -153,6 +155,8 @@ public:
 class TailCallValue : public Value {
 public:
     vector<Value *> args;
+    bool hasKwArgs = false;
+    unordered_map<wstring, Value *> kwArgs;
 
     explicit TailCallValue(vector<Value *> _args)
             : Value(ValueType::TAIL_CALL), args(std::move(_args)) {};

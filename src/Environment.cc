@@ -64,7 +64,7 @@ Value *Environment::eval_add(SyntaxNode *tree) {
     } else if (lhs->type == ValueType::STRING && rhs->type == ValueType::STRING) {
         return context->newStringValue(lhs->toStringValue()->value + rhs->toStringValue()->value);
     } else if (lhs->type == ValueType::ARRAY && rhs->type == ValueType::ARRAY) {
-        auto result = context->newArrayValue();
+        auto result = context->newArrayValue(this);
         auto a = ((ArrayValue *) lhs)->value;
         auto b = ((ArrayValue *) rhs)->value;
         result->value.insert(result->value.end(), a.begin(), a.end());
@@ -185,7 +185,7 @@ Value *Environment::eval_call(SyntaxNode *tree,
 Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
                               const FunctionValue *tailContext) {
     if (tail->type == NodeType::CALL_TAIL) {
-        return eval_calltail(static_cast<FunctionValue *> (first), tail, tailContext);
+        return eval_calltail(first, tail, tailContext);
     } else if (tail->type == NodeType::GET) {
         return eval_get(first, tail);
     } else if (tail->type == NodeType::GET_BIND) {
@@ -202,8 +202,13 @@ Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
 }
 
 
-Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
+Value *Environment::eval_calltail(Value *functionInput, SyntaxNode *tail,
                                   const FunctionValue *tailContext) {
+    if (functionInput->type != ValueType::FUNC) {
+        cout << "実行エラー：関数型ではない物を呼べません。" << endl;
+        return context->newNoneValue();
+    }
+    auto function = static_cast<FunctionValue *>(functionInput);
     if (tail->children.size() == 2) {
         tailContext = nullptr;
     }
@@ -228,7 +233,15 @@ Value *Environment::eval_calltail(FunctionValue *function, SyntaxNode *tail,
         for (auto arg : args) {
             context->tempRefDecrement(arg);
         }
-        return new TailCallValue(args);
+        for (auto arg : kwargsIn) {
+            context->tempRefDecrement(arg.second);
+        }
+        auto result = new TailCallValue(args);
+        if (!kwargsIn.empty()) {
+            result->kwArgs = kwargsIn;
+            result->hasKwArgs = true;
+        }
+        return result;
     }
     auto result = function->apply(
             args, this, kwargsIn.empty() ? nullptr : &kwargsIn);
@@ -403,7 +416,6 @@ Value *Environment::eval_text(SyntaxNode *tree,
 Value *Environment::eval_function(SyntaxNode *tree) {
     std::vector<wstring> params;
     std::unordered_map<wstring, Value *> paramsWithDefault;
-    wstring name = tree->children[0]->content.content;
     bool hasKwParam = false;
     bool hasVarParam = false;
     wstring kwParamName;
@@ -433,7 +445,16 @@ Value *Environment::eval_function(SyntaxNode *tree) {
     if (hasVarParam) {
         function->setVarParam(varParamName);
     }
-    bindings[name] = function;
+    auto nameNode = tree->children[0];
+    if (nameNode->type == NodeType::TERMINAL) {
+        wstring name = nameNode->content.content;
+        bindings[name] = function;
+    } else {
+        auto name1 = nameNode->children[0]->content.content;
+        auto name2 = nameNode->children[1]->content.content;
+        DictionaryValue *dictionary = static_cast<DictionaryValue *>(lookup(name1));
+        dictionary->set(name2, function);
+    }
     return Context::newNoneValue();
 }
 

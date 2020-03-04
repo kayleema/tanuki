@@ -233,7 +233,18 @@ SyntaxNode *Parser::run_function() {
         logInternal("エラー：関数作成文の中に関数名がありません。\n");
         return new SyntaxNode(NodeType::PARSE_ERROR);
     }
-    auto result = new SyntaxNode(NodeType::FUNC, {new SyntaxNode(name)});
+    SyntaxNode *nameNode = nullptr;
+    if(accept(TokenType::DOT)) {
+        Token name2;
+        if (!accept(TokenType::SYMBOL, &name2)) {
+            logInternal("エラー：関数作成文の一行目で「・」の右側での問題。\n");
+            return new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+        nameNode = new SyntaxNode(NodeType::FUNC_NAME, {new SyntaxNode(name), new SyntaxNode(name2)});
+    } else {
+        nameNode = new SyntaxNode(name);
+    }
+    auto result = new SyntaxNode(NodeType::FUNC, {nameNode});
     if (!expect(TokenType::LPAREN)) {
         logInternal("エラー：関数作成文の一行目で「（」を見つけられません。\n");
         delete result;

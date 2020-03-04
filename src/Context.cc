@@ -173,9 +173,10 @@ FunctionValue *Context::newBoundFunctionValue(FunctionValue *function, Value *ji
     return result;
 }
 
-ArrayValue *Context::newArrayValue() {
+ArrayValue *Context::newArrayValue(Environment *env) {
     auto result = new ArrayValue();
     values.insert(result);
+    result->setParent(static_cast<DictionaryValue *>(env->lookup(L"配列型")));
     return result;
 }
 

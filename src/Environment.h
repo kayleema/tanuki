@@ -14,7 +14,7 @@ class Environment {
 
     Value *eval_tail(Value *first, SyntaxNode *node, const FunctionValue *tailContext = nullptr);
 
-    Value *eval_calltail(FunctionValue *function, SyntaxNode *node,
+    Value *eval_calltail(Value *function, SyntaxNode *tail,
                          const FunctionValue *tailContext = nullptr);
 
     Value *eval_get(Value *source, SyntaxNode *tree);

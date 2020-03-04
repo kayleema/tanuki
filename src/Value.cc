@@ -69,6 +69,10 @@ string DictionaryValue::toString() const {
 
 DictionaryValue::DictionaryValue() : Value(ValueType::DICT), parent(nullptr) {}
 
+bool DictionaryValue::equals(const Value *rhs) const {
+    return this == rhs;
+}
+
 string UserFunctionValue::toString() const {
     ostringstream result;
     result << "UserFunctionValue(" << "..." << ")";
@@ -81,7 +85,10 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
     Environment *env;
     env = parentEnv->newChildEnvironment();
     env->caller = caller;
-    vector<Value *> args = argsIn;
+    vector<Value *> args;
+    args.insert(args.end(), argsIn.begin(), argsIn.end());
+    unordered_map<wstring, Value *> kwArgsStatic;
+    unordered_map<wstring, Value *> *kwArgs = (kwargsIn == nullptr) ? nullptr : (kwargsIn);
     do {
         if (bodyReturnValue != nullptr) {
             delete bodyReturnValue;
@@ -104,23 +111,23 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
         // bind default parameters when not specified
         for (auto item : paramsWithDefault) {
             wstring left = item.first;
-            if (kwargsIn && kwargsIn->count(item.first)) {
-                env->bind(item.first, (*kwargsIn)[item.first]);
+            if (kwArgs && kwArgs->count(item.first)) {
+                env->bind(item.first, (*kwArgs)[item.first]);
             } else {
                 env->bind(item.first, item.second);
             }
         }
         if (hasVarKeywordArgs) {
-            auto kwArgs = env->context->newDictionaryValue();
-            if (kwargsIn) {
-                for (const auto &arg : *kwargsIn) {
-                    kwArgs->set(arg.first, arg.second);
+            auto kwArgsDict = env->context->newDictionaryValue();
+            if (kwArgs) {
+                for (const auto &arg : *kwArgs) {
+                    kwArgsDict->set(arg.first, arg.second);
                 }
             }
-            env->bind(varKeywordArgsParam, kwArgs);
+            env->bind(varKeywordArgsParam, kwArgsDict);
         }
         if (hasVarArgs) {
-            auto varArgs = env->context->newArrayValue();
+            auto varArgs = env->context->newArrayValue(env);
             if (argsIn.size() > params.size()) {
                 for (size_t i = params.size(); i < argsIn.size(); i++) {
                     varArgs->push(argsIn[i]);
@@ -135,7 +142,17 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
             return inner;
         }
         if (bodyReturnValue->type == ValueType::TAIL_CALL) {
-            args = ((TailCallValue *) bodyReturnValue)->args;
+            TailCallValue *tailCallValue = (TailCallValue *) bodyReturnValue;
+            args = tailCallValue->args;
+            if (tailCallValue->hasKwArgs) {
+                if (!kwArgs) {
+                    kwArgs = &kwArgsStatic;
+                }
+                kwArgs->clear();
+                *kwArgs = tailCallValue->kwArgs;
+            } else {
+                kwArgs = nullptr;
+            }
             env->tailReset();
         }
     } while (bodyReturnValue->type == ValueType::TAIL_CALL);
