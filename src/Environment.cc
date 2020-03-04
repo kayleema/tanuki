@@ -170,8 +170,7 @@ Value *Environment::eval_lte(SyntaxNode *tree) {
     return context->newNoneValue();
 }
 
-Value *Environment::eval_call(SyntaxNode *tree,
-                              const FunctionValue *tailContext) {
+Value *Environment::eval_call(SyntaxNode *tree, const FunctionValue *tailContext) {
     Value *first = eval(tree->children[0]);
     context->tempRefIncrement(first);
     SyntaxNode *tail = tree->children[1];
@@ -266,6 +265,10 @@ Value *Environment::eval_calltail(Value *functionInput, SyntaxNode *tail,
 Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
     DictionaryValue *lookupSource = source->getLookupSource(this);
+    if (lookupSource == nullptr) {
+        cout << "エラー：「・」の左側はGET出来ない型。" << encodeUTF8(key) << endl;
+        return context->newNoneValue();
+    }
     if (!lookupSource->has(key)) {
         cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
@@ -283,13 +286,17 @@ Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
 Value *Environment::eval_get_bind(Value *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
     DictionaryValue *lookupSource = source->getLookupSource(this);
+    if (lookupSource == nullptr) {
+        cout << "実行エラー：波ダッシュの左側はGET出来ない型がある。" << encodeUTF8(key) << endl;
+        return context->newNoneValue();
+    }
     if (!lookupSource->has(key)) {
-        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
+        cout << "実行エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
         return context->newNoneValue();
     }
     auto getResult = lookupSource->get(key);
     if (getResult->type != ValueType::FUNC) {
-        cout << "エラー：波線の右側のタイプは関数ではありません。バインドはできません。" << endl;
+        cout << "実行エラー：波線の右側のタイプは関数ではありません。バインドはできません。" << endl;
         return context->newNoneValue();
     }
     context->tempRefIncrement(getResult);

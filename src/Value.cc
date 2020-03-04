@@ -88,7 +88,10 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
     vector<Value *> args;
     args.insert(args.end(), argsIn.begin(), argsIn.end());
     unordered_map<wstring, Value *> kwArgsStatic;
-    unordered_map<wstring, Value *> *kwArgs = (kwargsIn == nullptr) ? nullptr : (kwargsIn);
+    if (kwargsIn != nullptr) {
+        kwArgsStatic = *kwargsIn;
+    }
+    unordered_map<wstring, Value *> *kwArgs = (kwargsIn == nullptr) ? nullptr : (&kwArgsStatic);
     do {
         if (bodyReturnValue != nullptr) {
             delete bodyReturnValue;

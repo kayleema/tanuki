@@ -170,61 +170,23 @@ Basicな関数
 * 評価
 * エキステンション
 
-細かい事：Formal Grammar (incomplete)
-----------------------
+パーフォマンス試験
+------------------
 ```
-  text => NEWLINE statement
-  text => statement text
-  text => EPSILON
-
-  statement => FUNC COMMA SYMBOL LPAREN param_list RPAREN NEWL INDENT text DEDENT
-  statement => RETURN return_value
-  statement => if_statement
-  statement => SYMBOL ASSIGN infix_expression
-  statement => infix_expression
-
-  param_list => SYMBOL [COMMA SYMBOL]* | EPSILON
-  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT
-  if_statement => IF COMMA infix_expression NEWL INDENT text DEDENT ELSE NEWL INDENT text DEDENT
-  return_value => infix_expression
-  return_value => EPSILON
-
-  infix_expression => infix_comparison_expression
-  infix_comparison_expression => infix_additive_expression {==,!=,>,<,>=,<=} infix_additive_expression
-  infix_additive_expression => expression {+,-} expression [ {+,-} expression ]...
-
-  expression => STRING
-  expression => SYMBOL
-  expression => SYMBOL expression_tail
-  expression => NUMBER
-  expression => NUMBER expression_tail
-
-  expression_tail => LPAREN arg_list RPAREN expression_tail
-  expression_tail => EPSILON
-
-  arg_list => expression [COMMA expression]* | EPSILON
+cd build/
+make pinpon
+time ./pinpon ../example/codingquestions.pin
 ```
+結果：`./pinpon ../example/codingquestions.pin  0.86s user 0.01s system 99% cpu 0.867 total`
 
 細かい事：まだ実装されてない機能
 ------------------
 希望の機能：
 * フローティングポイントのタイプ。floating point calculations
-* infix mod operator
+* infix mod operator　今は
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no 
 new lines are allowed in the middle of a statement)
-* メソード短い（波ダッシュ）作り方。short form method definition
 * 文字列の中のエスケープコード。escape codes in strings
 * multithreading
 * network utilities
 * `－変数名`
-
-###希望の機能：簡単に関数を作って渡す
-```
-あ＝配列（１、２、３、４）
-あ〜それぞれ（）：（アイテム）
-　表示（アイテム）
-
-い＝あ〜マップ（）：（アイテム）
-　返す、アイテム＊２
-確認、い【１】＝＝４
-```
