@@ -1,16 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import * as sinon from 'sinon';
 import SocketRepo from "./SocketRepo";
+jest.mock('./SocketRepo')
 
-describe('REPL Loop', function () {
-    it('renders without crashing', () => {
+describe('REPL Loop',  () => {
+    beforeEach(() => {
+        SocketRepo.mockClear();
+    });
+
+    test('renders without crashing', () => {
         const div = document.createElement('div');
-        const socketRepo = sinon.createStubInstance(SocketRepo);
+        const socketRepo = new SocketRepo();
         ReactDOM.render(<App socketRepo={socketRepo}/>, div);
 
-        expect(socketRepo.startSocket.calledOnce).toBe(true);
+        expect(socketRepo.startSocket).toHaveBeenCalledTimes(1);
         ReactDOM.unmountComponentAtNode(div);
     });
 });
