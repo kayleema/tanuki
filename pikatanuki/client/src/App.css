@@ -55,6 +55,10 @@ textarea.Text:focus {
     color: #d0d0d0;
 }
 
+.outAreaItemInput {
+    color: #f8f8f2;
+}
+
 .smalltext {
     color: #75715e;
     font-size: 12px;

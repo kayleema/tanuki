@@ -12,7 +12,11 @@ export default class SocketRepo {
         this.socket.onopen = handler;
     }
     setOnMessage(handler) {
-        this.socket.onmessage = handler;
+        this.socket.onmessage = (evt) => {
+            console.log(evt.data);
+            let json = JSON.parse(evt.data);
+            handler(json);
+        };
     }
     setOnClose(handler) {
         this.socket.onclose = handler;

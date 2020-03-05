@@ -19,9 +19,9 @@ export default class App extends React.Component {
         this.setState({connection: "socket closed"})
     }
 
-    onSocketMessage(evt) {
+    onSocketMessage(data) {
         this.setState(state => ({
-            textContent: [...state.textContent, evt.data],
+            textContent: [...state.textContent, data],
         }))
     }
 
@@ -33,10 +33,35 @@ export default class App extends React.Component {
     }
 
     executeCommand() {
+        const newItem = {
+            messageType: "out",
+            code: this.state.inputString
+        };
+        this.setState(state => ({
+            textContent: [...state.textContent, newItem],
+        }));
         this.props.socketRepo.sendCode(this.state.inputString);
         this.setState(state => ({
             inputString: ""
         }));
+    }
+
+    onKeyDown(e) {
+        if (e.keyCode === 229) {
+            return;
+        }
+        if (e.key === "Enter") {
+            if (
+                !(this.state.inputString.startsWith("関数、") ||
+                    this.state.inputString.startsWith("もし") ||
+                    this.state.inputString.startsWith("あるいは") ||
+                    this.state.inputString.startsWith("その他")) ||
+                e.getModifierState("Shift")
+            ) {
+                this.executeCommand();
+                e.preventDefault();
+            }
+        }
     }
 
     render() {
@@ -44,30 +69,14 @@ export default class App extends React.Component {
             <div className="App">
                 <div className="outArea">
                     <div className="statusArea">{this.state.connection}</div>
-                    <div className="outAreaItem outAreaItemInfo">ピカ狸　ライブ実行</div>
+                    <div className="outAreaItem outAreaItemInfo">ピカ狸 ライブ実行</div>
                     {this.state.textContent.map((item, index) => (
                         this.renderItem(item, index)
                     ))}
                     <textarea
                         className={"Text " + (this.state.inputString.includes("\n") ? "multi" : "")}
                         placeholder="入力してください"
-                        onKeyDown={(e) => {
-                            if (e.keyCode === 229) {
-                                return;
-                            }
-                            if (e.key === "Enter") {
-                                if (
-                                    !(this.state.inputString.startsWith("関数、") ||
-                                        this.state.inputString.startsWith("もし") ||
-                                        this.state.inputString.startsWith("あるいは") ||
-                                        this.state.inputString.startsWith("その他")) ||
-                                    e.getModifierState("Shift")
-                                ) {
-                                    this.executeCommand();
-                                    e.preventDefault();
-                                }
-                            }
-                        }}
+                        onKeyDown={this.onKeyDown.bind(this)}
                         value={this.state.inputString}
                         onChange={(e) => this.setState({inputString: e.target.value})}
                     />
@@ -80,22 +89,27 @@ export default class App extends React.Component {
     }
 
     renderItem(item, index) {
-        if(item.startsWith("》")) {
+        if (item.messageType === "result") {
             return (
                 <div key={index} className="outAreaItem outAreaItemResult">
-                    {item.split("\n").map((line) => (
-                        <div>{line}</div>
-                    ))}
+                    結果：{item.resultString}
                 </div>
             )
         }
-        return (
-            <div key={index} className="outAreaItem">
-                {item.split("\n").map((line) => (
-                    <div>{line}</div>
-                ))}
-            </div>
-        )
+        if (item.messageType === "display") {
+            return (
+                <div key={index} className="outAreaItem outAreaItemInfo">
+                    表示：{item.message}
+                </div>
+            )
+        }
+        if (item.messageType === "out") {
+            return (
+                <div key={index} className="outAreaItem outAreaItemInput">
+                    {item.code}
+                </div>
+            )
+        }
     }
 }
 

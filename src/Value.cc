@@ -31,6 +31,12 @@ DictionaryValue *FunctionValue::getLookupSource(Environment *env) {
     return dynamic_cast<DictionaryValue *>(env->lookup(L"関数型"));
 }
 
+string FunctionValue::toStringJP() const {
+    stringstream ss;
+    ss << "関数値";
+    return ss.str();
+}
+
 bool NumberValue::equals(const Value *rhs) const {
     return Value::equals(rhs) && (value == ((NumberValue *) rhs)->value);
 }
@@ -40,6 +46,12 @@ string Value::toString() const {
     result << "Value(";
     result << ValueTypeStrings[(int) type];
     result << ")";
+    return result.str();
+}
+
+string Value::toStringJP() const {
+    ostringstream result;
+    result << "無";
     return result.str();
 }
 
@@ -53,8 +65,20 @@ string NumberValue::toString() const {
     return result.str();
 }
 
+string NumberValue::toStringJP() const {
+    ostringstream result;
+    result << value;
+    return result.str();
+}
+
 string StringValue::toString() const {
     return string("string");
+}
+
+string StringValue::toStringJP() const {
+    ostringstream result;
+    result << "「" << encodeUTF8(value) << "」";
+    return result.str();
 }
 
 bool StringValue::equals(const Value *rhs) const {
@@ -64,6 +88,12 @@ bool StringValue::equals(const Value *rhs) const {
 string DictionaryValue::toString() const {
     ostringstream result;
     result << "DictionaryValue(" << value.size() << ")";
+    return result.str();
+}
+
+string DictionaryValue::toStringJP() const {
+    ostringstream result;
+    result << "辞書〈長さ：" << value.size() << "〉";
     return result.str();
 }
 
@@ -175,6 +205,12 @@ void UserFunctionValue::setVarParam(wstring name) {
 string ArrayValue::toString() const {
     stringstream ss;
     ss << "Array(長さ=" << length() << ")";
+    return ss.str();
+}
+
+string ArrayValue::toStringJP() const {
+    stringstream ss;
+    ss << "配列〈長さ：" << length() << "〉";
     return ss.str();
 }
 

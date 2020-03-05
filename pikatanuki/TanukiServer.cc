@@ -42,7 +42,7 @@ void TanukiServer::handleMessage(websocketpp::connection_hdl hdl, server::messag
     stringstream out;
     out << R"({)"
         << R"( "messageType" : "result",)"
-        << R"( "resultString" : ")" << result->toString() << R"(")"
+        << R"( "resultString" : ")" << result->toStringJP() << R"(")"
         << R"(})";
     m_endpoint.send(hdl, out.str(), msg->get_opcode());
 }

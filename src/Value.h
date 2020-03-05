@@ -36,6 +36,8 @@ public:
 
     virtual string toString() const;
 
+    virtual string toStringJP() const;
+
     NumberValue *toNumberValue() { return (NumberValue *) this; }
 
     StringValue *toStringValue() { return (StringValue *) this; }
@@ -59,6 +61,7 @@ public:
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
+    string toStringJP() const override;
 
     bool isTruthy() const override { return value != 0; };
 
@@ -74,6 +77,7 @@ public:
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
+    string toStringJP() const override;
 
     DictionaryValue *getLookupSource(Environment *env) override;
 
@@ -110,6 +114,7 @@ public:
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
+    string toStringJP() const override;
 };
 
 
@@ -142,6 +147,7 @@ public:
     }
 
     string toString() const override;
+    string toStringJP() const override;
 };
 
 // Indicates that an expression should force exit of func body eval.
@@ -176,6 +182,8 @@ public:
     FunctionValueType functionType = FunctionValueType::NONE;
 
     DictionaryValue *getLookupSource(Environment *env) override;
+
+    string toStringJP() const override;
 };
 
 class SyntaxNode;
