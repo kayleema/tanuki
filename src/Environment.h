@@ -66,13 +66,13 @@ class Environment {
     Value *eval_assert(SyntaxNode *node);
 
 public:
-    explicit Environment(Context *context, Filesystem *_filesystem = nullptr);
+    explicit Environment(Context *context, Filesystem *_filesystem = nullptr, PinponLogger *_logger = nullptr);
 
     explicit Environment(Environment *parent, Context *_context = nullptr)
-            : parent(parent), filesystem(parent->filesystem) {
+            : parent(parent), filesystem(parent->filesystem), logger(parent->logger) {
         if (_context == nullptr) {
             if (parent->context == nullptr) {
-//                cout << "error null parent context" << endl;
+                cout << "ERROR ERROR null parent context" << endl;
             }
             context = parent->context;
         } else {
@@ -86,6 +86,7 @@ public:
     unordered_map<wstring, Value *> bindings;
     unordered_set<wstring> nonlocals;
     Filesystem *filesystem;
+    PinponLogger *logger;
 
     Value *lookup(const wstring &name);
 

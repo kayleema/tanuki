@@ -204,7 +204,7 @@ Value *Environment::eval_tail(Value *first, SyntaxNode *tail,
 Value *Environment::eval_calltail(Value *functionInput, SyntaxNode *tail,
                                   const FunctionValue *tailContext) {
     if (functionInput->type != ValueType::FUNC) {
-        cout << "実行エラー：関数型ではない物を呼べません。" << endl;
+        logger->log("実行エラー：関数型ではない物を呼べません。")->logEndl();
         return context->newNoneValue();
     }
     auto function = static_cast<FunctionValue *>(functionInput);
@@ -266,11 +266,11 @@ Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
     DictionaryValue *lookupSource = source->getLookupSource(this);
     if (lookupSource == nullptr) {
-        cout << "エラー：「・」の左側はGET出来ない型。" << encodeUTF8(key) << endl;
+        logger->log("エラー：「・」の左側はGET出来ない型。")->log(key)->logEndl();
         return context->newNoneValue();
     }
     if (!lookupSource->has(key)) {
-        cout << "エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
+        logger->log("エラー：辞書にキーは入っていない。")->log(key)->logEndl();
         return context->newNoneValue();
     }
     auto getResult = lookupSource->get(key);
@@ -578,8 +578,12 @@ Environment *Environment::newChildEnvironment() {
 }
 
 // Global Environment Constructor
-Environment::Environment(Context *context, Filesystem *_filesystem)
-        : context(context), filesystem(_filesystem) {
+Environment::Environment(Context *context, Filesystem *_filesystem, PinponLogger *_logger)
+        : context(context), filesystem(_filesystem), logger(_logger) {
+    static ConsoleLogger staticLogger;
+    if (logger == nullptr) {
+        logger = &staticLogger;
+    }
     initModule(this);
 }
 

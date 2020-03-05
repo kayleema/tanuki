@@ -63,6 +63,18 @@ PinponLogger *PinponLogger::logLong(long value) {
     return this;
 }
 
+PinponLogger *PinponLogger::logLn(std::string value) {
+    log(value);
+    logEndl();
+    return this;
+}
+
+PinponLogger *PinponLogger::logLn(std::wstring value) {
+    log(value);
+    logEndl();
+    return this;
+}
+
 #ifdef _WIN32
 bool ConsoleLogger::wide_mode = true;
 #else

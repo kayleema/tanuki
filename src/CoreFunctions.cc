@@ -84,28 +84,22 @@ public:
 
 class FunctionPrint : public FunctionValue {
 public:
-    PinponLogger *logger;
+    FunctionPrint() {}
 
-    FunctionPrint() {
-        logger = new ConsoleLogger();
-    }
+    ~FunctionPrint() override {}
 
-    ~FunctionPrint() override {
-        delete logger;
-    }
-
-    Value *apply(const vector<Value *> &args, Environment *,
+    Value *apply(const vector<Value *> &args, Environment *env,
                  unordered_map<wstring, Value *> *) const override {
         for (auto value : args) {
             if (value->type == ValueType::NUM) {
-                logger->logLong(value->toNumberValue()->value);
+                env->logger->logLong(value->toNumberValue()->value);
             } else if (value->type == ValueType::STRING) {
-                logger->log(value->toStringValue()->value);
+                env->logger->log(value->toStringValue()->value);
             } else {
-                logger->log(value->toString());
+                env->logger->log(value->toString());
             }
         }
-        logger->logEndl();
+        env->logger->logEndl();
         return Context::newNoneValue();
     };
 };

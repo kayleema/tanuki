@@ -26,14 +26,14 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        this.socket = new WebSocket("ws://localhost:9002/");
-        this.socket.onopen = this.onSocketOpen.bind(this);
-        this.socket.onmessage = this.onSocketMessage.bind(this);
-        this.socket.onclose = this.onSocketClose.bind(this);
+        this.props.socketRepo.startSocket();
+        this.props.socketRepo.setOnOpen(this.onSocketOpen.bind(this));
+        this.props.socketRepo.setOnMessage(this.onSocketMessage.bind(this));
+        this.props.socketRepo.setOnClose(this.onSocketClose.bind(this));
     }
 
     executeCommand() {
-        this.socket.send(this.state.inputString)
+        this.props.socketRepo.sendCode(this.state.inputString);
         this.setState(state => ({
             inputString: ""
         }));
