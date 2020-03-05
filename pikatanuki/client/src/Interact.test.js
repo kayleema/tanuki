@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import SocketRepo from "./SocketRepo";
 import ReactTestUtils from 'react-dom/test-utils';
+import Interact from "./Interact";
 
 jest.mock('./SocketRepo')
 
@@ -14,7 +15,7 @@ describe('REPL Loop', () => {
         SocketRepo.mockClear();
         socketRepo = new SocketRepo();
 
-        ReactDOM.render(<App socketRepo={socketRepo}/>, container);
+        ReactDOM.render(<Interact socketRepo={socketRepo}/>, container);
     });
 
     test('renders connection message', () => {
