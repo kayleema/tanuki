@@ -22,7 +22,7 @@ export default class App extends React.Component {
             <div className="App">
                 <div className="header">
                     ピカ狸・
-                    <button onClick={this.changeScreen.bind(this)}>画面切替</button>
+                    <button onClick={this.changeScreen.bind(this)}>画面スイッチ</button>
                 </div>
                 {(this.state.screen === "interact") && <Interact socketRepo={this.props.socketRepo}/>}
                 {(this.state.screen === "edit") && <Edit socketRepo={this.props.socketRepo}/>}
