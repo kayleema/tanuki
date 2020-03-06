@@ -19,6 +19,10 @@ DictionaryValue *NumberValue::getLookupSource(Environment *env) {
     return dynamic_cast<DictionaryValue *>(env->lookup(L"番号型"));
 }
 
+DictionaryValue *FloatValue::getLookupSource(Environment *env) {
+    return dynamic_cast<DictionaryValue *>(env->lookup(L"番号フロート型"));
+}
+
 DictionaryValue *StringValue::getLookupSource(Environment *env) {
     return dynamic_cast<DictionaryValue *>(env->lookup(L"文字列型"));
 }
@@ -66,6 +70,23 @@ string NumberValue::toString() const {
 }
 
 string NumberValue::toStringJP() const {
+    ostringstream result;
+    result << value;
+    return result.str();
+}
+
+bool FloatValue::equals(const Value *rhs) const {
+    static const double EPSILON = 0.00001;
+    return Value::equals(rhs) && ( abs(value - ((FloatValue *) rhs)->value) < EPSILON);
+}
+
+string FloatValue::toString() const {
+    ostringstream result;
+    result << "FloatValue(" << value << ")";
+    return result.str();
+}
+
+string FloatValue::toStringJP() const {
     ostringstream result;
     result << value;
     return result.str();

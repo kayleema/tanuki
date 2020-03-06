@@ -139,6 +139,12 @@ NumberValue *Context::newNumberValue(long number) {
     return result;
 }
 
+FloatValue *Context::newFloatValue(double number) {
+    auto result = new FloatValue(number);
+    values.insert(result);
+    return result;
+}
+
 StringValue *Context::newStringValue(wstring str) {
     auto result = new StringValue(std::move(str));
     values.insert(result);

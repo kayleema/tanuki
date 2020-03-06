@@ -104,16 +104,16 @@ const unordered_map<wstring, TokenType> identifiers(
                 {L"あるいは", TokenType::ELIF},
                 {L"その他",  TokenType::ELSE},
                 {L"導入",   TokenType::IMPORT},
-                {L"確認", TokenType::ASSERT},
-                {L"外側", TokenType::EXTERN}
+                {L"確認",   TokenType::ASSERT},
+                {L"外側",   TokenType::EXTERN}
         });
 
 bool charIsSymbolic(wchar_t c) {
     return symbolicChars.count(c) == 0;
 }
 
-bool charIsNumberic(wchar_t c) {
-    return c <= L'９' && c >= L'０';
+bool charIsNumeric(wchar_t c) {
+    return (c <= L'９' && c >= L'０') || c == L'。';
 }
 
 long parseNumeric(wstring s) {
@@ -125,7 +125,18 @@ long parseNumeric(wstring s) {
     return result + parseNumeric(s) * 10;
 }
 
-const char* tokenTypeToString(TokenType type) {
+float parseNumericFloat(wstring s) {
+    auto position = s.find(L'。');
+    auto lhs = s.substr(0, position);
+    auto rhs = s.substr(position + 1);
+    auto intPart = parseNumeric(lhs);
+    auto fracPart = parseNumeric(rhs);
+    auto fracLength = rhs.size();
+    auto result = float(intPart) + float(fracPart) / pow(10, fracLength);
+    return result;
+}
+
+const char *tokenTypeToString(TokenType type) {
     return TokenTypeStrings[(int) type];
 }
 
@@ -133,6 +144,9 @@ Token::Token(TokenType type, wstring _content, int line)
         : type(type), content(std::move(_content)), line(line) {
     if (type == TokenType::NUMBER) {
         number = parseNumeric(content);
+    }
+    if (type == TokenType::NUMBER_FLOAT) {
+        numberFloat = parseNumericFloat(content);
     }
 }
 
@@ -142,6 +156,9 @@ string Token::toString() const {
     result << u8"：”" << encodeUTF8(content);
     if (type == TokenType::NUMBER) {
         result << u8"（" << number << u8"）";
+    }
+    if (type == TokenType::NUMBER_FLOAT) {
+        result << u8"（" << numberFloat << u8"）";
     }
     result << u8"”、" << line << u8"行目";
     return result.str();
@@ -263,12 +280,15 @@ Token InputSourceTokenizer::getToken() {
         }
         return Token(newTokenType, L"", lineNumber);
     }
-    if (charIsNumberic(first)) {
+    if (charIsNumeric(first)) {
         wstring resultNumber = wstring(1, first);
-        while (charIsNumberic(input->peekChar()) && !input->eof()) {
+        while (charIsNumeric(input->peekChar()) && !input->eof()) {
             resultNumber.push_back(input->getChar());
         }
-        return Token(TokenType::NUMBER, wstring(resultNumber), lineNumber);
+        TokenType tokenType = (resultNumber.find(L'。') != std::string::npos) ? TokenType::NUMBER_FLOAT
+                                                                             : TokenType::NUMBER;
+
+        return Token(tokenType, wstring(resultNumber), lineNumber);
     }
     if (first == lsquare) {
         wstring resultString = wstring(L"");

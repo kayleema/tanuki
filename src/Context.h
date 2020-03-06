@@ -41,6 +41,8 @@ public:
 
     NumberValue *newNumberValue(long number);
 
+    FloatValue *newFloatValue(double number);
+
     StringValue *newStringValue(wstring str);
 
     DictionaryValue *newDictionaryValue();

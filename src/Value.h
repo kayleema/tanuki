@@ -13,10 +13,10 @@ class Environment;
 using namespace std;
 
 enum class ValueType {
-    NUM, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT, MODULE, ARRAY
+    NUM, NUM_FLOAT, FUNC, NONE, RETURN, STRING, TAIL_CALL, DICT, MODULE, ARRAY
 };
 const string ValueTypeStrings[] = {
-        "NUM", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT", "MODULE", "ARRAY"
+        "NUM", "NUM_FLOAT", "FUNC", "NONE", "RETURN", "STRING", "TAIL_CALL", "DICT", "MODULE", "ARRAY"
 };
 
 class NumberValue;
@@ -68,6 +68,22 @@ public:
     DictionaryValue *getLookupSource(Environment *env) override;
 
     long value;
+};
+
+class FloatValue : public Value {
+public:
+    explicit FloatValue(double n) : Value(ValueType::NUM_FLOAT), value(n) {};
+
+    bool equals(const Value *rhs) const override;
+
+    string toString() const override;
+    string toStringJP() const override;
+
+    bool isTruthy() const override { return value != 0; };
+
+    DictionaryValue *getLookupSource(Environment *env) override;
+
+    double value;
 };
 
 class StringValue : public Value {

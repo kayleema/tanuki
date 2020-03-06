@@ -28,6 +28,26 @@ TEST(eval, functions) {
     context.cleanup();
 }
 
+TEST(eval, floatNumber) {
+    auto stringInput = StringInputSource(
+            L"１２。３４"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto parser = Parser(&testTokenizer, nullptr);
+    SyntaxNode *tree = parser.run();
+    SyntaxNode *expr = tree->children[0];
+    string treeString = expr->toString();
+
+    Context context;
+    auto *env = new Environment(&context);
+    Value *v = env->eval(expr);
+    FloatValue expected(12.34);
+
+    EXPECT_TRUE(expected.equals(v));
+
+    context.cleanup();
+}
+
 TEST(eval, import_statement) {
     Mock<Filesystem> mockFilesystem;
     When(Method(mockFilesystem, getInputSourceForFilename)).Do(

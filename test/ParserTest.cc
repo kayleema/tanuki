@@ -8,7 +8,7 @@
 TEST(parsing, functions) {
 
     auto stringInput = StringInputSource(
-            L"あ（い（）、４５６、う（１２３））（え）"
+            L"あ（い（）、４５６。７８、う（１２３））（え）"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
@@ -23,7 +23,7 @@ TEST(parsing, functions) {
             u8"    TERMINAL symbol：”い”、1行目\n"
             u8"    CALL_TAIL\n"
             u8"     ARGS\n"
-            u8"   TERMINAL number：”４５６（456）”、1行目\n"
+            u8"   TERMINAL number_float：”４５６。７８（456.78）”、1行目\n"
             u8"   CALL\n"
             u8"    TERMINAL symbol：”う”、1行目\n"
             u8"    CALL_TAIL\n"

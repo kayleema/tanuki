@@ -44,6 +44,27 @@ TEST(tokenizer, multiline) {
     EXPECT_EQ(vector<Token>(allTokens.begin() + 6, allTokens.end()), expected);
 }
 
+TEST(tokenizer, parsesFloats) {
+    auto stringInput = StringInputSource(
+            L"関数、フィボナッチ（番号）\n"
+            L"　返す、１２３。４"
+    );
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+
+    auto allTokens = testTokenizer.getAllTokens();
+
+    auto expected = vector<Token>(
+            {
+                    Token(TokenType::NEWL, L"", 2),
+                    Token(TokenType::INDENT, L"", 2),
+                    Token(TokenType::RETURN, L"返す", 2),
+                    Token(TokenType::COMMA, L"、", 2),
+                    Token(TokenType::NUMBER_FLOAT, L"１２３。４", 2),
+                    Token(TokenType::END, L"", 2),
+            });
+    EXPECT_EQ(vector<Token>(allTokens.begin() + 6, allTokens.end()), expected);
+}
+
 TEST(tokenizer, functions) {
     auto stringInput = StringInputSource(
             L"あ（い（）、う（））"
