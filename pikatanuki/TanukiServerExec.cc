@@ -1,6 +1,6 @@
-#include "TanukiServer.h"
+#include "TanukiServerExec.h"
 
-TanukiServer::TanukiServer() {
+TanukiServerExec::TanukiServerExec() {
     m_endpoint.set_error_channels(websocketpp::log::elevel::all);
     m_endpoint.set_access_channels(websocketpp::log::alevel::all ^ websocketpp::log::alevel::frame_payload);
     m_endpoint.set_reuse_addr(true);
@@ -8,17 +8,17 @@ TanukiServer::TanukiServer() {
     m_endpoint.init_asio();
 
     m_endpoint.set_message_handler(std::bind(
-            &TanukiServer::handleMessage, this,
+            &TanukiServerExec::handleMessage, this,
             std::placeholders::_1, std::placeholders::_2
     ));
 
     m_endpoint.set_open_handler(std::bind(
-            &TanukiServer::handleOpen, this,
+            &TanukiServerExec::handleOpen, this,
             std::placeholders::_1
     ));
 
     m_endpoint.set_close_handler(std::bind(
-            &TanukiServer::handleClose, this,
+            &TanukiServerExec::handleClose, this,
             std::placeholders::_1
     ));
 
@@ -28,7 +28,7 @@ TanukiServer::TanukiServer() {
     evalPinponStarter(environment);
 }
 
-void TanukiServer::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
+void TanukiServerExec::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
     string inputRaw = msg->get_payload();
     wstring input = decodeUTF8(inputRaw);
 

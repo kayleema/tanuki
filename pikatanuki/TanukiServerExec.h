@@ -17,14 +17,14 @@
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
-class TanukiServer {
+class TanukiServerExec {
 public:
     Context *context;
     Environment *environment;
     std::set<websocketpp::connection_hdl, std::owner_less<websocketpp::connection_hdl>> connectionSet;
     std::vector<ServerLogger *> serverLoggers;
 
-    TanukiServer();
+    TanukiServerExec();
 
     void handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg);
 

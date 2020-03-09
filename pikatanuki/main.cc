@@ -1,15 +1,15 @@
 #include <signal.h>
 
-#include "TanukiServer.h"
+#include "TanukiServerREPL.h"
 
-TanukiServer *running_server = nullptr;
+TanukiServerREPL *running_server = nullptr;
 
 void shutdownInterrupt(int) {
     running_server->stop();
 }
 
 int main() {
-    TanukiServer s;
+    TanukiServerREPL s;
     running_server = &s;
     signal(SIGINT, shutdownInterrupt);
     signal(SIGTERM, shutdownInterrupt);
