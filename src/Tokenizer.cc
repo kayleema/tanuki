@@ -6,6 +6,7 @@
 
 // Needed for GCC
 #include <locale>
+#include <math.h>
 
 string encodeUTF8(const wstring &in) {
     try {

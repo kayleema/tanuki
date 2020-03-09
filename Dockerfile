@@ -1,0 +1,15 @@
+FROM ubuntu:bionic
+
+COPY . /code/
+
+WORKDIR /code/
+
+RUN apt-get update && \
+	apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev
+
+RUN mkdir build/
+WORKDIR /code/build/
+
+RUN cmake ..
+RUN make pikatanuki
+CMD ["./pikatanuki/pikatanuki"]
