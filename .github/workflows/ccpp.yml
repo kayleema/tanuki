@@ -17,11 +17,11 @@ jobs:
       uses: srt32/git-actions@v0.0.3
       with:
         args: git submodule update --init --recursive
-    - name: Install xmllint
+    - name: Install dependencies
       run: sudo apt-get install libasio-dev nlohmann-json-dev
     - name: configure
       run: mkdir build && cd build && cmake ..
     - name: make
       run: cd build && make pinpon_test
     - name: make test
-      run: build/pinpon_test
+      run: cd build && ./pinpon_test
