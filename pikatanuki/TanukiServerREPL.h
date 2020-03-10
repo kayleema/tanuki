@@ -27,6 +27,7 @@ public:
     void handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg);
 
     void handleOpen(websocketpp::connection_hdl hdl) {
+        cout << m_endpoint.get_con_from_hdl(hdl)->get_request_header("Cookie") << endl;
         auto *connectionLogger = new ServerLogger(&m_endpoint, hdl);
         environments[hdl] = new Environment(new Context(), nullptr, connectionLogger);
         environments[hdl]->context->setFrequency(10);
@@ -34,6 +35,12 @@ public:
         evalPinponStarter(environments[hdl]);
 
         connectionSet.insert(hdl);
+    }
+
+    bool handleValidate(websocketpp::connection_hdl hdl) {
+        cout << "VALIDATE" << endl;
+        cout << m_endpoint.get_con_from_hdl(hdl)->get_request_header("Cookie") << endl;
+        return true;
     }
 
     void handleClose(websocketpp::connection_hdl hdl) {

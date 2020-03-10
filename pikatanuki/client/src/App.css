@@ -164,3 +164,32 @@ textarea.Text:focus {
 .outAreaTest {
     margin-left: 0;
 }
+
+.loginContainer {
+    width: 100%;
+    background: #27282299;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    z-index: 9;
+    box-sizing: border-box;
+    padding: 50px;
+}
+
+.loginContainer h1 {
+    color: #f92672;
+}
+.loginContainer h2 {
+    color: #75715e;
+}
+.loginContainer div.dialog {
+    background: #272822;
+    border: 1px solid #f8f8f2;
+    padding: 20px 40px;
+    width: 328px;
+    margin: 0 auto;
+    border-radius: 4px;
+    box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.44);
+}

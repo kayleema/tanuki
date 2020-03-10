@@ -20,7 +20,7 @@ export default class SocketRepo {
     }
 
     onopen() {
-        this.onopenHandler();
+        this.onopenHandler && this.onopenHandler();
     }
 
     onmessage(evt) {

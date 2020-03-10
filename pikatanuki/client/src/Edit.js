@@ -123,9 +123,9 @@ export default class Edit extends React.Component {
                 </div>
                 <div className="terminal">
                     <pre>
-                    {this.state.resultList.map((item) => {
+                    {this.state.resultList.map((item, i) => {
                         if (item.messageType == "display") {
-                            return (<span>{item.message}</span>)
+                            return (<span key={i}>{item.message}</span>)
                         }
                     })}
                     </pre>
