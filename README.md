@@ -1,5 +1,6 @@
 狸語　プログラミング言語
 ===========================
+![Core Tests](https://github.com/kayleemann/pinpon/workflows/Core%20Tests/badge.svg?branch=master)
 
 「git submodule」のセットアップ
 -----------------------------
