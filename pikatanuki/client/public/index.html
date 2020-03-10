@@ -2,14 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-<!--    <link rel="icon" href="%PUBLIC_URL%/favicon.ico"/>-->
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="theme-color" content="#000000"/>
-<!--    <link rel="apple-touch-icon" href="logo192.png"/>-->
     <title>ピカ狸</title>
+    <style>
+        .lds-hourglass {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 10px auto;
+        }
+        .lds-hourglass:after {
+            content: " ";
+            display: block;
+            border-radius: 50%;
+            width: 0;
+            height: 0;
+            margin: 8px;
+            box-sizing: border-box;
+            border: 32px solid #f92672;
+            border-color: #f92672 transparent #f92672 transparent;
+            animation: lds-hourglass 1.2s infinite;
+        }
+        @keyframes lds-hourglass {
+            0% {
+                transform: rotate(0);
+                animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+            }
+            50% {
+                transform: rotate(900deg);
+                animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            }
+            100% {
+                transform: rotate(1800deg);
+            }
+        }
+        body {
+            background: #272822;
+        }
+        .loading p {
+            margin: 10px auto;
+            writing-mode: vertical-rl;
+            font-size: 40px;
+        }
+        .loading {
+            text-align:center;
+            font-family: sans-serif;
+            padding-top: 10vh;
+            color: #75715e;
+        }
+        .loading p.sub {
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
-<div id="root"></div>
+<div id="root">
+    <div class="loading">
+        <p>狸語　</p>
+        <div class="lds-hourglass"></div>
+        <p class="sub">　読み込み中です・・・</p>
+    </div>
+</div>
 </body>
 </html>
