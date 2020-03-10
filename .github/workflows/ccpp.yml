@@ -18,7 +18,7 @@ jobs:
       with:
         args: git submodule update --init --recursive
     - name: Install xmllint
-      run: sudo apt-get install libasio-dev nlohmann-json3-dev
+      run: sudo apt-get install libasio-dev nlohmann-json-dev
     - name: configure
       run: mkdir build && cd build && cmake ..
     - name: make
