@@ -41,4 +41,4 @@ jobs:
         name: pinpon_test
         path: build/
     - name: pinpon_test
-      run: cd build && ./pinpon_test
+      run: cd build && chmod a+x ./pinpon_test && ./pinpon_test
