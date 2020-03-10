@@ -36,8 +36,12 @@ void TanukiServerREPL::handleMessage(websocketpp::connection_hdl hdl, server::me
         return;
     } else if (parsed["messageType"] == "clear"){
         return;
-    } else if (parsed["messageType"] == "code"){
+    } else if (parsed["messageType"] == "code" | parsed["messageType"] == "file"){
         inputRaw = parsed["code"];
+    }
+    bool oneLine = true;
+    if (parsed["messageType"] == "file") {
+        oneLine = false;
     }
     wstring input = decodeUTF8(inputRaw);
 
@@ -46,7 +50,11 @@ void TanukiServerREPL::handleMessage(websocketpp::connection_hdl hdl, server::me
     auto tokenizer = InputSourceTokenizer(&source);
     auto parser = Parser(&tokenizer, &log);
     SyntaxNode *tree = parser.run();
-    auto result = environments[hdl]->eval(tree->children[0]);
+    cout << tree->toString() << endl;
+    if (oneLine) {
+        tree = tree->children[0];
+    }
+    auto result = environments[hdl]->eval(tree);
 
     stringstream out;
     out << R"({)"

@@ -138,3 +138,10 @@ textarea.Text:focus {
 .punctuation {color: #f8f8f2;}
 
 .cm-s-monokai .CodeMirror-cursor {border-left: 1px solid #f8f8f0 !important;}
+
+.terminal {
+    border: 2px solid #090908;
+    background: #1d1d19;
+    height: 30vh;
+    padding: 20px 40px;
+}

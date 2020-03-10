@@ -11,6 +11,10 @@ export default class App extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.props.socketRepo.startSocket();
+    }
+
     changeScreen() {
         this.setState({
             screen: (this.state.screen === "edit") ? "interact" : "edit"
@@ -22,7 +26,10 @@ export default class App extends React.Component {
             <div className="App">
                 <div className="header">
                     ピカ狸・
-                    <button onClick={this.changeScreen.bind(this)}>画面スイッチ</button>
+                    <button onClick={this.changeScreen.bind(this)}>
+                        {(this.state.screen === "interact") && "編集画面へ"}
+                        {(this.state.screen === "edit") && "ライブ実行画面へ"}
+                    </button>
                 </div>
                 {(this.state.screen === "interact") && <Interact socketRepo={this.props.socketRepo}/>}
                 {(this.state.screen === "edit") && <Edit socketRepo={this.props.socketRepo}/>}

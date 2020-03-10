@@ -25,56 +25,61 @@ export default class Edit extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            textContent: [],
-            code: "",
-            inputString: "",
-            connection: "接続中"
+            resultList: [],
+            code: "表示（「こんにちは」）",
+            terminalText: "結果はここで開きます。",
         };
     }
 
-    onSocketOpen() {
-        this.setState({connection: "接続した"})
-    }
-
-    onSocketClose() {
-        this.setState({connection: "socket closed"})
-    }
-
     onSocketMessage(data) {
+        console.log(data);
         this.setState(state => ({
-            textContent: [...state.textContent, data],
+            resultList: [...state.resultList, data],
         }))
     }
 
     componentDidMount() {
-        this.props.socketRepo.startSocket();
-        this.props.socketRepo.setOnOpen(this.onSocketOpen.bind(this));
         this.props.socketRepo.setOnMessage(this.onSocketMessage.bind(this));
-        this.props.socketRepo.setOnClose(this.onSocketClose.bind(this));
     }
 
-    executeCommand() {
+    executeCode() {
+        this.setState(state => ({
+            resultList: [],
+        }))
+        this.props.socketRepo.sendFile(this.state.code);
     }
 
     render() {
         return (
-            <div className="outArea outAreaEditor">
-                <div>
-                    <Editor
-                        value={this.state.code}
-                        onValueChange={code => this.setState({code})}
-                        highlight={(code) => (
-                            highlight(code, languages.tanuki)
-                        )}
-                        padding={10}
-                        style={{
-                            fontFamily: '"Fira code", "Fira Mono", monospace',
-                            fontSize: 14,
-                            outline: "none",
-                        }}
-                    />
+            <>
+                <div className="outArea outAreaEditor">
+                    <div>
+                        <Editor
+                            value={this.state.code}
+                            onValueChange={code => this.setState({code})}
+                            highlight={(code) => (
+                                highlight(code, languages.tanuki)
+                            )}
+                            padding={10}
+                            style={{
+                                fontFamily: '"Fira code", "Fira Mono", monospace',
+                                fontSize: 16,
+                                outline: "none",
+                            }}
+                        />
+                    </div>
                 </div>
-            </div>
+                <div className="header">
+                    <button onClick={this.executeCode.bind(this)}>🏃実行する</button>
+                </div>
+                <div className="terminal">
+                    {this.state.resultList.map((item) => {
+                        if (item.messageType == "display") {
+                            return (<div>{item.message}</div>)
+                        }
+                    })}
+                </div>
+            </>
         );
     }
 }

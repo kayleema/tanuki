@@ -25,7 +25,6 @@ export default class Interact extends React.Component {
     }
 
     componentDidMount() {
-        this.props.socketRepo.startSocket();
         this.props.socketRepo.setOnOpen(this.onSocketOpen.bind(this));
         this.props.socketRepo.setOnMessage(this.onSocketMessage.bind(this));
         this.props.socketRepo.setOnClose(this.onSocketClose.bind(this));
