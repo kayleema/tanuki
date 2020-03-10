@@ -9,11 +9,14 @@ export default class SocketRepo {
     }
 
     reconnect() {
-        this.socket = new WebSocket("ws://localhost:9002/");
+        if(process.env.NODE_ENV === "development") {
+            this.socket = new WebSocket("ws://localhost:9002/");
+        } else {
+            this.socket = new WebSocket("wss://pikatanuki.kaylee.jp/");
+        }
         this.socket.onopen = this.onopen.bind(this);
         this.socket.onmessage = this.onmessage.bind(this);
         this.socket.onclose = this.onclose.bind(this);
-        // this.socket = new WebSocket("ws://ec2-54-250-239-95.ap-northeast-1.compute.amazonaws.com:9002/");
     }
 
     onopen() {

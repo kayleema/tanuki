@@ -18,8 +18,13 @@
 
 ### ピカ狸のGUIのためだけの必要なライブラリ
 * asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
-「https://think-async.com/」からインストール出来ます。Linuxの場合は：`sudo apt-get install libasio-dev`
-* npmやnodeなど… Linuxの場合は：`sudo apt-get install npm`
+「https://think-async.com/」からインストール出来ます。
+* npmやnodeなど… 
+* nhlohman json OSXの場合は：`brew tap nlohmann/json && brew install nlohmann-json`
+
+```
+	apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev nlohmann-json3-dev
+```
 
 ビルド
 -----------

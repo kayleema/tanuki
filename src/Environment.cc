@@ -468,7 +468,12 @@ Value *Environment::eval_function(SyntaxNode *tree) {
     } else {
         auto name1 = nameNode->children[0]->content.content;
         auto name2 = nameNode->children[1]->content.content;
-        DictionaryValue *dictionary = static_cast<DictionaryValue *>(lookup(name1));
+        Value *name1value = lookup(name1);
+        if (name1value->type != ValueType::DICT) {
+            cout << "error not of type dict" << endl;
+            return Context::newNoneValue();
+        }
+        DictionaryValue *dictionary = static_cast<DictionaryValue *>(name1value);
         dictionary->set(name2, function);
     }
     return Context::newNoneValue();
@@ -549,7 +554,13 @@ Value *Environment::eval_assert(SyntaxNode *tree) {
     auto rhs = eval(tree->children[0]);
     if (!rhs->isTruthy()) {
         ConsoleLogger().log("確認エラー終了：")->logLong(tree->content.line)->logLn("行目");
-        exit(1);
+        if (exitHandler != nullptr) {
+            exitHandler->handleExit();
+            return new ReturnValue(context->newNumberValue(1));
+        } else {
+            ConsoleLogger().log("exit ")->logLn("now");
+            exit(1);
+        }
     }
     return Context::newNoneValue();
 }
@@ -562,7 +573,7 @@ Value *Environment::lookup(const wstring &name) {
         return parent->lookup(name);
     }
     ConsoleLogger().log("lookup failure for '")->log(name)->log("'")->logEndl();
-    return nullptr;
+    return context->newNoneValue();
 }
 
 void Environment::bind(const wstring &name, Value *value, bool recursive) {

@@ -1,11 +1,11 @@
-FROM ubuntu:bionic
+FROM ubuntu:eoan
 
 COPY . /code/
 
 WORKDIR /code/
 
 RUN apt-get update && \
-	apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev
+	apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev nlohmann-json3-dev
 
 RUN mkdir build/
 WORKDIR /code/build/

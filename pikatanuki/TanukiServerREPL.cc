@@ -50,7 +50,6 @@ void TanukiServerREPL::handleMessage(websocketpp::connection_hdl hdl, server::me
     auto tokenizer = InputSourceTokenizer(&source);
     auto parser = Parser(&tokenizer, &log);
     SyntaxNode *tree = parser.run();
-    cout << tree->toString() << endl;
     if (oneLine) {
         tree = tree->children[0];
     }

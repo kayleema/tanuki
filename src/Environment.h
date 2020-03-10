@@ -8,6 +8,7 @@
 #include "Filesystem.h"
 
 class Context;
+class ExitHandler;
 
 class Environment {
     Value *eval_call(SyntaxNode *node, const FunctionValue *tailContext = nullptr);
@@ -70,6 +71,7 @@ public:
 
     explicit Environment(Environment *parent, Context *_context = nullptr)
             : parent(parent), filesystem(parent->filesystem), logger(parent->logger) {
+        exitHandler = parent->exitHandler;
         if (_context == nullptr) {
             if (parent->context == nullptr) {
                 cout << "ERROR ERROR null parent context" << endl;
@@ -87,6 +89,7 @@ public:
     unordered_set<wstring> nonlocals;
     Filesystem *filesystem;
     PinponLogger *logger;
+    ExitHandler *exitHandler = nullptr;
 
     Value *lookup(const wstring &name);
 
@@ -101,6 +104,11 @@ public:
     }
 
     DictionaryValue *toNewDictionaryValue();
+};
+
+class ExitHandler {
+    public:
+    virtual void handleExit() = 0;
 };
 
 #endif

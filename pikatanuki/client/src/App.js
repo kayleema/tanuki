@@ -30,6 +30,7 @@ export default class App extends React.Component {
                         {(this.state.screen === "interact") && "編集画面へ"}
                         {(this.state.screen === "edit") && "ライブ実行画面へ"}
                     </button>
+                    {process.env.NODE_ENV == "development" && <em>・！開発環境ですよ！</em>}
                 </div>
                 {(this.state.screen === "interact") && <Interact socketRepo={this.props.socketRepo}/>}
                 {(this.state.screen === "edit") && <Edit socketRepo={this.props.socketRepo}/>}

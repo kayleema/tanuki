@@ -64,15 +64,19 @@ void Context::markTempRefs() {
 }
 
 void Context::tempRefIncrement(Value *value) {
-    tempReferences.insert(value);
+    if (value->type != ValueType::NONE) {
+        tempReferences.insert(value);
+    }
 }
 
 void Context::tempRefDecrement(Value *value) {
-    auto it = tempReferences.find(value);
-    if (it != tempReferences.end()) {
-        tempReferences.erase(it);
-    } else {
-        cout << "エラー：ワーニング：仮のメモリーが二倍消されました。" << value->toString() << endl;
+    if (value->type != ValueType::NONE) {
+        auto it = tempReferences.find(value);
+        if (it != tempReferences.end()) {
+            tempReferences.erase(it);
+        } else {
+            cout << "エラー：ワーニング：仮のメモリーが二倍消されました。" << value->toString() << endl;
+        }
     }
 }
 
