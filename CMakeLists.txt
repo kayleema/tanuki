@@ -17,6 +17,7 @@ include_directories("src/")
 include_directories("websocketpp/")
 include_directories("fakeit/single_header/gtest")
 include_directories("/usr/local/include")
+include_directories("/usr/include")
 
 file(GLOB pinpon_SRC
         "src/*.h"
