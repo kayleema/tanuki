@@ -17,6 +17,8 @@ jobs:
       uses: srt32/git-actions@v0.0.3
       with:
         args: git submodule update --init --recursive
+    - name: Install xmllint
+      run: sudo apt-get install libasio-dev nlohmann-json3-dev
     - name: configure
       run: mkdir build && cd build && cmake ..
     - name: make
