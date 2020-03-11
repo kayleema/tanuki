@@ -11,3 +11,6 @@ vsc_workspace.code-workspace
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/settings.json
+node_modules/
+.env
+runtime.env

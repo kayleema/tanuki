@@ -1,0 +1,16 @@
+{
+  "name": "tanukisekai",
+  "version": "1.0.0",
+  "description": "Tanuki no Sekai",
+  "author": "Kaylee <kmann@pivotal.io>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.16.1",
+    "google-auth-library": "^5.10.1",
+    "mongodb": "^3.5.4"
+  }
+}
