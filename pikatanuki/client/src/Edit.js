@@ -9,6 +9,7 @@ const mainTestCode = `\
 ＃＃＃
 ＃＃＃　第一　文字列
 ＃＃＃　　回文（palindrome）かどうかを確認する関数を作る
+＃＃＃　　（Hint：逆文字列という関数はあります）
 ＃＃＃
 
 関数、試験一覧・回文（）
@@ -50,6 +51,15 @@ const testFramework = `
 試験一覧＝辞書（）
 `
 
+/*
+関数、回文ですか（入力）
+　返す、逆文字列（入力）＝＝入力
+*/
+
+const questions = {
+    1 :  "問題一：回文",
+}
+
 export default class Edit extends React.Component {
     constructor(props) {
         super(props);
@@ -58,6 +68,8 @@ export default class Edit extends React.Component {
             code: "関数、回文ですか（入力）\n　返す、０\n",
             terminalText: "結果はここで開きます。",
             testCode: mainTestCode,
+            selected: 1,
+            completed: {},
         };
     }
 
@@ -66,10 +78,42 @@ export default class Edit extends React.Component {
         this.setState(state => ({
             resultList: [...state.resultList, data],
         }))
+        if (data.messageType == "display" && data.message == "✨試験全体は成功✨") {
+            console.log('successsssss');
+            this.success();
+        } 
+    }
+
+    success() {
+        fetch("https://tanukisekai.kaylee.jp/profile/complete/" + this.state.selected, {
+            method: "post",
+            headers: new Headers({
+              'Authorization': 'Bearer ' + localStorage.getItem('googleToken')
+            }),
+        })
+        .then(res => {
+            this.fetchProfile();
+        })
+    }
+
+    fetchProfile() {
+        fetch("https://tanukisekai.kaylee.jp/profile", {
+            headers: new Headers({
+              'Authorization': 'Bearer ' + localStorage.getItem('googleToken')
+            }),
+        })
+        .then(res => res.json())
+        .then(
+          (result) => {
+            console.log(result);
+            this.setState({completed: result.completed})
+          }
+        )
     }
 
     componentDidMount() {
         this.props.socketRepo.setOnMessage(this.onSocketMessage.bind(this));
+        this.fetchProfile();
     }
 
     executeCode() {
@@ -82,6 +126,34 @@ export default class Edit extends React.Component {
     render() {
         return (
             <div className="editPage">
+                <div className="challengeList">
+                    {this.state.expanded != true && (
+                        <button 
+                            onClick={() => {this.setState({expanded:true})}}
+                        >
+                            {questions[this.state.selected]}
+                            <span className={"badge" + (this.state.completed[this.state.selected] ? " done" : "")}>
+                            {this.state.completed[this.state.selected] && "完成"}
+                            {!this.state.completed[this.state.selected] && "未完成"}
+                            </span>
+                        </button>
+                    )}
+                    {this.state.expanded == true && [
+                        Object.entries(questions).map((question) => (
+                            <button 
+                                    onClick={() => {this.setState({expanded:false, selected: question[0]})}} 
+                            >
+                                {question[1]}
+                                <span className={"badge" + (this.state.completed[question[0]] ? " done" : "")}>
+                                {this.state.completed[question[0]] && "🎉完成"}
+                                {!this.state.completed[question[0]] && "未完成"}
+                                </span>
+                            </button>
+                        )),
+                        <p><em>他の問題はまだ開発中です、すみません。</em></p>
+                    ]}
+                    {this.state.expanded == true && (<p></p>)}
+                </div>
                 <div className="sideBySide">
                     <div className="outArea outAreaEditor">
                         <div>

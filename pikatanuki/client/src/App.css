@@ -198,6 +198,51 @@ textarea.Text:focus {
     justify-content: stretch;
     flex-grow: 1;
 }
+.editPage .challengeList {
+    width: 300px;
+    height: auto;
+    background: #272822;
+    position: absolute;
+    margin: 0px auto;
+    top: 0;
+    text-align: center;
+    left: 136px;
+    border-radius: 0 0 5px 5px;
+    z-index: 5;
+}
+.editPage .challengeList button {
+    font-size: 18px;
+    border: none;
+    border-top: 1px solid #505050;
+    border-bottom: 1px solid #303030;
+    width: 100%;
+    height: 47px;
+    color: white;
+    text-align: left;
+    padding: 0 18px;
+    background: #404040;
+}
+.editPage .challengeList button:hover {
+    background: #505050;
+}
+.editPage .challengeList p {
+    background: #505050;
+    font-size: 14px;
+    padding: 0;
+    margin:0;
+    text-align: center;
+}
+span.badge {
+    padding: 3px 7px;
+    border-radius: 5px;
+    float: right;
+    font-weight: bold;
+    font-size: 14px;
+    background: #f92672;
+}
+span.done {
+    background: #29861f;
+}
 
 .outAreaTest {
     margin-left: 0;

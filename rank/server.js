@@ -11,6 +11,7 @@ const MONGO_URI = `mongodb+srv://tanuki:${MONGO_PASS}@tanuki-krzkv.gcp.mongodb.n
 
 // Imports
 const express = require('express');
+var cors = require('cors');
 const {OAuth2Client} = require('google-auth-library');
 
 const oauthClient = new OAuth2Client(CLIENT_ID);
@@ -45,6 +46,8 @@ client.connect(err => {
 
 // App
 const app = express();
+app.use(cors());
+
 app.get('/', (req, res) => {
     res.send('狸の世界は素晴らしいです。');
 });
