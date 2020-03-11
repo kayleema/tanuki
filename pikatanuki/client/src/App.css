@@ -17,6 +17,25 @@
     padding: 10px 40px;
 }
 
+.header img {
+    height: 20px;
+    margin-right: 8px;
+    /* background: white; */
+    transform: translateY(3px);
+}
+
+.header a.logo {
+    font-size: 18px;
+    display: inline;
+    font-weight: bold;
+    margin-right: 18px;
+    text-decoration: none;
+    color: #f92672;
+}
+.header a.logo:hover {
+    color: #f8f8f2;
+}
+
 .header button {
     background: #272822;
     border: none;
@@ -26,6 +45,25 @@
 }
 .header button:hover {
     background: #75715e;
+}
+
+.header .accountHeader {
+    float: right;
+}
+
+.header .accountHeader .loginMessage {
+    font-size: 14px;
+    color: #75715e;
+}
+
+.header .accountHeader button {
+    font-size: 14px;
+    color: #75715e;
+    margin-left: 10px;
+}
+
+.header .accountHeader button:hover {
+    color: #f8f8f2;
 }
 
 .statusArea {
@@ -131,12 +169,12 @@ textarea.Text:focus {
 
 .comment {color: #75715e;}
 .specialcomment {color: #e1e1e1;}
-.operator {color: #ae81ff;}
+.operator, a {color: #ae81ff;}
 .number {color: #ae81ff;}
-.keyword {color: #f92672; font-weight: bold;}
+.keyword, h1 {color: #f92672; font-weight: bold;}
 .string {color: #e6db74; font-style: italic;}
 .builtin {color: #9effff;}
-.function {color: #fd971f;}
+.function, h2 {color: #fd971f;}
 .punctuation {color: #f8f8f2; font-weight: bold;}
 
 .terminal {
@@ -192,4 +230,81 @@ textarea.Text:focus {
     margin: 0 auto;
     border-radius: 4px;
     box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.44);
+}
+
+.Home {
+    background: #1d1d19;
+}
+
+.Home div {
+    margin: 80px auto;
+    padding: 40px;
+    width: 600px;
+    background: #272822;
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.44);
+}
+
+.Home div h1 {
+    margin-top: 0;
+}
+
+h2 {
+    font-weight: normal;
+}
+
+a.bigButton {
+    background: #9a1747;
+    border: none;
+    color: #f8f8f2;
+    border-radius: 3px;
+    font-size: 18px;
+    padding: 10px 20px;
+    text-decoration: none;
+}
+
+a.bigButton {
+    float: right;
+    margin-left: 30px;
+    margin-bottom: 0px;
+}
+
+a.bigButton:hover {
+    background: #f92672;
+}
+
+hr {
+    border: none;
+    border-bottom: 1px solid #75715e;
+}
+
+div.featurePhoto {
+    width: 65%;
+    border: none;
+    padding: 20px 20px;
+    margin: 0;
+    background: grey;
+    box-sizing: border-box;
+    margin-bottom: -100px;
+}
+
+div.featurePhoto img {
+    width: 100%;
+}
+
+div.footer {
+    margin-top: 200px;
+    border: none;
+    box-shadow: none;
+    background: none;
+    text-align: center;
+    color: grey;
+}
+h1.pageTitle {
+    text-align: center;
+    font-size: 40px;
+}
+h2.pageTitle {
+    text-align: center;
 }
