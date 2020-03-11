@@ -10,9 +10,11 @@ export default class SocketRepo {
 
     reconnect() {
         if(process.env.NODE_ENV === "development") {
-            this.socket = new WebSocket("ws://localhost:9002/");
+            this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
+            // this.socket = new WebSocket("ws://tanukiballance-1807834760.ap-northeast-1.elb.amazonaws.com/");
+            // this.socket = new WebSocket("ws://localhost:9002/");
         } else {
-            this.socket = new WebSocket("wss://pikatanuki.kaylee.jp/");
+            this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
         }
         this.socket.onopen = this.onopen.bind(this);
         this.socket.onmessage = this.onmessage.bind(this);

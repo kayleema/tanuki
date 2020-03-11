@@ -29,6 +29,11 @@ TanukiServerREPL::TanukiServerREPL() {
             &TanukiServerREPL::handleValidate, this,
             std::placeholders::_1
     ));
+
+    m_endpoint.set_http_handler(std::bind(
+            &TanukiServerREPL::handleHttp, this,
+            std::placeholders::_1
+    ));
 }
 
 void TanukiServerREPL::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {

@@ -54,6 +54,13 @@ public:
         connectionSet.erase(hdl);
     }
 
+    void handleHttp(websocketpp::connection_hdl hdl) {
+        auto con = m_endpoint.get_con_from_hdl(hdl);
+
+        con->set_body("Healthy");
+        con->set_status(websocketpp::http::status_code::ok);
+    }
+
     void run() {
         m_endpoint.listen(9002);
 
