@@ -95,31 +95,35 @@ app.post('/profile/complete/:testId', async (req, res) => {
     const userId = auth.sub;
     const testId = req.params.testId;
 
-    await db.collection('requests').updateOne({userId, userId}, {
+    await db.collection('requests').updateOne({userId: userId}, {
         $set: {
             [`completed.${testId}`]: true,
         },
     });
 
     res.send(`いらっしゃいませ、${name}様`);
+
+    const prof = await db.collection('requests').findOne({userId: userId});
+
+    const completedCount = Object.entries(prof.completed).filter(entry=>(entry[1])).length;
+
+    await db.collection('rank').updateOne({userId: userId}, {
+        $set: {
+            name: name,
+            userId: userId, 
+            completed: completedCount,
+        },
+        $currentDate: {
+            lastUpdate: true,
+        }
+    }, {upsert: true});
 })
 
 
 app.get('/rank', async (req, res) => {
-    // await db.collection('rank').updateOne({userId: "100766333777507384761"}, {
-    //     $set: {
-    //         name: "Canyon",
-    //         userId: "100766333777507384761", 
-    //         completed: 1,
-    //     },
-    //     $currentDate: {
-    //         lastUpdate: true,
-    //     }
-    // }, {upsert: true});
     let result = [];
-    const dbCursor = await db.collection('rank').find();
+    const dbCursor = await db.collection('rank').find().sort({completed: -1});
     await dbCursor.forEach(item => {
-        // console.log(item);
         result.push({name: item.name, completed: item.completed});
     });
     res.send(result);
