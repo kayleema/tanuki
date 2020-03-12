@@ -34,6 +34,7 @@ export default class App extends React.Component {
             screen: "edit",
             googleToken: localStorage.getItem("googleToken"),
             googleEmail: localStorage.getItem("googleEmail"),
+            googleExpire: localStorage.getItem("googleExpire")
         }
     }
 
@@ -42,6 +43,12 @@ export default class App extends React.Component {
         this.props.socketRepo.setOnClose(this.socketClose.bind(this));
         this.props.socketRepo.setOnOpen(this.socketOpen.bind(this));
         // this.props.socketRepo.setOnError(this.socketError.bind(this));
+        var timestamp = (new Date()).getTime();
+        if (this.state.googleExpire <= Date.now()) {
+            this.logout();
+        } else {
+            console.log("login session remaining ", (this.state.googleExpire - timestamp) / 1000 / 60, "min");
+        }
     }
 
     socketOpen() {
@@ -66,16 +73,24 @@ export default class App extends React.Component {
         console.log(event)
         localStorage.setItem("googleToken", event.tokenId)
         localStorage.setItem("googleEmail", event.profileObj.email)
+        localStorage.setItem("googleExpire", event.tokenObj.expires_at)
         this.setState({
             googleToken: event.tokenId,
             googleEmail: event.profileObj.email,
+            googleExpire: event.tokenObj.expires_at,
         })
     }
 
     logout(event) {
-        localStorage.removeItem("googleToken")
+        localStorage.removeItem("googleToken");
+        localStorage.removeItem("googleEmail");
+        localStorage.removeItem("googleExpire");
         this.setState(
-            {googleToken: undefined}
+            {
+                googleToken: undefined,
+                googleEmail: undefined,
+                googleExpire: undefined,
+            }
         )
     }
 
