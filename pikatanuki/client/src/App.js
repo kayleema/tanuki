@@ -2,30 +2,12 @@ import React from 'react';
 import './App.css';
 import Interact from "./Interact";
 import Edit from "./Edit";
+import Home from "./Home";
 import GoogleLogin from 'react-google-login';
-import GoogleLogout from 'react-google-login';
 import {
     BrowserRouter as Router,
     Switch,
-    Route,
-    Link
-} from "react-router-dom";
-import replImg from './repl.png';
-import biglogo from './biglogo.png';
-import {tanukiLang} from './languageDef'
-import {highlight, languages} from 'prismjs/components/prism-core';
-
-const code_example = `\
-＃例文
-関数、フィボ（号）
-　　もし、号＝＝１
-　　　返す、１
-　　もし、号＝＝０
-　　　返す、１
-　　あ＝フィボ（号－１）
-　　い＝フィボ（号－２）
-　　返す、あ＋い
-`;
+    Route} from "react-router-dom";
 
 export default class App extends React.Component {
     constructor(props) {
@@ -44,11 +26,21 @@ export default class App extends React.Component {
         this.props.socketRepo.setOnOpen(this.socketOpen.bind(this));
         // this.props.socketRepo.setOnError(this.socketError.bind(this));
         var timestamp = (new Date()).getTime();
-        if (this.state.googleExpire <= Date.now()) {
+        if (this.state.googleExpire <= Date.now() || (this.state.googleEmail == undefined) || (this.state.googleToken == undefined)) {
             this.logout();
         } else {
-            console.log("login session remaining ", (this.state.googleExpire - timestamp) / 1000 / 60, "min");
+            console.log("login session remaining", (this.state.googleExpire - timestamp) / 1000 / 60, "min");
+            this.timeoutNotificationSetup();
         }
+    }
+
+    timeoutNotificationSetup() {
+        var timestamp = (new Date()).getTime();
+        const remaining = (this.state.googleExpire - timestamp);
+        console.log('timeout notification in', remaining/1000/60, "min")
+        setTimeout(() => {
+            this.logout();
+        }, remaining)
     }
 
     socketOpen() {
@@ -78,7 +70,7 @@ export default class App extends React.Component {
             googleToken: event.tokenId,
             googleEmail: event.profileObj.email,
             googleExpire: event.tokenObj.expires_at,
-        })
+        }, () => {this.timeoutNotificationSetup();})
     }
 
     logout(event) {
@@ -148,55 +140,7 @@ export default class App extends React.Component {
                         <Interact socketRepo={this.props.socketRepo}/>
                     </Route>
                     <Route path="/">
-                        <div className="Home">
-                            <img src={biglogo} className="biglogo"/>
-                            <h1 className="pageTitle">狸語</h1>
-                            <h2 className="pageTitle">日本語でプログラミングをしよう<span className="jump">！</span></h2>
-                            <hr/>
-                            <div className="plain fade-in"><br/><br/><br/><br/>
-                                    <span className="token comment">＃例文</span><br/>
-                                    <span className="token keyword">関数</span><span className="token punctuation">、</span><span className="token function">フィボ</span><span className="token punctuation">（</span>号<span className="token punctuation">）</span><br/>
-                                    　<span className="token keyword">もし</span><span className="token punctuation">、</span>号<span className="token operator">＝</span><span className="token operator">＝</span><span className="token number">１</span><br/>
-                                    　　<span className="token keyword">返す</span><span className="token punctuation">、</span><span className="token number">１</span><br/>
-                                    　<span className="token keyword">もし</span><span className="token punctuation">、</span>号<span className="token operator">＝</span><span className="token operator">＝</span><span className="token number">０</span><br/>
-                                    　　<span className="token keyword">返す</span><span className="token punctuation">、</span><span className="token number">１</span><br/>
-                                    　あ<span className="token operator">＝</span>フィボ<span className="token punctuation">（</span>号<span className="token number">－１</span><span className="token punctuation">）</span><br/>
-                                    　い<span className="token operator">＝</span>フィボ<span className="token punctuation">（</span>号<span className="token number">－２</span><span className="token punctuation">）</span><br/>
-                                    　<span className="token keyword">返す</span><span className="token punctuation">、</span>あ<span className="token operator">＋</span>い<br/>
-                            </div>
-                            <div>
-                                <h1>GitHubで</h1>
-                                <h2>ドキュメンテーションやソースコード</h2>
-                                <a href="https://github.com/kayleema/tanuki" className="bigButton">GitHubへ</a>
-                                <p>今すぐインストールして使てみってください。</p>
-                            </div>
-                            <div>
-                                <h1>狸語プログラミングチャレンジしませんか。</h1>
-                                <Link to="/edit" className="bigButton">チャレンジへ</Link>
-                                <p>
-                                    チャレンジしながら<br/>
-                                    狸語の使い方を学びましょう<br/>
-                                </p>
-                                <hr/>
-                                <h2>チャレンジのランキング</h2>
-                                <ul>
-                                    <li>未実装</li>
-                                    <li>未実装</li>
-                                    <li>未実装</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h1>ライブ実行ＲＥＰＬターミナル。</h1>
-                                <Link to="/interract" className="bigButton">ライブ実行へ</Link>
-                                <div className="featurePhoto">
-                                    <img src={replImg} />
-                                </div>
-                                <p></p>
-                            </div>
-                            <div className="footer">
-                                ※　狸語　※
-                            </div>
-                        </div>
+                        <Home/>
                     </Route>
                 </Switch>
             </div>

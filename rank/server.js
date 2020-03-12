@@ -63,12 +63,14 @@ app.get('/profile', async (req, res) => {
     }
 
     const name = auth.given_name;
+    const email = auth.email;
     const userId = auth.sub;
 
     await db.collection('requests').updateOne({userId, userId}, {
         $set: {
             name: name,
             userId: userId,
+            email: email,
         },
         $currentDate: {
             lastRequest: true,

@@ -1,3 +1,7 @@
+body {
+    min-width: 800px;
+}
+
 .App {
     display: flex;
     flex-direction: column;
@@ -9,7 +13,7 @@
     background: #272822;
     font-size: 18px;
     color: #f8f8f2;
-    font-family: monospace;
+    font-family: sans-serif;
 }
 
 .header {
@@ -281,9 +285,13 @@ span.done {
     background: #1d1d19;
 }
 
-.Home div {
+.cardFooter {
+    text-align: right;
+    margin-top: 16px;
+}
+.Home > div {
     margin: 80px auto;
-    padding: 40px;
+    padding: 25px 30px;
     width: 600px;
     background: #272822;
     border-radius: 4px;
@@ -314,13 +322,26 @@ span.done {
 
 .Home div h1 {
     margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 30px;
 }
 
-h2 {
+.Home div h2 {
     font-weight: normal;
+    font-size: 24px;
+    margin: 8px 0;
+}
+
+.Home p {
+    margin: 0px;
+}
+
+ul {
+    margin: 0;
 }
 
 a.bigButton {
+    display: inline-block;
     background: #9a1747;
     border: none;
     color: #f8f8f2;
@@ -331,8 +352,6 @@ a.bigButton {
 }
 
 a.bigButton {
-    float: right;
-    margin-left: 30px;
     margin-bottom: 0px;
 }
 
@@ -349,10 +368,10 @@ div.featurePhoto {
     width: 65%;
     border: none;
     padding: 20px 20px;
-    margin: 0;
+    margin: 0 auto;
+    margin-bottom: 20px;
     background: #75715e;
     box-sizing: border-box;
-    margin-bottom: -100px;
 }
 
 div.featurePhoto img {
