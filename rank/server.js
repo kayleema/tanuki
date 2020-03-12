@@ -103,3 +103,24 @@ app.post('/profile/complete/:testId', async (req, res) => {
 
     res.send(`いらっしゃいませ、${name}様`);
 })
+
+
+app.get('/rank', async (req, res) => {
+    // await db.collection('rank').updateOne({userId: "100766333777507384761"}, {
+    //     $set: {
+    //         name: "Canyon",
+    //         userId: "100766333777507384761", 
+    //         completed: 1,
+    //     },
+    //     $currentDate: {
+    //         lastUpdate: true,
+    //     }
+    // }, {upsert: true});
+    let result = [];
+    const dbCursor = await db.collection('rank').find();
+    await dbCursor.forEach(item => {
+        // console.log(item);
+        result.push({name: item.name, completed: item.completed});
+    });
+    res.send(result);
+})
