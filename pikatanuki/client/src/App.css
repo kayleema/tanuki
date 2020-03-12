@@ -290,6 +290,27 @@ span.done {
     border: none;
     box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.44);
 }
+.Home div.plain {
+    box-shadow: none;
+    background: none;
+    background: none;
+    padding: 0;
+
+    writing-mode: tb-rl;
+    opacity: 1.0;
+    line-height: 35px;
+    margin: 0 auto;
+    margin-top: 20px;
+    padding-top: 40px;
+    /* border-top: 2px solid #272822; */
+    font-size: 22px;
+    line-height: 36px;
+}
+.Home hr {
+    width: 600px;
+    border: none;
+    border-top: 2px solid #272822;
+}
 
 .Home div h1 {
     margin-top: 0;
@@ -329,7 +350,7 @@ div.featurePhoto {
     border: none;
     padding: 20px 20px;
     margin: 0;
-    background: grey;
+    background: #75715e;
     box-sizing: border-box;
     margin-bottom: -100px;
 }
@@ -348,8 +369,46 @@ div.footer {
 }
 h1.pageTitle {
     text-align: center;
-    font-size: 40px;
+    font-size: 60px;
 }
 h2.pageTitle {
     text-align: center;
+}
+
+pre {
+    margin: 0;
+}
+
+.fade-in {
+    animation: fadeIn ease 1s;
+}
+@keyframes fadeIn {
+    0% {
+        opacity:0;
+        transform: translateY(-15px);
+        /* transform: scaleX(0.8); */
+    }
+    100% {
+        opacity:1;
+        transform: translateY(0);
+        /* transform: scaleX(1.0); */
+    }
+}
+
+@keyframes jumpIn {
+    0% {
+        opacity: 0.7;
+        transform: translateY(0px) scale(1.1) translateX(0);
+    }
+    100% {
+        opacity:1;
+        transform: translateY(0) scale(1) translateX(0);
+    }
+}
+
+img.biglogo {
+    margin: 0 auto;
+    display: block;
+    width: 300px;
+    margin-bottom: -50px;
 }

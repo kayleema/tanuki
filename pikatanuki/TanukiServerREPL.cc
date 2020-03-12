@@ -39,11 +39,14 @@ TanukiServerREPL::TanukiServerREPL() {
 void TanukiServerREPL::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
     string inputRaw = msg->get_payload();
     auto parsed = json::parse(inputRaw, nullptr, false);
-    if (parsed == json::value_t::discarded) {
+    if (parsed == json::value_t::discarded || !parsed.is_object()) {
         return;
     } else if (parsed["dummy"] == "clear"){
         return;
     } else if (parsed["messageType"] == "clear"){
+        return;
+    } else if (parsed["messageType"] == "ping"){
+        m_endpoint.send(hdl, "{\"messageType\": \"pong\"}", msg->get_opcode());
         return;
     } else if (parsed["messageType"] == "code" | parsed["messageType"] == "file"){
         inputRaw = parsed["code"];

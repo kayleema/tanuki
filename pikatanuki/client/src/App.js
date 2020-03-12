@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import Interact from "./Interact";
 import Edit from "./Edit";
-import { highlightAllUnder } from 'prismjs';
 import GoogleLogin from 'react-google-login';
 import GoogleLogout from 'react-google-login';
 import {
@@ -12,7 +11,21 @@ import {
     Link
 } from "react-router-dom";
 import replImg from './repl.png';
-import favipng from './favipng.png';
+import biglogo from './biglogo.png';
+import {tanukiLang} from './languageDef'
+import {highlight, languages} from 'prismjs/components/prism-core';
+
+const code_example = `\
+＃例文
+関数、フィボ（号）
+　　もし、号＝＝１
+　　　返す、１
+　　もし、号＝＝０
+　　　返す、１
+　　あ＝フィボ（号－１）
+　　い＝フィボ（号－２）
+　　返す、あ＋い
+`;
 
 export default class App extends React.Component {
     constructor(props) {
@@ -26,6 +39,21 @@ export default class App extends React.Component {
 
     componentDidMount() {
         this.props.socketRepo.startSocket();
+        this.props.socketRepo.setOnClose(this.socketClose.bind(this));
+        this.props.socketRepo.setOnOpen(this.socketOpen.bind(this));
+        // this.props.socketRepo.setOnError(this.socketError.bind(this));
+    }
+
+    socketOpen() {
+        this.setState({socketState: "open"});
+    }
+
+    socketError(e) {
+        console.log("socket error", e);
+    }
+
+    socketClose() {
+        this.setState({socketState: "close"});
     }
 
     changeScreen() {
@@ -55,6 +83,14 @@ export default class App extends React.Component {
         return (
             <Router>
             <div className="App">
+                {this.state.socketState != "open" && (
+                    <div className="loginContainer">
+                        <div className="dialog">
+                            <div className="lds-hourglass"/>
+                            <p>ウエッブソケット読み込み中</p>
+                        </div>
+                    </div>
+                )}
                 {(this.state.googleToken == undefined) && (
                     <div className="loginContainer">
                         <div className="dialog">
@@ -98,15 +134,26 @@ export default class App extends React.Component {
                     </Route>
                     <Route path="/">
                         <div className="Home">
-                            {/* <div> */}
-                                <h1 className="pageTitle">狸語</h1>
-                                <h2 className="pageTitle">日本語でプログラミングをしましょう！</h2>
-                            {/* </div> */}
+                            <img src={biglogo} className="biglogo"/>
+                            <h1 className="pageTitle">狸語</h1>
+                            <h2 className="pageTitle">日本語でプログラミングをしよう<span className="jump">！</span></h2>
+                            <hr/>
+                            <div className="plain fade-in"><br/><br/><br/><br/>
+                                    <span className="token comment">＃例文</span><br/>
+                                    <span className="token keyword">関数</span><span className="token punctuation">、</span><span className="token function">フィボ</span><span className="token punctuation">（</span>号<span className="token punctuation">）</span><br/>
+                                    　<span className="token keyword">もし</span><span className="token punctuation">、</span>号<span className="token operator">＝</span><span className="token operator">＝</span><span className="token number">１</span><br/>
+                                    　　<span className="token keyword">返す</span><span className="token punctuation">、</span><span className="token number">１</span><br/>
+                                    　<span className="token keyword">もし</span><span className="token punctuation">、</span>号<span className="token operator">＝</span><span className="token operator">＝</span><span className="token number">０</span><br/>
+                                    　　<span className="token keyword">返す</span><span className="token punctuation">、</span><span className="token number">１</span><br/>
+                                    　あ<span className="token operator">＝</span>フィボ<span className="token punctuation">（</span>号<span className="token number">－１</span><span className="token punctuation">）</span><br/>
+                                    　い<span className="token operator">＝</span>フィボ<span className="token punctuation">（</span>号<span className="token number">－２</span><span className="token punctuation">）</span><br/>
+                                    　<span className="token keyword">返す</span><span className="token punctuation">、</span>あ<span className="token operator">＋</span>い<br/>
+                            </div>
                             <div>
                                 <h1>GitHubで</h1>
                                 <h2>ドキュメンテーションやソースコード</h2>
                                 <a href="https://github.com/kayleema/tanuki" className="bigButton">GitHubへ</a>
-                                <p>今すぐインストールして使ってみってください。</p>
+                                <p>今すぐインストールして使てみってください。</p>
                             </div>
                             <div>
                                 <h1>狸語プログラミングチャレンジしませんか。</h1>
@@ -132,7 +179,7 @@ export default class App extends React.Component {
                                 <p></p>
                             </div>
                             <div className="footer">
-                                ・　狸語　・
+                                ※　狸語　※
                             </div>
                         </div>
                     </Route>

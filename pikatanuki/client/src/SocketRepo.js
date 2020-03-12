@@ -9,34 +9,55 @@ export default class SocketRepo {
     }
 
     reconnect() {
+        clearInterval(this.interval);
         if(process.env.NODE_ENV === "development") {
-            this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
-            // this.socket = new WebSocket("ws://tanukiballance-1807834760.ap-northeast-1.elb.amazonaws.com/");
             // this.socket = new WebSocket("ws://localhost:9002/");
+            this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
+
         } else {
             this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
         }
         this.socket.onopen = this.onopen.bind(this);
         this.socket.onmessage = this.onmessage.bind(this);
         this.socket.onclose = this.onclose.bind(this);
+        this.socket.onerror = this.onerror.bind(this);
     }
 
     onopen() {
         this.onopenHandler && this.onopenHandler();
+        this.liveFlag = true;
+        this.interval = setInterval(() => {
+            if (!this.liveFlag) {
+                console.log("socket deaaaath");
+                this.socket.close();
+                return;
+            }
+            this.liveFlag = false;
+            this.socket.send(JSON.stringify({messageType: "ping"}));
+        }, 5000);
     }
 
     onmessage(evt) {
-        // console.log(evt.data);
+        console.log(evt.data);
         let json = JSON.parse(evt.data);
-        this.onmessageHandler(json);
+        if (json.messageType === "pong") {
+            this.liveFlag=true;
+            return;
+        }
+        this.onmessageHandler && this.onmessageHandler(json);
+    }
+
+    onerror(e) {
+        console.log(e);
     }
 
     onclose() {
+        clearInterval(this.interval);
         this.oncloseHandler();
         setTimeout(() => {
             console.log('reconnecting...');
             this.reconnect();
-        }, 1000);
+        }, 5000);
     }
 
     sendCode(code) {
