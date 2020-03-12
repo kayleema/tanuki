@@ -5,6 +5,8 @@
 「git submodule」のセットアップ
 -----------------------------
 ```
+  git clone https://github.com/kayleema/tanuki.git
+  cd tanuki
   git submodule init
   git submodule update
 ```
@@ -21,42 +23,36 @@
 * asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
 「 https://think-async.com/ 」からインストール出来ます。
 * npmやnodeなど… 
-* nhlohman json OSXの場合は：`brew tap nlohmann/json && brew install nlohmann-json`
+* nhlohman json
 
+###　簡単ビルド環境セットアップおすすめ：
+
+OSXの場合は：（最近OSXのthink-asyncのbrewに入っているパッケージは問題ありそうですからソースからインストールした方はいい）
+```
+  brew tap nlohmann/json
+  brew install nlohmann-json
+  brew install cmake
+
+  # https://think-async.com/Asio/Download.html からダウンロードしてください。
+  cd ~/Downloads/asio-1.12.2
+  ./configure --without-boost
+  make
+  sudo make install
+```
+
+Linuxの場合は：
 ```
 	apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev nlohmann-json3-dev
 ```
 
-ビルド
+狸語をビルド
 -----------
+cloneしたレポジトリのフォルダの中から
 ```
   mkdir build
   cd build
   cmake ..
   make
-```
-
-テストする
----------
-`build`のディレクトリの中から
-```
-  cmake ..
-  make pinpon_test && ./pinpon_test
-```
-
-`tests.pin`ファイルに入っているテストを実行する：
-```
-  cmake ..
-  make pinpon && ./pinpon ../testpin/tests.pin
-```
-
-GCCで`pinpon_test`をビルドする時に`cmake -DCMAKE_BUILD_TYPE=Debug ..`しないといけない。
-fakeitのライブラリはGCCの`-O2`以上サポートしないだからです。
-
-`codingquestions.pin`ファイルに入っているテストを実行する：
-```
-  cmake ..
-  make pinpon && ./pinpon ../testpin/codingquestions.pin
 ```
 
 呼び方
@@ -74,7 +70,27 @@ VSCodeとのインテグレーション（シンタックスハイライトと�
 .pinファイル編集するときのおすすめ：
 https://marketplace.visualstudio.com/items?itemName=tanuki1.pin
 
-説明書
+テストする
+---------
+`build`のディレクトリの中から
+```
+  make pinpon_test && ./pinpon_test
+```
+
+`tests.pin`ファイルに入っているテストを実行する：
+```
+  make pinpon && ./pinpon ../testpin/tests.pin
+```
+
+GCCで`pinpon_test`をビルドする時に`cmake -DCMAKE_BUILD_TYPE=Debug ..`しないといけない。
+fakeitのライブラリはGCCの`-O2`以上サポートしないだからです。
+
+`codingquestions.pin`ファイルに入っているテストを実行する：
+```
+  make pinpon && ./pinpon ../testpin/codingquestions.pin
+```
+
+言語の説明書
 -----
 ### 変数：
 ```
@@ -194,7 +210,7 @@ time ./pinpon ../example/codingquestions.pin
 ------------------
 希望の機能：
 * フローティングポイントのタイプ。floating point calculations
-* infix mod operator　今は
+* infix mod operator　今は関数のみ
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no 
 new lines are allowed in the middle of a statement)
 * 文字列の中のエスケープコード。escape codes in strings
