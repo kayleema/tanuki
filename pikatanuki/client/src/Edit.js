@@ -84,6 +84,10 @@ export default class Edit extends React.Component {
         } 
     }
 
+    onLogin() {
+        
+    }
+
     success() {
         fetch("https://tanukisekai.kaylee.jp/profile/complete/" + this.state.selected, {
             method: "post",

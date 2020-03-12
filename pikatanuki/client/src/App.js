@@ -24,7 +24,6 @@ export default class App extends React.Component {
         this.props.socketRepo.startSocket();
         this.props.socketRepo.setOnClose(this.socketClose.bind(this));
         this.props.socketRepo.setOnOpen(this.socketOpen.bind(this));
-        // this.props.socketRepo.setOnError(this.socketError.bind(this));
         var timestamp = (new Date()).getTime();
         if (this.state.googleExpire <= Date.now() || (this.state.googleEmail == undefined) || (this.state.googleToken == undefined)) {
             this.logout();
@@ -70,7 +69,10 @@ export default class App extends React.Component {
             googleToken: event.tokenId,
             googleEmail: event.profileObj.email,
             googleExpire: event.tokenObj.expires_at,
-        }, () => {this.timeoutNotificationSetup();})
+        }, () => {
+            this.timeoutNotificationSetup();
+            this.props.loginRepository.login();
+        })
     }
 
     logout(event) {
@@ -112,7 +114,7 @@ export default class App extends React.Component {
                                 icon={false}
                                 theme="dark"
                             />
-                            <h1>🦝</h1>
+                            <h1>🦝・🦝・🦝</h1>
                         </div>
                     </div>
                 )}
@@ -130,14 +132,17 @@ export default class App extends React.Component {
                     )}
                     </span>
                 </div>
-                {/* {(this.state.screen === "interact") && <Interact socketRepo={this.props.socketRepo}/>}
-                {(this.state.screen === "edit") && <Edit socketRepo={this.props.socketRepo}/>} */}
                 <Switch>
                     <Route path="/edit">
-                        <Edit socketRepo={this.props.socketRepo}/>
+                        <Edit
+                            socketRepo={this.props.socketRepo}
+                        />
                     </Route>
                     <Route path="/interract">
-                        <Interact socketRepo={this.props.socketRepo}/>
+                        <Interact
+                            socketRepo={this.props.socketRepo}
+                            loginRepository={this.props.loginRepository}
+                        />
                     </Route>
                     <Route path="/">
                         <Home/>
