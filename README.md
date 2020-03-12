@@ -19,7 +19,7 @@
 
 ### ピカ狸のGUIのためだけの必要なライブラリ
 * asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
-「https://think-async.com/」からインストール出来ます。
+「 https://think-async.com/ 」からインストール出来ます。
 * npmやnodeなど… 
 * nhlohman json OSXの場合は：`brew tap nlohmann/json && brew install nlohmann-json`
 
@@ -68,6 +68,11 @@ Helpメッセージを表示：
 ```
   ./pinpon -h
 ```
+
+VSCodeとのインテグレーション（シンタックスハイライトとか）
+--------------------
+.pinファイル編集するときのおすすめ：
+https://marketplace.visualstudio.com/items?itemName=tanuki1.pin
 
 説明書
 -----
