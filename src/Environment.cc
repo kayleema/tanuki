@@ -58,7 +58,11 @@ Value *Environment::eval_add(SyntaxNode *tree) {
     context->tempRefIncrement(lhs);
     auto rhs = eval(tree->children[1]);
     context->tempRefDecrement(lhs);
-    if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
+    if (lhs->type == ValueType::NUM_FLOAT && rhs->type == ValueType::NUM_FLOAT) {
+        return context->newFloatValue(
+                ((FloatValue *) lhs)->value + ((FloatValue *) rhs)->value
+        );
+    } else if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value + rhs->toNumberValue()->value);
     } else if (lhs->type == ValueType::STRING && rhs->type == ValueType::STRING) {
