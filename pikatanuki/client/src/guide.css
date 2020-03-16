@@ -1,0 +1,40 @@
+
+.guideBackground {
+    background: #1d1d19;
+}
+
+.guide {
+    width: 800px;
+    margin: 10px auto;
+    padding: 40px;
+    background: #272822;
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.44);
+}
+
+.guide a {
+    text-decoration: none;
+}
+
+.guide a:hover {
+    text-decoration: underline;
+}
+
+.guide code {
+    background: #1d1d19;
+    display: block;
+    padding: 10px;
+}
+
+.guide ul {
+    padding-left: 30px;
+}
+.guide li a {
+    font-weight: bold;
+    display: block;
+}
+.guide li a:hover {
+    background: #ffffff11;
+    text-decoration: none;
+}

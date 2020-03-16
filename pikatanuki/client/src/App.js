@@ -3,6 +3,7 @@ import './App.css';
 import Interact from "./Interact";
 import Edit from "./Edit";
 import Home from "./Home";
+import Guide from "./Guide";
 import GoogleLogin from 'react-google-login';
 import {
     BrowserRouter as Router,
@@ -145,6 +146,9 @@ export default class App extends React.Component {
                             socketRepo={this.props.socketRepo}
                             loginRepository={this.props.loginRepository}
                         />
+                    </Route>
+                    <Route path="/guide">
+                        <Guide/>
                     </Route>
                     <Route path="/">
                         <Home/>

@@ -34,6 +34,14 @@ module.exports = {
                 ],
             },
             {
+                test: /\.(md)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                    },
+                ],
+            },
+            {
                 test: /\.(pin)$/i,
                 use: [
                     {
@@ -49,6 +57,7 @@ module.exports = {
     plugins: [
         new HtmlWebPackPlugin({ template: "./public/index.html", filename: "./index.html", }),
         new HtmlWebPackPlugin({ template: "./public/index.html", filename: "./edit/index.html", }),
+        new HtmlWebPackPlugin({ template: "./public/index.html", filename: "./guide/index.html", }),
         new HtmlWebPackPlugin({ template: "./public/index.html", filename: "./interract/index.html", }),
     ],
     devServer: {
