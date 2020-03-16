@@ -217,20 +217,25 @@ textarea.Text:focus {
 .editPage .challengeList button {
     font-size: 18px;
     border: none;
-    border-top: 1px solid #505050;
-    border-bottom: 1px solid #303030;
     width: 100%;
     height: 47px;
     color: white;
     text-align: left;
     padding: 0 18px;
-    background: #404040;
+    background: #777;
+    border: 3px solid transparent;
 }
 .editPage .challengeList button:hover {
-    background: #505050;
+    background: #777;
+    border: 3px solid white;
+}
+.editPage .challengeList button:disabled {
+    background: #777;
+    border: 3px solid transparent;
+    color: #49483E;
 }
 .editPage .challengeList p {
-    background: #505050;
+    background: #777;
     font-size: 14px;
     padding: 0;
     margin:0;
@@ -246,6 +251,14 @@ span.badge {
 }
 span.done {
     background: #29861f;
+}
+span.lock {
+    background: #666;
+}
+
+.editPage .hanamaru {
+    font-size: 100px;
+    animation: fadeIn ease 1s;
 }
 
 .outAreaTest {
@@ -336,11 +349,31 @@ span.done {
     margin: 0px;
 }
 
+dl {
+    border: 1px solid #75715e;
+    height: 150px;
+    overflow-y: scroll;
+    padding: 10px 0;
+    border-radius: 4px;
+}
+dt {
+    float: left;
+    clear: left;
+    width: 150px;
+    font-weight: bold;
+    text-align: right;
+    color: #a49e80;
+}
+dt::after {
+    content: "：　";
+    color: #75715e;
+}
+
 ul {
     margin: 0;
 }
 
-a.bigButton {
+a.bigButton, button.bigButton {
     display: inline-block;
     background: #9a1747;
     border: none;
@@ -351,11 +384,11 @@ a.bigButton {
     text-decoration: none;
 }
 
-a.bigButton {
+a.bigButton, button.bigButton {
     margin-bottom: 0px;
 }
 
-a.bigButton:hover {
+a.bigButton:hover, button.bigButton {
     background: #f92672;
 }
 

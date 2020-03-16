@@ -8,6 +8,7 @@ import {
     BrowserRouter as Router,
     Switch,
     Route} from "react-router-dom";
+import QuestionsRepo from './QuestionsRepo';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -136,6 +137,7 @@ export default class App extends React.Component {
                     <Route path="/edit">
                         <Edit
                             socketRepo={this.props.socketRepo}
+                            questionsRepo={new QuestionsRepo()}
                         />
                     </Route>
                     <Route path="/interract">

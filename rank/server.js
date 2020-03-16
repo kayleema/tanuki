@@ -128,3 +128,10 @@ app.get('/rank', async (req, res) => {
     });
     res.send(result);
 })
+
+app.get('/questions/:questionId', async (req, res) => {
+    const questionId = req.params.questionId;
+    const question = await db.collection('questions').findOne({number: questionId});
+    console.log(question);
+    res.send(question);
+})

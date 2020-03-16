@@ -5,6 +5,31 @@ import {Link} from "react-router-dom";
 import {SampleCode} from "./sampleCode";
 
 export default class Home extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            ranking: []
+        }
+    }
+
+    componentDidMount() {
+        fetch("https://tanukisekai.kaylee.jp/rank", {
+            headers: new Headers({
+              'Authorization': 'Bearer ' + localStorage.getItem('googleToken')
+            }),
+        })
+        .then(res => res.json())
+        .then(
+          (result) => {
+            console.log("ranking received ", result);
+            this.setState({
+                ranking: result
+            })
+          }
+        )
+    }
+    
+
     render() {
         return (
             <div className="Home">
@@ -20,7 +45,7 @@ export default class Home extends React.Component {
                     <h2></h2>
                     <p>ドキュメンテーションやソースコードを見ることができます。</p>
                     <div className="cardFooter">
-                        <a href="https://github.com/kayleema/tanuki" className="bigButton">GitHubへ</a>
+                        <a href="https://github.com/kayleema/tanuki" className="bigButton" target="_blank">GitHubへ</a>
                     </div>
                 </div>
                 <div>
@@ -29,12 +54,13 @@ export default class Home extends React.Component {
                         チャレンジしながら、<br/>
                         狸語の使い方を学びましょう。
                     </p>
-                    <h2>チャレンジのランキング</h2>
-                    <ul>
-                        <li>未実装</li>
-                        <li>未実装</li>
-                        <li>未実装</li>
-                    </ul>
+                    <h2>チャレンジのランキング：</h2>
+                    <dl>
+                        {this.state.ranking.map((rankItem) => [
+                            (<dt key={rankItem.name}>{rankItem.name}</dt>),
+                            (<dd key={rankItem.name+"-points"}>{rankItem.completed}点</dd>)
+                        ])}
+                    </dl>
                     <div className="cardFooter">
                         <Link to="/edit" className="bigButton">チャレンジへ</Link>
                     </div>

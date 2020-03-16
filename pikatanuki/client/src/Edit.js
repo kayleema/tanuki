@@ -4,72 +4,20 @@ import {highlight, languages} from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import {tanukiLang} from './languageDef'
-
-const mainTestCode = `\
-＃＃＃
-＃＃＃　第一　文字列
-＃＃＃　　回文（palindrome）かどうかを確認する関数を作る
-＃＃＃　　（Hint：逆文字列という関数はあります）
-＃＃＃
-
-関数、試験一覧・回文（）
-　確認、回文ですか（「こんにちは」）＝＝０
-　確認、回文ですか（「よく行くよ」）＝＝１
-
-全試験実行（）
-`
-
-const testFramework = `
-関数、試験実行（試験関数、名前）
-　表示（「＊＊＊　試験実行：」、名前、「　＊＊＊」）
-　結果＝試験関数（）
-　もし、結果＝＝１
-　　返す、１
-　表示（「＊＊＊　……合格」）
-
-関数、全試験実行（）
-　全部結果＝１
-　表示（「全試験始まります」）
-　関数、ループ（試験名、試験関数）
-　　外側、全部結果
-　　部分結果＝試験実行（試験関数、試験名）
-　　もし、部分結果＝＝１
-　　　全部結果＝０
-　　返す、部分結果
-　それぞれ（試験一覧、ループ）
-　もし、全部結果＝＝１
-　　表示（「✨試験全体は成功✨」）
-
-関数、確認イコール（左、右）
-　もし、左＝＝右
-　　返す、１
-　その他
-　　表示（「確認エラー。左：」、左、「、右：」、右）
-　　確認、０
-
-＃全テストが入っている辞書
-試験一覧＝辞書（）
-`
-
-/*
-関数、回文ですか（入力）
-　返す、逆文字列（入力）＝＝入力
-*/
-
-const questions = {
-    1 :  "問題一：回文",
-}
+import {testFramework} from "./QuestionsRepo"
 
 export default class Edit extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             resultList: [],
-            code: "関数、回文ですか（入力）\n　返す、０\n",
+            code: "＃ここで答えを入力してください\n",
             terminalText: "結果はここで開きます。",
-            testCode: mainTestCode,
+            testCode: "",
             selected: 1,
             completed: {},
+            showCongrats: false,
+            loading: true,
         };
     }
 
@@ -85,10 +33,11 @@ export default class Edit extends React.Component {
     }
 
     onLogin() {
-        
+        // TODO: implement
     }
 
     success() {
+        this.setState({showCongrats: true, loading: true});
         fetch("https://tanukisekai.kaylee.jp/profile/complete/" + this.state.selected, {
             method: "post",
             headers: new Headers({
@@ -110,9 +59,32 @@ export default class Edit extends React.Component {
         .then(
           (result) => {
             console.log(result);
-            this.setState({completed: (result.completed === undefined) ? {} : result.completed})
+            this.setState({
+                completed: (result.completed === undefined) ? {} : result.completed
+            }, () => {this.loadNextQuestion();})
           }
         )
+    }
+
+    loadNextQuestion() {
+        const done = Object.entries(this.state.completed)
+            .filter(entry => entry[1] === true).map(entry => parseInt(entry[0]));
+        const lastDone = done.reduce((a, b) => Math.max(a,b), 0);
+        console.log('last done', lastDone, "done", done);
+        this.handleSelect(lastDone + 1);
+    }
+
+    async handleSelect(index) {
+        this.setState({loading: true});
+        const testText = await fetch(`/questions/test/${index}.pin`).then(res => res.text());
+        const codeText = await fetch(`/questions/code/${index}.pin`).then(res => res.text());
+        this.setState({
+            expanded:false,
+            selected: index,
+            testCode: testText,
+            code: codeText,
+            loading: false,
+        })
     }
 
     componentDidMount() {
@@ -127,35 +99,71 @@ export default class Edit extends React.Component {
         this.props.socketRepo.sendFile(this.state.code + testFramework + this.state.testCode);
     }
 
+    renderButton(question) {
+        const index = question[0];
+        const name = question[1];
+        const finished = this.state.completed[index];
+        const locked = !finished && !this.state.completed[index-1] && (index != 1)
+        return (
+            <button onClick={() => {this.handleSelect(index)}} key={index} disabled={locked}>
+                {this.renderButtonContent(question)}
+            </button>
+        );
+    }
+
+    renderButtonContent(question) {
+        const index = question[0];
+        const name = question[1];
+        const finished = this.state.completed[index];
+        const locked = !finished && !this.state.completed[index-1] && (index != 1)
+        return (<span>
+                {name}
+                <span 
+                    className={
+                        "badge" + 
+                        (this.state.completed[index] ? " done" : "") + 
+                        (locked ? " lock" : "")
+                    }
+                >
+                {finished && "🎉完成"}
+                {!finished && (this.state.completed[index-1] || index == 1) && "未完成"}
+                {locked && "ロック"}
+                </span>
+        </span>);
+    }
+
     render() {
+        const questions =  this.props.questionsRepo.getQuestions();
         return (
             <div className="editPage">
-                <div className="challengeList">
-                    {this.state.expanded != true && (
-                        <button 
-                            onClick={() => {this.setState({expanded:true})}}
-                        >
-                            {questions[this.state.selected]}
-                            <span className={"badge" + (this.state.completed[this.state.selected] ? " done" : "")}>
-                            {this.state.completed[this.state.selected] && "完成"}
-                            {!this.state.completed[this.state.selected] && "未完成"}
-                            </span>
-                        </button>
-                    )}
-                    {this.state.expanded == true && [
-                        Object.entries(questions).map((question) => (
-                            <button 
-                                    onClick={() => {this.setState({expanded:false, selected: question[0]})}} 
-                            >
-                                {question[1]}
-                                <span className={"badge" + (this.state.completed[question[0]] ? " done" : "")}>
-                                {this.state.completed[question[0]] && "🎉完成"}
-                                {!this.state.completed[question[0]] && "未完成"}
-                                </span>
+                {(this.state.showCongrats) && (
+                    <div className="loginContainer">
+                        <div className="dialog">
+                            <h1>おめでとう</h1>
+                            <h2>テスト成功しました</h2>
+                            <div className="hanamaru">💮</div>
+                            <button className="bigButton" onClick={() => {this.setState({showCongrats: false})}}>
+                                次の問題へ　》
                             </button>
-                        )),
-                        <p><em>他の問題はまだ開発中です、すみません。</em></p>
-                    ]}
+                        </div>
+                    </div>
+                )}
+                {this.state.loading && (
+                    <div className="loginContainer">
+                        <div className="dialog">
+                            <div className="lds-hourglass"/>
+                            <p>読み込み中…</p>
+                        </div>
+                    </div>
+                )}
+                <div className="challengeList">
+                    <button onClick={() => {this.setState({expanded:true})}} disabled={this.state.expanded}>
+                        {this.renderButtonContent([this.state.selected, questions[this.state.selected]])}
+                    </button>
+                    {this.state.expanded == true && <>
+                        <p><em>↓問題を選択してください↓</em></p>
+                        {Object.entries(questions).map(this.renderButton.bind(this))}
+                    </>}
                     {this.state.expanded == true && (<p></p>)}
                 </div>
                 <div className="sideBySide">
