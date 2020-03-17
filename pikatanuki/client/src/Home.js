@@ -49,10 +49,10 @@ export default class Home extends React.Component {
                     </div>
                 </div>
                 <div>
-                    <h1>使い方説明</h1>
+                    <h1>使い方説明書</h1>
                     <p>関数の作り方や定義済み関数などを説明する。</p>
                     <div className="cardFooter">
-                        <Link to="/guide" className="bigButton">使い方説明</Link>
+                        <Link to="/guide" className="bigButton">使い方説明書</Link>
                     </div>
                 </div>
                 <div>

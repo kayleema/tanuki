@@ -5,6 +5,7 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import {tanukiLang} from './languageDef'
 import {testFramework} from "./QuestionsRepo"
+import "./Edit.css"
 
 export default class Edit extends React.Component {
     constructor(props) {
@@ -79,7 +80,6 @@ export default class Edit extends React.Component {
         const testText = await fetch(`/questions/test/${index}.pin`).then(res => res.text());
         const codeText = await fetch(`/questions/code/${index}.pin`).then(res => res.text());
         this.setState({
-            expanded:false,
             selected: index,
             testCode: testText,
             code: codeText,
@@ -102,10 +102,16 @@ export default class Edit extends React.Component {
     renderButton(question) {
         const index = question[0];
         const name = question[1];
+        const selected = parseInt(question[0]) === parseInt(this.state.selected);
         const finished = this.state.completed[index];
         const locked = !finished && !this.state.completed[index-1] && (index != 1)
         return (
-            <button onClick={() => {this.handleSelect(index)}} key={index} disabled={locked}>
+            <button 
+                onClick={() => {this.handleSelect(index)}}
+                key={index}
+                disabled={locked}
+                className={selected ? "selected" : ""}
+            >
                 {this.renderButtonContent(question)}
             </button>
         );
@@ -125,9 +131,9 @@ export default class Edit extends React.Component {
                         (locked ? " lock" : "")
                     }
                 >
-                {finished && "🎉完成"}
-                {!finished && (this.state.completed[index-1] || index == 1) && "未完成"}
-                {locked && "ロック"}
+                {finished && "合格 🎉"}
+                {!finished && (this.state.completed[index-1] || index == 1) && "挑戦中 🤔"}
+                {locked && "鍵 🗝"}
                 </span>
         </span>);
     }
@@ -156,63 +162,60 @@ export default class Edit extends React.Component {
                         </div>
                     </div>
                 )}
+                
                 <div className="challengeList">
-                    <button onClick={() => {this.setState({expanded:true})}} disabled={this.state.expanded}>
-                        {this.renderButtonContent([this.state.selected, questions[this.state.selected]])}
-                    </button>
-                    {this.state.expanded == true && <>
-                        <p><em>↓問題を選択してください↓</em></p>
-                        {Object.entries(questions).map(this.renderButton.bind(this))}
-                    </>}
-                    {this.state.expanded == true && (<p></p>)}
+                    <p></p>
+                    {Object.entries(questions).map(this.renderButton.bind(this))}
                 </div>
-                <div className="sideBySide">
-                    <div className="outArea outAreaEditor">
-                        <div>
-                            <Editor
-                                value={this.state.code}
-                                onValueChange={code => this.setState({code})}
-                                highlight={(code) => (
-                                    highlight(code, tanukiLang)
-                                )}
-                                padding={10}
-                                style={{
-                                    fontFamily: '"Fira code", "Fira Mono", monospace',
-                                    fontSize: 16,
-                                    outline: "none",
-                                }}
-                            />
+                <div className="rhs">
+                    <div className="sideBySide">
+                        <div className="outArea outAreaEditor outAreaTest">
+                            <div style={{width: "1000px"}}>
+                                <Editor
+                                    value={this.state.testCode}
+                                    highlight={(code) => (
+                                        highlight(code, tanukiLang)
+                                    )}
+                                    readOnly={true}
+                                    padding={10}
+                                    style={{
+                                        fontFamily: '"Fira code", "Fira Mono", monospace',
+                                        fontSize: 16,
+                                        outline: "none",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="outArea outAreaEditor">
+                            <div>
+                                <Editor
+                                    value={this.state.code}
+                                    onValueChange={code => this.setState({code})}
+                                    highlight={(code) => (
+                                        highlight(code, tanukiLang)
+                                    )}
+                                    padding={10}
+                                    style={{
+                                        fontFamily: '"Fira code", "Fira Mono", monospace',
+                                        fontSize: 16,
+                                        outline: "none",
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="outArea outAreaEditor outAreaTest">
-                        <div style={{width: "1000px"}}>
-                            <Editor
-                                value={this.state.testCode}
-                                highlight={(code) => (
-                                    highlight(code, tanukiLang)
-                                )}
-                                readOnly={true}
-                                padding={10}
-                                style={{
-                                    fontFamily: '"Fira code", "Fira Mono", monospace',
-                                    fontSize: 16,
-                                    outline: "none",
-                                }}
-                            />
-                        </div>
+                    <div className="header">
+                        <button onClick={this.executeCode.bind(this)}>🏃実行する</button>
                     </div>
-                </div>
-                <div className="header">
-                    <button onClick={this.executeCode.bind(this)}>🏃実行する</button>
-                </div>
-                <div className="terminal">
-                    <pre>
-                    {this.state.resultList.map((item, i) => {
-                        if (item.messageType == "display") {
-                            return (<span key={i}>{item.message}</span>)
-                        }
-                    })}
-                    </pre>
+                    <div className="terminal">
+                        <pre>
+                        {this.state.resultList.map((item, i) => {
+                            if (item.messageType == "display") {
+                                return (<span key={i}>{item.message}</span>)
+                            }
+                        })}
+                        </pre>
+                    </div>
                 </div>
             </div>
         );

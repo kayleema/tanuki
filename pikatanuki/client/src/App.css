@@ -1,5 +1,6 @@
 body {
     min-width: 800px;
+    font-family: sans-serif;
 }
 
 .App {
@@ -24,7 +25,6 @@ body {
 .header img {
     height: 20px;
     margin-right: 8px;
-    /* background: white; */
     transform: translateY(3px);
 }
 
@@ -189,12 +189,6 @@ textarea.Text:focus {
     overflow: scroll;
 }
 
-.sideBySide {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-}
-
 .editPage {
     flex-grow: 1;
     display: flex;
@@ -202,67 +196,10 @@ textarea.Text:focus {
     justify-content: stretch;
     flex-grow: 1;
 }
-.editPage .challengeList {
-    width: 300px;
-    height: auto;
-    background: #272822;
-    position: absolute;
-    margin: 0px auto;
-    top: 0;
-    text-align: center;
-    left: 136px;
-    border-radius: 0 0 5px 5px;
-    z-index: 5;
-}
-.editPage .challengeList button {
-    font-size: 18px;
-    border: none;
-    width: 100%;
-    height: 47px;
-    color: white;
-    text-align: left;
-    padding: 0 18px;
-    background: #777;
-    border: 3px solid transparent;
-}
-.editPage .challengeList button:hover {
-    background: #777;
-    border: 3px solid white;
-}
-.editPage .challengeList button:disabled {
-    background: #777;
-    border: 3px solid transparent;
-    color: #49483E;
-}
-.editPage .challengeList p {
-    background: #777;
-    font-size: 14px;
-    padding: 0;
-    margin:0;
-    text-align: center;
-}
-span.badge {
-    padding: 3px 7px;
-    border-radius: 5px;
-    float: right;
-    font-weight: bold;
-    font-size: 14px;
-    background: #f92672;
-}
-span.done {
-    background: #29861f;
-}
-span.lock {
-    background: #666;
-}
 
 .editPage .hanamaru {
     font-size: 100px;
     animation: fadeIn ease 1s;
-}
-
-.outAreaTest {
-    margin-left: 0;
 }
 
 .loginContainer {
