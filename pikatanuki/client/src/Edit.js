@@ -145,12 +145,17 @@ export default class Edit extends React.Component {
                 {(this.state.showCongrats) && (
                     <div className="loginContainer">
                         <div className="dialog">
-                            <h1>おめでとう</h1>
-                            <h2>テスト成功しました</h2>
                             <div className="hanamaru">💮</div>
-                            <button className="bigButton" onClick={() => {this.setState({showCongrats: false})}}>
-                                次の問題へ　》
-                            </button>
+                            <hr/>
+                            <div className="congrats">
+                                <h1>おめでとう</h1>
+                                <h2>テスト成功しました</h2>
+                                <h1>
+                                <a href="#" className="bigButton" onClick={() => {this.setState({showCongrats: false})}}>
+                                    次の問題へ進む　→
+                                </a>
+                                </h1>
+                            </div>
                         </div>
                     </div>
                 )}

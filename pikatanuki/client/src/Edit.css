@@ -79,3 +79,19 @@ span.lock {
 .editPage .header button {
     padding: 2px 10px;
 }
+
+.loginContainer div.congrats {
+    writing-mode: vertical-rl;
+    margin: 20px auto;
+    padding: 0px;
+    width: auto;
+    text-align: left;
+}
+
+.loginContainer div.congrats a {
+    margin: 0;
+    padding: 20px;
+    display: block;
+    margin: auto 40px;
+    margin-left: 0px;
+}
