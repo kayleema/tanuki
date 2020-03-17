@@ -11,6 +11,14 @@ import '../questions/code/2.pin'
 import '../questions/test/2.pin'
 import '../questions/code/3.pin'
 import '../questions/test/3.pin'
+import '../questions/code/4.pin'
+import '../questions/test/4.pin'
+import '../questions/code/5.pin'
+import '../questions/test/5.pin'
+import '../questions/code/6.pin'
+import '../questions/test/6.pin'
+import '../questions/code/7.pin'
+import '../questions/test/7.pin'
 
 let socketRepo = new SocketRepo();
 let loginRepo = new LoginRepository();

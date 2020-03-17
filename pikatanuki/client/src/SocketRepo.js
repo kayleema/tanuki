@@ -11,8 +11,8 @@ export default class SocketRepo {
     reconnect() {
         clearInterval(this.interval);
         if(process.env.NODE_ENV === "development") {
-            // this.socket = new WebSocket("ws://localhost:9002/");
-            this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
+            this.socket = new WebSocket("ws://localhost:9002/");
+            // this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
 
         } else {
             this.socket = new WebSocket("wss://socktanuki.kaylee.jp/");
