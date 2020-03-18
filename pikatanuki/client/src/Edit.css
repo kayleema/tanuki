@@ -95,3 +95,7 @@ span.lock {
     margin: auto 40px;
     margin-left: 0px;
 }
+
+.editPage .loginContainer {
+    z-index: 5;
+}

@@ -139,6 +139,7 @@ export default class App extends React.Component {
                         <Edit
                             socketRepo={this.props.socketRepo}
                             questionsRepo={new QuestionsRepo()}
+                            loginRepo={this.props.loginRepository}
                         />
                     </Route>
                     <Route path="/interract">

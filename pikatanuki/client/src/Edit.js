@@ -34,7 +34,7 @@ export default class Edit extends React.Component {
     }
 
     onLogin() {
-        // TODO: implement
+        this.fetchProfile();
     }
 
     success() {
@@ -90,6 +90,7 @@ export default class Edit extends React.Component {
     componentDidMount() {
         this.props.socketRepo.setOnMessage(this.onSocketMessage.bind(this));
         this.fetchProfile();
+        this.props.loginRepo.setLoginListener(this.onLogin.bind(this));
     }
 
     executeCode() {
