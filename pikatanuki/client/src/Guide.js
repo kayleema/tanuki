@@ -8,13 +8,18 @@ function flatten(text, child) {
     return typeof child === 'string'
       ? text + child
       : React.Children.toArray(child.props.children).reduce(flatten, text)
-  }
+}
 
 function HeadingRenderer(props) {
     var children = React.Children.toArray(props.children)
     var text = children.reduce(flatten, '')
     var slug = text.toLowerCase() //text.toLowerCase().replace(/\W/g, '-')
     return React.createElement('h' + props.level, {id: slug}, props.children)
+}
+
+function DefinitionRenderer(props) {
+    console.log(props);
+    return React.createElement('dd', {}, props.children)
 }
 
 export default class Guide extends React.Component {
@@ -38,7 +43,10 @@ export default class Guide extends React.Component {
                 <ReactMarkdown 
                     source={this.state.readme} 
                     plugins={[toc]}
-                    renderers={{heading: HeadingRenderer}}
+                    renderers={{
+                        heading: HeadingRenderer,
+                        definition: DefinitionRenderer,
+                    }}
                 />
             </div>
             </div>

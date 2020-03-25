@@ -38,3 +38,12 @@
     background: #ffffff11;
     text-decoration: none;
 }
+
+.guide h3 {
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid #75715e;
+    border-top: 1px dotted #75715e;
+    padding-left: 10px;
+    padding-top: 3px;
+    margin-left: -15px;
+}
