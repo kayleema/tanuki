@@ -68,8 +68,6 @@ public:
 class InputSourceTokenizer : public Tokenizer {
     InputSource *input;
     int lineNumber = 1;
-    int indentLevel = 0;
-    queue<Token> nextTokens;
 public:
     explicit InputSourceTokenizer(InputSource *input) : input(input) {
     }

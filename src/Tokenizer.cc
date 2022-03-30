@@ -12,8 +12,7 @@ string encodeUTF8(const wstring &in) {
     try {
         std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
         return conv1.to_bytes(in);
-    }
-    catch (const std::range_error &exception) {
+    } catch (const std::range_error &exception) {
         cout << "could not convert to utf8 string " << in.size() << endl;
         return string("XXX");
     }
@@ -23,8 +22,7 @@ wstring decodeUTF8(const string &in) {
     try {
         std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
         return conv1.from_bytes(in);
-    }
-    catch (const std::range_error &exception) {
+    } catch (const std::range_error &exception) {
         return wstring(L"XXX");
     }
 }
@@ -204,25 +202,75 @@ bool isComplete(const vector<Token> &tokens) {
 vector<Token> Tokenizer::getAllTokens() {
     vector<Token> result;
     Token current;
+    int indentLevel = 0;
+    int newIndentLevel = 0;
+    bool indentProcessed = false;
     do {
         current = getToken();
-        result.push_back(current);
+        if (current.type == TokenType::INDENT) {
+            newIndentLevel++;
+            if (newIndentLevel > indentLevel) {
+                result.emplace_back(TokenType::INDENT, L"", current.line);
+            }
+        } else if (current.type == TokenType::NEWL) {
+
+            if (!indentProcessed) {
+                int dedentQuantity = -(newIndentLevel - indentLevel);
+                if (dedentQuantity > 0) {
+                    for (int i = 0; i < dedentQuantity; i++) {
+                        result.emplace_back(TokenType::DEDENT, L"",
+                                            current.line);
+                    }
+                }
+                indentProcessed = true;
+            }
+            indentLevel = newIndentLevel;
+            newIndentLevel = 0;
+            indentProcessed = false;
+            result.push_back(current);
+        } else if (current.type == TokenType::END) {
+            if (!indentProcessed) {
+                int dedentQuantity = -(newIndentLevel - indentLevel);
+                if (dedentQuantity > 0) {
+                    for (int i = 0; i < dedentQuantity; i++) {
+                        result.emplace_back(TokenType::DEDENT, L"",
+                                            current.line);
+                    }
+                }
+                indentProcessed = true;
+            }
+            result.push_back(current);
+        } else {
+            if (!indentProcessed) {
+                int dedentQuantity = -(newIndentLevel - indentLevel);
+                if (dedentQuantity > 0) {
+                    for (int i = 0; i < dedentQuantity; i++) {
+                        result.emplace_back(TokenType::DEDENT, L"",
+                                            current.line);
+                    }
+                }
+                indentProcessed = true;
+            }
+            result.push_back(current);
+        }
     } while (current.type != TokenType::END);
+
     return result;
 }
 
 Token InputSourceTokenizer::getToken() {
-    if (!nextTokens.empty()) {
-        Token result = nextTokens.front();
-        nextTokens.pop();
-        return result;
-    }
     wchar_t first = input->getChar();
+
+    // EOF Matcher
     if (input->eof()) {
         return Token(TokenType::END, L"", lineNumber);
     }
-    unordered_set<wchar_t> comparisonChars({greaterThan, lessThan, assign, notSign});
-    if (comparisonChars.count(first) && comparisonChars.count(input->peekChar())) {
+
+    // Comparison Matcher
+    unordered_set<wchar_t> comparisonChars(
+        {greaterThan, lessThan, assign, notSign});
+    if (comparisonChars.count(first) &&
+        comparisonChars.count(input->peekChar())) {
         wstring comparison(1, first);
         comparison.append(1, input->getChar());
         if (comparison == L"＝＝") {
@@ -237,10 +285,14 @@ Token InputSourceTokenizer::getToken() {
             cout << "lexer error : invalid comparison" << endl;
         }
     }
+
+    // One Character Token Mapper Matcher
     if (charToTokenTypeMap.count(first)) {
         return Token(charToTokenTypeMap.at(first), wstring(1, first),
                      lineNumber);
     }
+
+    // Comment Matcher
     if (first == sharp) {
         while (input->getChar() != newline) {
             if (input->eof()) {
@@ -250,47 +302,32 @@ Token InputSourceTokenizer::getToken() {
         lineNumber++;
         return Token(TokenType::NEWL, L"", lineNumber);
     }
+
+    // Newline Matcher
     if (first == newline) {
         lineNumber++;
-        if (input->peekChar() != L'　' && input->peekChar() != L'\n' &&
-            indentLevel > 0) {
-            // Dedent to zero case
-            for (int i = 0; i < indentLevel; i++) {
-                nextTokens.push(Token(TokenType::DEDENT, L"", lineNumber));
-            }
-            indentLevel = 0;
-            return Token(TokenType::NEWL, L"", lineNumber);
-        }
         return Token(TokenType::NEWL, L"", lineNumber);
     }
+
+    // Indent Matcher
     if (first == space) {
-        int newIndentLevel = 1;
-        while (input->peekChar() == L'　') {
-            newIndentLevel++;
-            input->getChar();
-        }
-        if (newIndentLevel == indentLevel) {
-            return getToken();
-        }
-        auto newTokenType = (newIndentLevel > indentLevel) ?
-                            TokenType::INDENT : TokenType::DEDENT;
-        int difference = abs(newIndentLevel - indentLevel);
-        indentLevel = newIndentLevel;
-        for (int i = 0; i < difference - 1; i++) {
-            nextTokens.push(Token(newTokenType, L"", lineNumber));
-        }
-        return Token(newTokenType, L"", lineNumber);
+        return Token(TokenType::INDENT, L"　", lineNumber);
     }
+
+    // Number Literal Matcher
     if (charIsNumeric(first)) {
         wstring resultNumber = wstring(1, first);
         while (charIsNumeric(input->peekChar()) && !input->eof()) {
             resultNumber.push_back(input->getChar());
         }
-        TokenType tokenType = (resultNumber.find(L'。') != std::string::npos) ? TokenType::NUMBER_FLOAT
-                                                                             : TokenType::NUMBER;
+        TokenType tokenType = (resultNumber.find(L'。') != std::string::npos)
+                                  ? TokenType::NUMBER_FLOAT
+                                  : TokenType::NUMBER;
 
         return Token(tokenType, wstring(resultNumber), lineNumber);
     }
+
+    // String Literal Matcher
     if (first == lsquare) {
         wstring resultString = wstring(L"");
         wchar_t nextChar;
@@ -300,12 +337,16 @@ Token InputSourceTokenizer::getToken() {
                 lineNumber++;
             }
             if (input->eof()) {
-                cout << u8"エラー：文字列を読みながら、ファイルの終わり（ＥＯＦ）" << endl;
+                cout << u8"エラー：文字列を読みながら、ファイルの終わり（ＥＯＦ"
+                        u8"）"
+                     << endl;
                 return Token(TokenType::END, L"", lineNumber);
             }
         }
         return Token(TokenType::STRING, wstring(resultString), lineNumber);
     }
+
+    // Symbol Matcher
     wstring resultSymbol = wstring(1, first);
     while (charIsSymbolic(input->peekChar()) && !input->eof()) {
         resultSymbol.push_back(input->getChar());
