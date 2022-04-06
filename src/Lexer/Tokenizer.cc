@@ -1,5 +1,6 @@
 #include <utility>
 
+#include "Token.h"
 #include "Tokenizer.h"
 #include <unordered_map>
 #include <unordered_set>
@@ -51,65 +52,41 @@ const wchar_t notSign = L'！';
 const wchar_t nami = L'〜';
 
 const unordered_set<wchar_t> symbolicChars(
-        {
-                lparen,
-                rparen,
-                comma,
-                space,
-                newline,
-                assign,
-                dot,
-                star,
-                colon,
-                sharp,
-                minuszenkaku,
-                plusSign,
-                nullChar,
-                slash,
-                greaterThan,
-                notSign,
-                lessThan,
-                lbrace,
-                rbrace,
-                nami
-        });
+    {lparen,      rparen,  comma,    space,        newline,  assign,   dot,
+     star,        colon,   sharp,    minuszenkaku, plusSign, nullChar, slash,
+     greaterThan, notSign, lessThan, lbrace,       rbrace,   nami});
 
-const unordered_map<wchar_t, const TokenType> charToTokenTypeMap(
-        {
-                {lparen,       TokenType::LPAREN},
-                {lparen,       TokenType::LPAREN},
-                {lbrace,       TokenType::LBRACE},
-                {rbrace,       TokenType::RBRACE},
-                {rparen,       TokenType::RPAREN},
-                {comma,        TokenType::COMMA},
-                {assign,       TokenType::ASSIGN},
-                {dot,          TokenType::DOT},
-                {minuszenkaku, TokenType::MINUS},
-                {star,         TokenType::STAR},
-                {colon,        TokenType::COLON},
-                {plusSign,     TokenType::PLUS},
-                {slash,        TokenType::SLASH},
-                {greaterThan,  TokenType::GT},
-                {lessThan,     TokenType::LT},
-                {nami,         TokenType::NAMI},
-        });
+const unordered_map<wchar_t, const TokenType> charToTokenTypeMap({
+    {lparen, TokenType::LPAREN},
+    {lparen, TokenType::LPAREN},
+    {lbrace, TokenType::LBRACE},
+    {rbrace, TokenType::RBRACE},
+    {rparen, TokenType::RPAREN},
+    {comma, TokenType::COMMA},
+    {assign, TokenType::ASSIGN},
+    {dot, TokenType::DOT},
+    {minuszenkaku, TokenType::MINUS},
+    {star, TokenType::STAR},
+    {colon, TokenType::COLON},
+    {plusSign, TokenType::PLUS},
+    {slash, TokenType::SLASH},
+    {greaterThan, TokenType::GT},
+    {lessThan, TokenType::LT},
+    {nami, TokenType::NAMI},
+});
 
 // Tokenizer Implementation
-const unordered_map<wstring, TokenType> identifiers(
-        {
-                {L"関数",   TokenType::FUNC},
-                {L"返す",   TokenType::RETURN},
-                {L"もし",   TokenType::IF},
-                {L"あるいは", TokenType::ELIF},
-                {L"その他",  TokenType::ELSE},
-                {L"導入",   TokenType::IMPORT},
-                {L"確認",   TokenType::ASSERT},
-                {L"外側",   TokenType::EXTERN}
-        });
+const unordered_map<wstring, TokenType>
+    identifiers({{L"関数", TokenType::FUNC},
+                 {L"返す", TokenType::RETURN},
+                 {L"もし", TokenType::IF},
+                 {L"あるいは", TokenType::ELIF},
+                 {L"その他", TokenType::ELSE},
+                 {L"導入", TokenType::IMPORT},
+                 {L"確認", TokenType::ASSERT},
+                 {L"外側", TokenType::EXTERN}});
 
-bool charIsSymbolic(wchar_t c) {
-    return symbolicChars.count(c) == 0;
-}
+bool charIsSymbolic(wchar_t c) { return symbolicChars.count(c) == 0; }
 
 bool charIsNumeric(wchar_t c) {
     return (c <= L'９' && c >= L'０') || c == L'。';
@@ -133,48 +110,6 @@ float parseNumericFloat(wstring s) {
     auto fracLength = rhs.size();
     auto result = float(intPart) + float(fracPart) / pow(10, fracLength);
     return result;
-}
-
-const char *tokenTypeToString(TokenType type) {
-    return TokenTypeStrings[(int) type];
-}
-
-Token::Token(TokenType type, wstring _content, int line)
-        : type(type), content(std::move(_content)), line(line) {
-    if (type == TokenType::NUMBER) {
-        number = parseNumeric(content);
-    }
-    if (type == TokenType::NUMBER_FLOAT) {
-        numberFloat = parseNumericFloat(content);
-    }
-}
-
-string Token::toString() const {
-    ostringstream result("");
-    result << TokenTypeStrings[(int) type];
-    result << u8"：”" << encodeUTF8(content);
-    if (type == TokenType::NUMBER) {
-        result << u8"（" << number << u8"）";
-    }
-    if (type == TokenType::NUMBER_FLOAT) {
-        result << u8"（" << numberFloat << u8"）";
-    }
-    result << u8"”、" << line << u8"行目";
-    return result.str();
-}
-
-bool Token::operator==(const Token &rhs) const {
-    return type == rhs.type && content == rhs.content && line == rhs.line;
-}
-
-std::ostream &operator<<(std::ostream &os, const Token &token) {
-    return os << "Token("
-              << TokenTypeStrings[(int) token.type]
-              << ", \""
-              << encodeUTF8(token.content)
-              << "\", "
-              << token.line
-              << ")";
 }
 
 bool isComplete(const vector<Token> &tokens) {

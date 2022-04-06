@@ -1,7 +1,7 @@
 #include <CoreFunctions.h>
 #include "gtest/gtest.h"
 
-#include "Tokenizer.h"
+#include "Lexer/Tokenizer.h"
 #include "Parser.h"
 #include "Environment.h"
 #include "Context.h"

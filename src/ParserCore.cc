@@ -1,5 +1,3 @@
-
-
 #include "Parser.h"
 
 bool Parser::accept(TokenType type, Token *out) {

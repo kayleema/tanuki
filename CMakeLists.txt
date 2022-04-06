@@ -22,6 +22,8 @@ include_directories("/usr/include")
 file(GLOB pinpon_SRC
         "src/*.h"
         "src/*.cc"
+        "src/Lexer/*.h"
+        "src/Lexer/*.cc"
         )
 file(GLOB pinpon_test_SRC
         "test/*.h"

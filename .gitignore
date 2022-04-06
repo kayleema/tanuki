@@ -14,3 +14,4 @@ vsc_workspace.code-workspace
 node_modules/
 .env
 runtime.env
+cmake*/

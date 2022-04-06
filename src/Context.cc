@@ -186,7 +186,9 @@ FunctionValue *Context::newBoundFunctionValue(FunctionValue *function, Value *ji
 ArrayValue *Context::newArrayValue(Environment *env) {
     auto result = new ArrayValue();
     values.insert(result);
-    result->setParent(static_cast<DictionaryValue *>(env->lookup(L"配列型")));
+    if (env->isBound(L"配列型")) {
+        result->setParent(static_cast<DictionaryValue *>(env->lookup(L"配列型")));
+    }
     return result;
 }
 

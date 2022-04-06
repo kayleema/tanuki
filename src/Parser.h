@@ -3,7 +3,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "Tokenizer.h"
+#include "Lexer/Tokenizer.h"
 #include "Logger.h"
 
 class SyntaxNode;

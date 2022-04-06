@@ -93,6 +93,8 @@ public:
 
     Value *lookup(const wstring &name);
 
+    bool isBound(const wstring &name);
+
     void bind(const wstring &name, Value *value, bool recursive=false);
 
     Value *eval(SyntaxNode *node, const FunctionValue *tailContext = nullptr);

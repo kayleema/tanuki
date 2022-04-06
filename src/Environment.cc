@@ -580,6 +580,10 @@ Value *Environment::lookup(const wstring &name) {
     return context->newNoneValue();
 }
 
+bool Environment::isBound(const wstring &name) {
+    return bindings.count(name) || (parent && parent->isBound(name));
+}
+
 void Environment::bind(const wstring &name, Value *value, bool recursive) {
     if ((recursive && bindings.find(name) == bindings.end()) || (nonlocals.find(name) != nonlocals.end())) {
         if (parent) {

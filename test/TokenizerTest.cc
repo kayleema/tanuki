@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "Tokenizer.h"
+#include "Lexer/Tokenizer.h"
 
 TEST(tokenizer, simple_test) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
@@ -25,23 +25,39 @@ TEST(tokenizer, simple_test) {
 
 TEST(tokenizer, multiline) {
     auto stringInput = StringInputSource(
-            L"関数、フィボナッチ（番号）\n"
-            L"　返す、１２３"
+        L"関数、フィボナッチ（番号）\n"
+        L"　返す、１２３"
     );
     auto testTokenizer = InputSourceTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
     auto expected = vector<Token>(
-            {
-                    Token(TokenType::NEWL, L"", 2),
-                    Token(TokenType::INDENT, L"", 2),
-                    Token(TokenType::RETURN, L"返す", 2),
-                    Token(TokenType::COMMA, L"、", 2),
-                    Token(TokenType::NUMBER, L"１２３", 2),
-                    Token(TokenType::END, L"", 2),
-            });
+        {
+            Token(TokenType::NEWL, L"", 2),
+            Token(TokenType::INDENT, L"", 2),
+            Token(TokenType::RETURN, L"返す", 2),
+            Token(TokenType::COMMA, L"、", 2),
+            Token(TokenType::NUMBER, L"１２３", 2),
+            Token(TokenType::END, L"", 2),
+        });
     EXPECT_EQ(vector<Token>(allTokens.begin() + 6, allTokens.end()), expected);
+}
+
+TEST(tokenizer, emptyline) {
+    auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）\n"
+                                         L"　返す、１２３\n"
+                                         L"\n"
+                                         L"フィボナッチ（４）");
+    auto testTokenizer = InputSourceTokenizer(&stringInput);
+
+    auto allTokens = testTokenizer.getAllTokens();
+
+    EXPECT_EQ(tokenListToTypeList(allTokens),
+              "function, comma, symbol, lparen, symbol, rparen, newl, "
+              "indent, return, comma, number, newl, "
+              "dedent, newl, "
+              "symbol, lparen, number, rparen, end");
 }
 
 TEST(tokenizer, parsesFloats) {
