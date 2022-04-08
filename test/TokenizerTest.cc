@@ -6,9 +6,9 @@
 
 TEST(tokenizer, simple_test) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto tokenizer = TanukiTokenizer(&stringInput);
 
-    auto allTokens = testTokenizer.getAllTokens();
+    auto allTokens = tokenizer.getAllTokens();
 
     auto expected = vector<Token>(
             {
@@ -28,7 +28,7 @@ TEST(tokenizer, multiline) {
         L"関数、フィボナッチ（番号）\n"
         L"　返す、１２３"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -49,7 +49,7 @@ TEST(tokenizer, emptyline) {
                                          L"　返す、１２３\n"
                                          L"\n"
                                          L"フィボナッチ（４）");
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -65,7 +65,7 @@ TEST(tokenizer, parsesFloats) {
             L"関数、フィボナッチ（番号）\n"
             L"　返す、１２３。４"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -85,7 +85,7 @@ TEST(tokenizer, functions) {
     auto stringInput = StringInputSource(
             L"あ（い（）、う（））"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -112,7 +112,7 @@ TEST(tokenizer, comments) {
             L"あ（＃コメント"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -140,7 +140,7 @@ TEST(tokenizer, indentation) {
             L"　　あ\n"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -185,7 +185,7 @@ TEST(tokenizer, infix) {
             L"ほげ＋ふが－ぴよ＊ほげ／ぴよ"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -210,7 +210,7 @@ TEST(tokenizer, comparison) {
             L"あ＝＝い＜＝う＞＝え＜お＞か！＝き"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -239,7 +239,7 @@ TEST(tokenizer, assert) {
             L"確認、０＝＝１"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -261,7 +261,7 @@ TEST(tokenizer, braces) {
             L"鈴木さん【「名前」】"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
 
     auto allTokens = testTokenizer.getAllTokens();
 
@@ -282,7 +282,7 @@ TEST(tokenizer, nonlocal_external) {
             L"外側、私の変数名"
     );
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto allTokens = testTokenizer.getAllTokens();
 
     auto expected = vector<Token>(

@@ -10,7 +10,7 @@ TEST(parsing, functions) {
     auto stringInput = StringInputSource(
             L"あ（い（）、４５６。７８、う（１２３））（え）"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -40,7 +40,7 @@ TEST(parsing, importing_file) {
     auto stringInput = StringInputSource(
             L"導入、フォルダー・フォルダー２・ファイル名"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -57,7 +57,7 @@ TEST(parsing, function_with_kwargs) {
     auto stringInput = StringInputSource(
             L"関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -83,7 +83,7 @@ TEST(parsing, user_function) {
             L"関数、ほげ（引数、＊＊辞書引数）\n"
             L"　返す、１\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -106,7 +106,7 @@ TEST(parsing, user_function_varparam) {
             L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
             L"　返す、１\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
 
@@ -135,7 +135,7 @@ TEST(parsing, user_function_defaultparam) {
             L"関数、ほげ（引数、あ：１＋２、＊配列引数、＊＊辞書引数）\n"
             L"　返す、１\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
 
@@ -170,7 +170,7 @@ TEST(parsing, dot_lookup) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -189,7 +189,7 @@ TEST(parsing, dot_lookup_and_assign) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか＝あ・い・う"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -214,7 +214,7 @@ TEST(parsing, dot_lookup_and_call) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか（）"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -235,7 +235,7 @@ TEST(parsing, dot_lookup_and_call_and_lookup) {
     auto stringInput = StringInputSource(
             L"ほげ・何か・ほか（）・あ・い・う"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -262,7 +262,7 @@ TEST(parsing_infix, simple) {
     auto stringInput = StringInputSource(
             L"１－２＋３"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
 
@@ -280,7 +280,7 @@ TEST(parsing_infix, complex) {
     auto stringInput = StringInputSource(
             L"１－２＋あ（３）＋い"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -304,7 +304,7 @@ TEST(parsing_infix, within) {
     auto stringInput = StringInputSource(
             L"表示（１－２＋３）"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     string treeString = tree->children[0]->toString();
@@ -326,7 +326,7 @@ TEST(parsing_infix, comparison) {
     auto stringInput = StringInputSource(
             L"表示（１＝＝２）"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -349,7 +349,7 @@ TEST(parsing_infix, comparisonNotEqual) {
     auto stringInput = StringInputSource(
             L"あ＝１！＝２"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -368,7 +368,7 @@ TEST(parsing_infix, comparisonLessThan) {
     auto stringInput = StringInputSource(
             L"あ＝１＜２"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -387,7 +387,7 @@ TEST(parsing_infix, comparisonGreaterThan) {
     auto stringInput = StringInputSource(
             L"あ＝１＞２"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -406,7 +406,7 @@ TEST(parsing_infix, comparisonGreaterThanEqual) {
     auto stringInput = StringInputSource(
             L"あ＝１＞＝２"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -425,7 +425,7 @@ TEST(parsing_infix, comparisonLessThanEqual) {
     auto stringInput = StringInputSource(
             L"あ＝１＜＝２"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -444,7 +444,7 @@ TEST(parsing_infix, assert) {
     auto stringInput = StringInputSource(
             L"確認、１＝＝２"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -462,7 +462,7 @@ TEST(parsing_subscript, subscript) {
     auto stringInput = StringInputSource(
             L"辞書（名前：「すずき」）【「名前」】"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -489,7 +489,7 @@ TEST(parsing_subscript, subscript_complex) {
     auto stringInput = StringInputSource(
             L"辞書（名前：「すずき」）【「名前」】・長さ"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -518,7 +518,7 @@ TEST(parsing_subscript, subscript_set) {
     auto stringInput = StringInputSource(
             L"辞書（名前：「すずき」）【「名前」】＝「田中」"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
 
     SyntaxNode *tree = parser.run();
@@ -545,7 +545,7 @@ TEST(parsing_nonlocal, external_sotogawa) {
     auto stringInput = StringInputSource(
             L"外側、私の変数名"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     Parser parser(&testTokenizer, new ConsoleLogger);
 
     SyntaxNode *tree = parser.run();
@@ -562,7 +562,7 @@ TEST(parsing, parse_error) {
     auto stringInput = StringInputSource(
             L"導入＋１"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     Mock<PinponLogger> logger;
     When(OverloadedMethod(logger, log, PinponLogger * (string))).AlwaysReturn(&logger.get());
     auto parser = Parser(&testTokenizer, &logger.get());

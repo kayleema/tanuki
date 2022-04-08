@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     const char *sourceFilename = argv[argc - 1];
     log.log(L"始まります")->log(sourceFilename)->logEndl();
     FileInputSource input(sourceFilename);
-    auto t = InputSourceTokenizer(&input);
+    auto t = TanukiTokenizer(&input);
 
     if (print_lex) {
         log.logLn("LEXER 結果:");
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 void evalPinponStarter(Environment *env) {
     ConsoleLogger log;
     auto source = StringInputSource(corePinponStarter);
-    auto tokenizer = InputSourceTokenizer(&source);
+    auto tokenizer = TanukiTokenizer(&source);
     auto parser = Parser(&tokenizer, &log);
     SyntaxNode *tree = parser.run();
     env->eval(tree);

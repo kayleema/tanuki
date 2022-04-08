@@ -12,7 +12,7 @@ TEST(eval, functions) {
     auto stringInput = StringInputSource(
             L"足す（２、引く（５、２）、４）"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     SyntaxNode *expr = tree->children[0];
@@ -32,7 +32,7 @@ TEST(eval, floatNumber) {
     auto stringInput = StringInputSource(
             L"１２。３４"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     SyntaxNode *expr = tree->children[0];
@@ -61,7 +61,7 @@ TEST(eval, import_statement) {
     auto stringInput = StringInputSource(
             L"導入、フォルダー・フォルダー２・ファイル名"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     SyntaxNode *expr = tree->children[0];
@@ -87,7 +87,7 @@ TEST(eval, user_function) {
             L"　返す、足す（あ、２）\n"
             L""
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -99,7 +99,7 @@ TEST(eval, user_function) {
     auto stringInput2 = StringInputSource(
             L"プラス二（７）"
     );
-    auto testTokenizer2 = InputSourceTokenizer(&stringInput2);
+    auto testTokenizer2 = TanukiTokenizer(&stringInput2);
     auto parser2 = Parser(&testTokenizer2, nullptr);
     SyntaxNode *tree2 = parser2.run();
     SyntaxNode *expr = tree2->children[0];
@@ -116,7 +116,7 @@ TEST(eval, if_statement) {
             L"　返す、０\n"
             L""
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -128,8 +128,8 @@ TEST(eval, if_statement) {
     auto stringInput2 = StringInputSource(
             L"五番です（５）"
     );
-    testTokenizer = InputSourceTokenizer(&stringInput2);
-    parser = Parser(&testTokenizer, nullptr);
+    auto testTokenizer2 = TanukiTokenizer(&stringInput2);
+    parser = Parser(&testTokenizer2, nullptr);
     tree = parser.run();
     SyntaxNode *expr = tree->children[0];
     Value *v = env.eval(expr);
@@ -139,8 +139,8 @@ TEST(eval, if_statement) {
     auto stringInput3 = StringInputSource(
             L"五番です（４）"
     );
-    testTokenizer = InputSourceTokenizer(&stringInput3);
-    parser = Parser(&testTokenizer, nullptr);
+    auto testTokenizer3 = TanukiTokenizer(&stringInput3);
+    parser = Parser(&testTokenizer3, nullptr);
     tree = parser.run();
     expr = tree->children[0];
     v = env.eval(expr);
@@ -163,7 +163,7 @@ TEST(program, fibonacci) {
     );
 
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -186,7 +186,7 @@ TEST(program, string_eq) {
     );
 
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -210,7 +210,7 @@ TEST(program, dictionary) {
     );
 
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -236,7 +236,7 @@ TEST(program, if_elif_else) {
     );
 
 
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -253,7 +253,7 @@ TEST(eval, user_function_varargs) {
             L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
             L"　返す、１\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -277,7 +277,7 @@ TEST(eval, call_user_function_varargs) {
             L"　返す、配列引数\n"
             L"あ＝ほげ（１、２、３、４、あ：５）\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -300,7 +300,7 @@ TEST(eval, call_user_function_default) {
             L"あ＝ほげ（あああ：５）\n"
             L"い＝ほげ（）\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -317,7 +317,7 @@ TEST(eval, infix) {
     auto stringInput = StringInputSource(
             L"あ＝１＋２－４＋３\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;
@@ -339,7 +339,7 @@ TEST(eval, infix_equality) {
             L"お＝１＞３\n"
             L"か＝１＜３\n"
     );
-    auto testTokenizer = InputSourceTokenizer(&stringInput);
+    auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(&testTokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     Context context;

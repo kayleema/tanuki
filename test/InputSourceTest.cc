@@ -68,7 +68,7 @@ TEST(stringInputSource, fileSource) {
 
 void evalPinponStarter(Environment *env) {
     auto source = StringInputSource(corePinponStarter);
-    auto tokenizer = InputSourceTokenizer(&source);
+    auto tokenizer = TanukiTokenizer(&source);
     auto parser = Parser(&tokenizer, nullptr);
     SyntaxNode *tree = parser.run();
     env->eval(tree);
@@ -80,7 +80,7 @@ TEST(stringInputSource, selftest) {
     ConsoleLogger::wide_mode = false;
     logger.logLn("Starting self test");
     FileInputSource stringInput(filename.c_str());
-    auto t = InputSourceTokenizer(&stringInput);
+    auto t = TanukiTokenizer(&stringInput);
     auto p = Parser(&t, nullptr);
     SyntaxNode *tree = p.run();
     EXPECT_NE(tree->type, NodeType::PARSE_ERROR);

@@ -59,7 +59,7 @@ void TanukiServerREPL::handleMessage(websocketpp::connection_hdl hdl, server::me
 
     ConsoleLogger log;
     auto source = StringInputSource(input.c_str());
-    auto tokenizer = InputSourceTokenizer(&source);
+    auto tokenizer = TanukiTokenizer(&source);
     auto parser = Parser(&tokenizer, &log);
     SyntaxNode *tree = parser.run();
     if (oneLine) {

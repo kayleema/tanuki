@@ -2,6 +2,7 @@
 #define TOKENIZER_H
 
 #include "InputSource.h"
+#include "Matcher.h"
 #include "Token.h"
 #include <clocale>
 #include <codecvt>
@@ -19,10 +20,6 @@ string encodeUTF8(const wstring &in);
 
 wstring decodeUTF8(const string &in);
 
-long parseNumeric(wstring s);
-
-float parseNumericFloat(wstring s);
-
 bool charIsSymbolic(wchar_t c);
 
 class Tokenizer {
@@ -36,24 +33,20 @@ class InputSourceTokenizer : public Tokenizer {
     InputSource *input;
     int lineNumber = 1;
 
+  protected:
+    vector<Matcher *> matchers;
+
   public:
     explicit InputSourceTokenizer(InputSource *input) : input(input) {}
 
-    virtual Token getToken() override;
+    Token getToken() override;
 };
 
-class BufferedTokenizer : public Tokenizer {
-    int position = 0;
-    vector<Token> tokens;
-
+class TanukiTokenizer : public InputSourceTokenizer {
   public:
-    explicit BufferedTokenizer(vector<Token> tokens) {
-        this->tokens = std::move(tokens);
-    }
+    explicit TanukiTokenizer(InputSource *input);
 
-    virtual Token getToken() override { return tokens[position++]; }
+    ~TanukiTokenizer();
 };
-
-bool isComplete(const vector<Token> &);
 
 #endif

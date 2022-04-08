@@ -226,7 +226,7 @@ public:
         auto moduleEnv = env->newChildEnvironment();
         wstring text = args[0]->toStringValue()->value;
         StringInputSource inputSource(text.c_str());
-        InputSourceTokenizer tokenizer(&inputSource);
+        TanukiTokenizer tokenizer(&inputSource);
         ConsoleLogger logger;
         Parser parser(&tokenizer, &logger);
         SyntaxNode *ast = parser.run();

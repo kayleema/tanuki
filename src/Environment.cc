@@ -514,7 +514,7 @@ Value *Environment::eval_import(SyntaxNode *tree) {
         logger.log("ERROR: could not import")->logEndl();
         return context->newNoneValue();
     }
-    InputSourceTokenizer tokenizer(fileInputSource.get());
+    TanukiTokenizer tokenizer(fileInputSource.get());
     Parser parser(&tokenizer, &logger);
     auto parsedTree = parser.run();
     auto importEnv = newChildEnvironment();

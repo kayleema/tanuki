@@ -24,6 +24,8 @@ file(GLOB pinpon_SRC
         "src/*.cc"
         "src/Lexer/*.h"
         "src/Lexer/*.cc"
+        "src/Lexer/Matchers/*.h"
+        "src/Lexer/Matchers/*.cc"
         )
 file(GLOB pinpon_test_SRC
         "test/*.h"
