@@ -4,7 +4,7 @@
 
 MatcherResult MatcherSingleCharacter::match(wchar_t first,
                                             int currentLineNumber,
-                                            InputSource *input) {
+                                            InputSource *) {
     static const std::unordered_map<wchar_t, const TokenType>
         charToTokenTypeMap({{lparen, TokenType::LPAREN},
                             {lparen, TokenType::LPAREN},

@@ -78,4 +78,7 @@ Token InputSourceTokenizer::getToken() {
             return match.result;
         }
     }
+
+    cout << "ERROR: Tokenizer overrun past end of file. Line " << lineNumber << endl;
+    return {};
 }

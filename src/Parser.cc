@@ -342,7 +342,7 @@ SyntaxNode *Parser::run_infix_comparison_expression() {
                     {TokenType::GEQ, NodeType::GTE},
                     {TokenType::LEQ, NodeType::LTE}
             });
-    for (const auto pair : operatorToNode) {
+    for (const auto &pair : operatorToNode) {
         if (accept(pair.first)) {
             auto rhs = run_infix_additive_expression();
             if (!rhs) {
