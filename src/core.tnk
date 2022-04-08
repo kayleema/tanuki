@@ -1,4 +1,4 @@
-const wchar_t *corePinponStarter = LR"(
+const wchar_t *coreTanukiStarter = LR"(
 
 表示（「狸語・プログラミング言語　〈バージョン０.４.１１〉」）
 バージョン＝１

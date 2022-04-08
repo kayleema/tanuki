@@ -21,12 +21,12 @@ jobs:
     - name: configure
       run: mkdir build && cd build && cmake ..
     - name: make
-      run: cd build && make pinpon_test
+      run: cd build && make tanuki_test
     - name: Upload binaries
       uses: actions/upload-artifact@v1
       with:
-        name: pinpon_test
-        path: build/pinpon_test
+        name: tanuki_test
+        path: build/tanuki_test
   test:
     name: "Test Core"
     runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
     - name: Download binary
       uses: actions/download-artifact@v1
       with:
-        name: pinpon_test
+        name: tanuki_test
         path: build/
-    - name: pinpon_test
-      run: cd build && chmod a+x ./pinpon_test && ./pinpon_test
+    - name: tanuki_test
+      run: cd build && chmod a+x ./tanuki_test && ./tanuki_test

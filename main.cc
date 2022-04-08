@@ -18,7 +18,7 @@
 
 using namespace std;
 
-void evalPinponStarter(Environment *env);
+void evalTanukiStarter(Environment *env);
 
 int main(int argc, char **argv) {
     ConsoleLogger log;
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
                 ->logEndl()
                 ->log("使い方：")
                 ->logEndl()
-                ->log("　./pinpon ファイル名.pin")
+                ->log("　./tanuki ファイル名.tnk")
                 ->logEndl()
                 ->logEndl()
                 ->log("パラメーター：")
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     FilesystemImpl filesystem;
     auto *env = new Environment(&context, &filesystem);
     env->bind(L"FILE", context.newStringValue(decodeUTF8(sourceFilename)));
-    evalPinponStarter(env);
+    evalTanukiStarter(env);
     env->eval(tree);
 
     delete tree;
@@ -113,9 +113,9 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void evalPinponStarter(Environment *env) {
+void evalTanukiStarter(Environment *env) {
     ConsoleLogger log;
-    auto source = StringInputSource(corePinponStarter);
+    auto source = StringInputSource(coreTanukiStarter);
     auto tokenizer = TanukiTokenizer(&source);
     auto parser = Parser(&tokenizer, &log);
     SyntaxNode *tree = parser.run();

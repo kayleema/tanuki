@@ -1,9 +1,9 @@
 #include "starterEvaluator.h"
 #include "CoreFunctions.h"
 
-void evalPinponStarter(Environment *env) {
+void evalTanukiStarter(Environment *env) {
     ConsoleLogger log;
-    auto source = StringInputSource(corePinponStarter);
+    auto source = StringInputSource(coreTanukiStarter);
     auto tokenizer = TanukiTokenizer(&source);
     auto parser = Parser(&tokenizer, &log);
     SyntaxNode *tree = parser.run();

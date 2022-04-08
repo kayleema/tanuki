@@ -4,7 +4,7 @@
 #include "Environment.h"
 
 extern "C" {
-    void pinponLoadModule(Environment *env);
+    void tanukiLoadModule(Environment *env);
 }
 
 #endif //PINPON_MAIN_H

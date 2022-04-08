@@ -11,4 +11,4 @@ add_executable(pikatanuki
         ${pikatanuki_SRC}
         )
 
-target_link_libraries(pikatanuki pinpon_lib ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(pikatanuki tanuki_lib ${CMAKE_THREAD_LIBS_INIT})

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "core.pin"
+#include "core.tnk"
 #include "Logger.h"
 
 

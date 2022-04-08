@@ -9,7 +9,7 @@
     [
         {
             "name": "cmake",
-            "shell_cmd": "make -C build pinpon_test",
+            "shell_cmd": "make -C build tanuki_test",
             "file_regex": "/([^/:]+):(\\d+):(\\d+): "
         }
     ]

@@ -3,6 +3,6 @@
 
 #include <Environment.h>
 
-void evalPinponStarter(Environment *env);
+void evalTanukiStarter(Environment *env);
 
 #endif

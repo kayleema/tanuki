@@ -502,7 +502,7 @@ Value *Environment::eval_import(SyntaxNode *tree) {
         dirToken = child->content.content;
         relativePath += string("/") + encodeUTF8(dirToken);
     }
-    relativePath += string(".pin");
+    relativePath += string(".tnk");
 
     string tryPath = dir + relativePath;
     ConsoleLogger logger;

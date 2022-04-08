@@ -41,7 +41,7 @@ TEST(stringInputSource, readSingleCharacters) {
 }
 
 TEST(stringInputSource, fileSource) {
-    auto filename = string("../example/fileInputSource.pin");
+    auto filename = string("../example/fileInputSource.tnk");
     FileInputSource stringInput(filename.c_str());
 
     EXPECT_EQ(stringInput.peekChar(), L'関');
@@ -66,8 +66,8 @@ TEST(stringInputSource, fileSource) {
     EXPECT_TRUE(stringInput.eof());
 }
 
-void evalPinponStarter(Environment *env) {
-    auto source = StringInputSource(corePinponStarter);
+void evalTanukiStarter(Environment *env) {
+    auto source = StringInputSource(coreTanukiStarter);
     auto tokenizer = TanukiTokenizer(&source);
     auto parser = Parser(&tokenizer, nullptr);
     SyntaxNode *tree = parser.run();
@@ -75,7 +75,7 @@ void evalPinponStarter(Environment *env) {
 }
 
 TEST(stringInputSource, selftest) {
-    auto filename = string("../testpin/tests.pin");
+    auto filename = string("../testpin/tests.tnk");
     ConsoleLogger logger;
     ConsoleLogger::wide_mode = false;
     logger.logLn("Starting self test");
@@ -92,7 +92,7 @@ TEST(stringInputSource, selftest) {
             L"FILE",
             context.newStringValue(decodeUTF8(filename))
     );
-    evalPinponStarter(env);
+    evalTanukiStarter(env);
     env->eval(tree);
 
     delete tree;

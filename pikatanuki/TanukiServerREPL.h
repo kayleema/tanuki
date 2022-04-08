@@ -32,7 +32,7 @@ public:
         environments[hdl] = new Environment(new Context(), nullptr, connectionLogger);
         environments[hdl]->context->setFrequency(10);
         environments[hdl]->exitHandler = connectionLogger;
-        evalPinponStarter(environments[hdl]);
+        evalTanukiStarter(environments[hdl]);
 
         connectionSet.insert(hdl);
     }

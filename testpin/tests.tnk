@@ -4,7 +4,7 @@
 確認イコール＝framework・確認イコール
 試験一覧＝framework・試験一覧
 
-＃呼び方：$ build/pinpon testpin/tests.pin
+＃呼び方：$ build/tanuki testpin/tests.tnk
 
 ＃数学に関するテスト
 関数、試験（）

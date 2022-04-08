@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(PinponProject)
+project(TanukiProject)
 
 set(CMAKE_CXX_STANDARD 11)
 if(WIN32)
@@ -19,7 +19,7 @@ include_directories("fakeit/single_header/gtest")
 include_directories("/usr/local/include")
 include_directories("/usr/include")
 
-file(GLOB pinpon_SRC
+file(GLOB tanuki_SRC
         "src/*.h"
         "src/*.cc"
         "src/Lexer/*.h"
@@ -27,7 +27,7 @@ file(GLOB pinpon_SRC
         "src/Lexer/Matchers/*.h"
         "src/Lexer/Matchers/*.cc"
         )
-file(GLOB pinpon_test_SRC
+file(GLOB tanuki_test_SRC
         "test/*.h"
         "test/*.cc"
         )
@@ -36,23 +36,23 @@ file(GLOB dynamic_SRC
         "dynamic/*.cc"
         )
 
-add_executable(pinpon main.cc ${pinpon_SRC})
-target_link_libraries(pinpon dl)
+add_executable(tanuki main.cc ${tanuki_SRC})
+target_link_libraries(tanuki dl)
 
-add_library(pinpon_lib ${pinpon_SRC})
-target_link_libraries(pinpon_lib dl)
+add_library(tanuki_lib ${tanuki_SRC})
+target_link_libraries(tanuki_lib dl)
 
-add_library(pinpon_dynamic SHARED ${dynamic_SRC} ${pinpon_SRC})
+add_library(tanuki_dynamic SHARED ${dynamic_SRC} ${tanuki_SRC})
 
 set(CTEST_OUTPUT_ON_FAILURE ON)
 enable_testing()
-add_executable(pinpon_test ${pinpon_SRC} ${pinpon_test_SRC})
+add_executable(tanuki_test ${tanuki_SRC} ${tanuki_test_SRC})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using GCC
-        set_target_properties ( pinpon_test PROPERTIES COMPILE_FLAGS " -O1" )
+        set_target_properties ( tanuki_test PROPERTIES COMPILE_FLAGS " -O1" )
 endif()
-target_link_libraries(pinpon_test gtest dl)
-add_test(NAME pinpon_test COMMAND pinpon_test)
+target_link_libraries(tanuki_test gtest dl)
+add_test(NAME tanuki_test COMMAND tanuki_test)
 
 add_subdirectory(pikatanuki)
 

@@ -15,17 +15,19 @@
 --------------
 * C++11 compatible compiler
 * cmake
+
+###「git submodule」ですでに導入されている依存ライブラリ
 * fakeit (git submodule に入っている)
 * googletest (git submodule に入っている)
 * websocketpp (git submodule に入っている)
 
-### ピカ狸のGUIのためだけの必要なライブラリ
+###（ピカ狸のGUIの場合だけ）必要なライブラリ
 * asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
 「 https://think-async.com/ 」からインストール出来ます。
 * npmやnodeなど… 
 * nhlohman json
 
-###　簡単ビルド環境セットアップおすすめ：
+###（ピカ狸のGUIの場合だけ）簡単ビルド環境セットアップおすすめ：
 
 OSXの場合は：（最近OSXのthink-asyncのbrewに入っているパッケージは問題ありそうですからソースからインストールした方はいい）
 ```
@@ -47,22 +49,22 @@ Linuxの場合は：
 
 狸語をビルド
 -----------
-cloneしたレポジトリのフォルダの中から
+cloneしたレポジトリのrootから
 ```
   mkdir build
   cd build
   cmake ..
-  make
+  make tanuki
 ```
 
 呼び方
 --------
 ```
-  ./pinpon <ファイル名.pin>
+  ./tanuki <ファイル名.tnk>
 ```
-Helpメッセージを表示：
+説明メッセージを表示：
 ```
-  ./pinpon -h
+  ./tanuki -h
 ```
 
 VSCodeとのインテグレーション（シンタックスハイライトとか）
@@ -74,20 +76,20 @@ https://marketplace.visualstudio.com/items?itemName=tanuki1.pin
 ---------
 `build`のディレクトリの中から
 ```
-  make pinpon_test && ./pinpon_test
+  make tanuki_test && ./tanuki_test
 ```
 
-`tests.pin`ファイルに入っているテストを実行する：
+`tests.tnk`ファイルに入っているテストを実行する：
 ```
-  make pinpon && ./pinpon ../testpin/tests.pin
+  make tanuki && ./tanuki ../testpin/tests.tnk
 ```
 
-GCCで`pinpon_test`をビルドする時に`cmake -DCMAKE_BUILD_TYPE=Debug ..`しないといけない。
+GCCで`tanuki_test`をビルドする時に`cmake -DCMAKE_BUILD_TYPE=Debug ..`しないといけない。
 fakeitのライブラリはGCCの`-O2`以上サポートしないだからです。
 
-`codingquestions.pin`ファイルに入っているテストを実行する：
+`codingquestions.tnk`ファイルに入っているテストを実行する：
 ```
-  make pinpon && ./pinpon ../testpin/codingquestions.pin
+  make tanuki && ./tanuki ../example/codingquestions.tnk
 ```
 
 言語の説明書
@@ -159,7 +161,7 @@ fakeitのライブラリはGCCの`-O2`以上サポートしないだからです
 
 ### 導入
 ```
-＃ファイル名：＂私のモジュール.pin＂
+＃ファイル名：＂私のモジュール.tnk＂
 関数、フィボナッチ（あ）
 　もし、あ＜＝１
 　　返す、１
@@ -167,16 +169,16 @@ fakeitのライブラリはGCCの`-O2`以上サポートしないだからです
 　　返す、フィボナッチ（あー１）＋フィボナッチ（あー２）
 ```
 ```
-＃ファイル名：＂私のアプリ.pin＂
+＃ファイル名：＂私のアプリ.tnk＂
 導入、私のモジュール
 表示（私のモジュール・フィボナッチ（２０））　＃６７６５
 ```
 
 ## 定義済み関数
-Basicな関数
+**表示**
 * 表示（表示したい事、他の事、…）
 
-データ構造
+**データ構造**
 * 辞書（キー：バリュー、キー２：バリュー２、…）→新しい辞書を作る
 * それぞれ（辞書、関数）→辞書のアイテムそれぞれ
 * 長さ（配列）→配列の長さを返す
@@ -184,7 +186,7 @@ Basicな関数
 * 辞書調べ（辞書、キー）→バリュー
 * 配列更新
 
-数学：
+**数学：**
 * 足す
 * 引く
 * 割り算
@@ -192,7 +194,7 @@ Basicな関数
 * イコール
 * 比べ
 
-システム：
+**システム：**
 * ファイル読む
 * 評価
 * エキステンション
@@ -201,10 +203,10 @@ Basicな関数
 ------------------
 ```
 cd build/
-make pinpon
-time ./pinpon ../example/codingquestions.pin
+make tanuki
+time ./tanuki ../example/codingquestions.tnk
 ```
-結果：`./pinpon ../example/codingquestions.pin  0.86s user 0.01s system 99% cpu 0.867 total`
+結果：`./tanuki ../example/codingquestions.tnk  0.86s user 0.01s system 99% cpu 0.867 total`
 
 細かい事：まだ実装されてない機能
 ------------------
