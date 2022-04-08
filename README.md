@@ -210,6 +210,12 @@ time ./tanuki ../example/codingquestions.tnk
 
 細かい事：まだ実装されてない機能
 ------------------
+Nativeエキステンションのテストする方法：
+```
+cd build/
+make tanuki tanuki_dynamic
+./tanuki ../example/importDynamicLibrary.tnk
+```
 希望の機能：
 * フローティングポイントのタイプ。floating point calculations
 * infix mod operator　今は関数のみ
