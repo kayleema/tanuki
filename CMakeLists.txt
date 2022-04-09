@@ -60,5 +60,8 @@ add_test(NAME tanuki_test COMMAND tanuki_test)
 
 #add_subdirectory(pikatanuki)
 
+include(GNUInstallDirs)
+
 install(TARGETS tanuki DESTINATION bin)
+install(TARGETS tanuki_dynamic LIBRARY DESTINATION lib)
 install(PROGRAMS tanuki-alias.sh DESTINATION bin RENAME 狸)
