@@ -1,12 +1,6 @@
-#include <iostream>
-#include <unordered_map>
 #include "Parser.h"
 
-SyntaxNode *Parser::run() {
-    allTokens = lexer->getAllTokens();
-    currentTokenIndex = 0;
-    return run_text();
-}
+#include <unordered_map>
 
 SyntaxNode *Parser::run_text() {
     auto result = new SyntaxNode(NodeType::TEXT);

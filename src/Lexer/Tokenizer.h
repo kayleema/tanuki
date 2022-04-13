@@ -4,23 +4,9 @@
 #include "TextInput/InputSource.h"
 #include "Matcher.h"
 #include "Token.h"
-#include <clocale>
-#include <codecvt>
-#include <cwchar>
-#include <iostream>
-#include <queue>
-#include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
 using namespace std;
-
-string encodeUTF8(const wstring &in);
-
-wstring decodeUTF8(const string &in);
-
-bool charIsSymbolic(wchar_t c);
 
 class Tokenizer {
   public:

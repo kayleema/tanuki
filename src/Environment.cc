@@ -3,6 +3,10 @@
 #include "CoreFunctions.h"
 #include "pathutils.h"
 #include "Logger.h"
+#include "Lexer/Tokenizer.h"
+#include "TextInput/UnicodeConversion.h"
+
+using namespace std;
 
 Value *Environment::eval(SyntaxNode *tree,
                          const FunctionValue *tailContext) {
@@ -515,8 +519,8 @@ Value *Environment::eval_import(SyntaxNode *tree) {
         return context->newNoneValue();
     }
     TanukiTokenizer tokenizer(fileInputSource.get());
-    Parser parser(&tokenizer, &logger);
-    auto parsedTree = parser.run();
+    Parser parser(&logger);
+    auto parsedTree = parser.run(tokenizer.getAllTokens());
     auto importEnv = newChildEnvironment();
     importEnv->bind(L"FILE", context->newStringValue(decodeUTF8(tryPath)));
     importEnv->eval(parsedTree);

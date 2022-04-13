@@ -6,6 +6,9 @@
 #include "Parser/Parser.h"
 #include "Value.h"
 #include "Filesystem.h"
+#include <iostream>
+
+using namespace std;
 
 class Context;
 class ExitHandler;
@@ -74,7 +77,7 @@ public:
         exitHandler = parent->exitHandler;
         if (_context == nullptr) {
             if (parent->context == nullptr) {
-                cout << "ERROR ERROR null parent context" << endl;
+                std::cout << "ERROR ERROR null parent context" << endl;
             }
             context = parent->context;
         } else {

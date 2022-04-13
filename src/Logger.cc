@@ -1,12 +1,14 @@
 ﻿#include "Logger.h"
-#include "Lexer/Tokenizer.h"
+#include "TextInput/UnicodeConversion.h"
 #include <iostream>
-
+#include <sstream>
 
 #ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
 #endif
+
+using namespace std;
 
 PinponLogger *ConsoleLogger::setup() {
     if (wide_mode) {

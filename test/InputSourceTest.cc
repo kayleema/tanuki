@@ -9,6 +9,7 @@
 #include <Context.h>
 #include <CoreFunctions.h>
 #include <Logger.h>
+#include "TextInput/UnicodeConversion.h"
 
 TEST(stringInputSource, eof_is_false) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
@@ -70,8 +71,8 @@ TEST(stringInputSource, fileSource) {
 void evalTanukiStarter(Environment *env) {
     auto source = StringInputSource(coreTanukiStarter);
     auto tokenizer = TanukiTokenizer(&source);
-    auto parser = Parser(&tokenizer, nullptr);
-    SyntaxNode *tree = parser.run();
+    auto parser = Parser(nullptr);
+    SyntaxNode *tree = parser.run(tokenizer.getAllTokens());
     env->eval(tree);
 }
 
@@ -82,8 +83,8 @@ TEST(stringInputSource, selftest) {
     logger.logLn("Starting self test");
     FileInputSource stringInput(filename.c_str());
     auto t = TanukiTokenizer(&stringInput);
-    auto p = Parser(&t, nullptr);
-    SyntaxNode *tree = p.run();
+    auto p = Parser(nullptr);
+    SyntaxNode *tree = p.run(t.getAllTokens());
     EXPECT_NE(tree->type, NodeType::PARSE_ERROR);
     Context context;
     context.setFrequency(1);

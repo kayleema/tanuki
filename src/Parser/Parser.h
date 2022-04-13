@@ -1,23 +1,13 @@
-#include <utility>
-
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "Lexer/Tokenizer.h"
-#include "Logger.h"
-#include "SyntaxNode.h"
+#include "GenericParser.h"
 
-class Parser {
-    Tokenizer *lexer;
-    vector<Token> allTokens;
-    PinponLogger *logger;
-    int currentTokenIndex{};
+class Parser : public GenericParser {
 public:
-    explicit Parser(Tokenizer *t, PinponLogger *l) : lexer(t), logger(l) {}
+    using GenericParser::GenericParser;
 
-    SyntaxNode *run();
-
-    SyntaxNode *run_text();
+    SyntaxNode *run_text() override;
 
     SyntaxNode *run_statement();
 
@@ -48,20 +38,6 @@ public:
     SyntaxNode *run_args();
 
     SyntaxNode *run_expression_tail();
-
-    bool accept(TokenType type, Token *out = nullptr);
-
-    bool accept(const vector<TokenType> &types, const vector<Token *> &outs);
-
-    bool accept(const vector<TokenType> &types, const vector<Token *> &outs,
-                const vector<TokenType> &reject);
-
-    bool expect(TokenType type);
-
-    Token currentToken();
-
-private:
-    void logInternal(string message);
 };
 
 #endif

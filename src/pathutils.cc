@@ -2,9 +2,7 @@
 
 #include <string>
 #include <cstring>
-#include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
 #ifdef _WIN32
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")

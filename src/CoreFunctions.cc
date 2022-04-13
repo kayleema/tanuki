@@ -6,8 +6,8 @@
 #include "Extension.h"
 #include "CoreFunctions.h"
 #include "Logger.h"
-
-#include <iostream>
+#include "Lexer/Tokenizer.h"
+#include "TextInput/UnicodeConversion.h"
 
 #include "core.tnk"
 
@@ -229,8 +229,8 @@ public:
         StringInputSource inputSource(text.c_str());
         TanukiTokenizer tokenizer(&inputSource);
         ConsoleLogger logger;
-        Parser parser(&tokenizer, &logger);
-        SyntaxNode *ast = parser.run();
+        Parser parser(&logger);
+        SyntaxNode *ast = parser.run(tokenizer.getAllTokens());
         moduleEnv->eval(ast);
         delete ast;
         return moduleEnv->toNewDictionaryValue();

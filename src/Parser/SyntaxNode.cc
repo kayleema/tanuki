@@ -28,6 +28,11 @@ string SyntaxNode::toString(int indent) {
 }
 
 bool SyntaxNode::isError() const {
+    for (const auto &child : children) {
+        if (child->isError()) {
+            return true;
+        }
+    }
     return type == NodeType::PARSE_ERROR;
 }
 

@@ -6,6 +6,8 @@
 #include "Environment.h"
 #include "Context.h"
 #include "Logger.h"
+#include "Lexer/Tokenizer.h"
+#include "TextInput/UnicodeConversion.h"
 
 bool Value::equals(const Value *rhs) const {
     return (type == rhs->type);

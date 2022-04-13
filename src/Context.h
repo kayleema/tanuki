@@ -1,9 +1,8 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
-#include <unordered_set>
-
 #include "Environment.h"
+#include <unordered_set>
 
 // Manages Memory and object lifecycle
 class Context {

@@ -1,6 +1,8 @@
 #include "Token.h"
 #include "Tokenizer.h"
 #include "NumericConversion.h"
+#include "TextInput/UnicodeConversion.h"
+#include <sstream>
 
 Token::Token(TokenType type, wstring _content, int line)
     : type(type), content(move(_content)), line(line) {
