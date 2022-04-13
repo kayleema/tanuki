@@ -2,49 +2,13 @@
 ===========================
 ![Core Tests](https://github.com/kayleemann/pinpon/workflows/Core%20Tests/badge.svg?branch=master)
 
-「git submodule」のセットアップ
+「git clone」してから「git submodule」のセットアップ
 -----------------------------
 ```
   git clone https://github.com/kayleema/tanuki.git
   cd tanuki
   git submodule init
   git submodule update
-```
-
-狸語の必要なライブラリ
---------------
-* C++11 compatible compiler
-* cmake
-
-###「git submodule」ですでに導入されている依存ライブラリ
-* fakeit (git submodule に入っている)
-* googletest (git submodule に入っている)
-* websocketpp (git submodule に入っている)
-
-###（ピカ狸のGUIの場合だけ）必要なライブラリ
-* asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
-「 https://think-async.com/ 」からインストール出来ます。
-* npmやnodeなど… 
-* nhlohman json
-
-###（ピカ狸のGUIの場合だけ）簡単ビルド環境セットアップおすすめ：
-
-OSXの場合は：（最近OSXのthink-asyncのbrewに入っているパッケージは問題ありそうですからソースからインストールした方はいい）
-```
-  brew tap nlohmann/json
-  brew install nlohmann-json
-  brew install cmake
-
-  # https://think-async.com/Asio/Download.html からダウンロードしてください。
-  cd ~/Downloads/asio-1.12.2
-  ./configure --without-boost
-  make
-  sudo make install
-```
-
-Linuxの場合は：
-```
-	apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev nlohmann-json3-dev
 ```
 
 狸語をビルド
@@ -57,6 +21,32 @@ cloneしたレポジトリのrootから
   make tanuki
 ```
 
+## インストール
+ビルドした後で`make install`を実行。
+
+
+狸語の必要なライブラリ
+--------------
+* C++11 compatible compiler
+* cmake
+
+### 「git submodule」ですでに導入されている依存ライブラリ
+* fakeit (git submodule に入っている)
+* googletest (git submodule に入っている)
+* websocketpp (git submodule に入っている)
+
+### OSXの場合は：
+```
+  xcode-select --install
+  brew install cmake
+```
+
+### Linuxの場合は：
+```
+  apt-get install -y build-essential git cmake autoconf libtool pkg-config libasio-dev nlohmann-json3-dev
+```
+
+
 呼び方
 --------
 ```
@@ -67,10 +57,16 @@ cloneしたレポジトリのrootから
   ./tanuki -h
 ```
 
-VSCodeとのインテグレーション（シンタックスハイライトとか）
+インストールすると、「狸」のaliasを作成されるから「tanuki」の代わりに「狸」でもかけます。
+
+
+IDEとのインテグレーション（シンタックスハイライトとか）
 --------------------
-.pinファイル編集するときのおすすめ：
-https://marketplace.visualstudio.com/items?itemName=tanuki1.pin
+VSCodeとのインテグレーション：
+  https://marketplace.visualstudio.com/items?itemName=tanuki1.pin
+
+SublimeTextとのインテグレーション：
+  (Sublime Text → Preferences → Browse Packages)をクリックして。Gitレポジトリの「tanuki.sublime-syntax」ファイルを「Packages/User/」にドラッグする。
 
 テストする
 ---------
@@ -113,7 +109,7 @@ fakeitのライブラリはGCCの`-O2`以上サポートしないだからです
 末尾再帰（tail recursion）はオプティマイズされました。
 
 ### 数学
-```$xslt
+```
 表示（１＋５ー４）
 表示（１＋５＜＝１０－２）
 ```
@@ -225,3 +221,25 @@ new lines are allowed in the middle of a statement)
 * multithreading
 * network utilities
 * `－変数名`
+
+
+### （ピカ狸のGUIの場合だけ）必要なライブラリ
+* asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
+「 https://think-async.com/ 」からインストール出来ます。
+* npmやnodeなど… 
+* nhlohman json
+
+### （ピカ狸のGUIの場合だけ）簡単ビルド環境セットアップおすすめ：
+
+OSXの場合は：（最近OSXのthink-asyncのbrewに入っているパッケージは問題ありそうですからソースからインストールした方はいい）
+```
+  brew tap nlohmann/json
+  brew install nlohmann-json
+  brew install cmake
+
+  # https://think-async.com/Asio/Download.html からダウンロードしてください。
+  cd ~/Downloads/asio-1.12.2
+  ./configure --without-boost
+  make
+  sudo make install
+```

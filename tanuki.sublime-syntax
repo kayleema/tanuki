@@ -4,6 +4,7 @@
 name: tanuki
 file_extensions:
   - pin
+  - tnk
 scope: source.example-c
 contexts:
   main:
@@ -23,7 +24,7 @@ contexts:
     # strings in YAML. When using single quoted strings, only single quotes
     # need to be escaped: this is done by using two single quotes next to each
     # other.
-    - match: '\b(もし|その他|返す)\b'
+    - match: '\b(もし|その他|返す|確認|外側)\b'
       scope: keyword.control.example-c
 
     - match: '(関数)、'
@@ -32,10 +33,10 @@ contexts:
       push: function
 
     # Numbers
-    - match: '\b(-)?[０-９.]+\b'
+    - match: '\b(－)?[０-９.]+\b'
       scope: constant.numeric.example-c
 
-    - match: '\b([^、（）]*)（'
+    - match: '\b([^、（）〜・]*)（'
       captures:
         1: variable.function
 
