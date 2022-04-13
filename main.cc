@@ -7,16 +7,13 @@
 #include "Parser/Parser.h"
 #include "TextInput/FileInputSource.h"
 #include "TextInput/StringInputSource.h"
+#include "TextInput/UnicodeConversion.h"
 #include "helpText.h"
 #include <cstring>
-#include <fcntl.h>
-#include <iostream>
 #include <locale.h>
 
 #ifdef _WIN32
 #include <io.h>
-#else
-#include <sys/uio.h>
 #endif
 
 using namespace std;
@@ -60,9 +57,13 @@ int main(int argc, char **argv) {
     }
 
     // Load file
-    const char *sourceFilename = argv[argc - 1];
+    auto sourceFilename = string(argv[argc - 1]);
+    if (sourceFilename.length() < 4 ||
+        (sourceFilename.substr(sourceFilename.length() - 4) != ".tnk")) {
+        sourceFilename.append(".tnk");
+    }
     log.log(L"実行始まります：")->log(sourceFilename)->logEndl();
-    FileInputSource input(sourceFilename);
+    FileInputSource input(sourceFilename.c_str());
 
     // Tokenize
     auto tokenizer = TanukiTokenizer(&input);
@@ -77,8 +78,8 @@ int main(int argc, char **argv) {
     }
 
     // Parse
-    auto parser = Parser(&tokenizer, &log);
-    SyntaxNode *tree = parser.run();
+    auto parser = Parser(&log);
+    SyntaxNode *tree = parser.run(tokenizer.getAllTokens());
     if (print_ast) {
         string treeString = tree->toString();
         log.logLn("ABSTRACT SYNTAX TREE:");
@@ -106,7 +107,7 @@ void evalTanukiStarter(Environment *env) {
     ConsoleLogger log;
     auto source = StringInputSource(coreTanukiStarter);
     auto tokenizer = TanukiTokenizer(&source);
-    auto parser = Parser(&tokenizer, &log);
-    SyntaxNode *tree = parser.run();
+    auto parser = Parser(&log);
+    SyntaxNode *tree = parser.run(tokenizer.getAllTokens());
     env->eval(tree);
 }
