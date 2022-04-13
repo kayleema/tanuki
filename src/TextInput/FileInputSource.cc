@@ -1,6 +1,8 @@
 #include <codecvt>
 #include <iostream>
-#include "InputSource.h"
+#include "FileInputSource.h"
+
+using namespace std;
 
 FileInputSource::FileInputSource(const char *filename) : file(filename) {
     file.imbue(std::locale(std::locale(), new std::codecvt_utf8<wchar_t>));
@@ -28,21 +30,4 @@ wchar_t FileInputSource::peekChar() {
 
 bool FileInputSource::eof() {
     return file.eof();
-}
-
-
-wchar_t StringInputSource::getChar() {
-    if (*source == L'\0') {
-        finished = true;
-        return L'\0';
-    }
-    return *source++;
-}
-
-wchar_t StringInputSource::peekChar() {
-    return *source;
-}
-
-bool StringInputSource::eof() {
-    return finished;
 }

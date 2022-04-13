@@ -4,7 +4,10 @@
 #include "Extension.h"
 #include "Lexer/Tokenizer.h"
 #include "Logger.h"
-#include "Parser.h"
+#include "Parser/Parser.h"
+#include "TextInput/FileInputSource.h"
+#include "TextInput/StringInputSource.h"
+#include "helpText.h"
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
@@ -24,9 +27,10 @@ int main(int argc, char **argv) {
     ConsoleLogger log;
     log.setup();
 
+    // Parse command line args
     setlocale(LC_ALL, "");
     if (argc < 2) {
-        log.logLn("使い方は間違い");
+        log.logLn("使い方は間違い；引数はありません。");
         return 1;
     }
     long freq = 100000;
@@ -37,9 +41,11 @@ int main(int argc, char **argv) {
             i++;
             if (strcmp(argv[i], "ast") == 0) {
                 print_ast = true;
-            }
-            if (strcmp(argv[i], "lex") == 0) {
+            } else if (strcmp(argv[i], "lex") == 0) {
                 print_lex = true;
+            } else {
+                log.logLn("使い方は間違い：「-d」フラグの後に意外な直");
+                return 1;
             }
         }
         if (strcmp(argv[i], "-f") == 0) {
@@ -48,49 +54,31 @@ int main(int argc, char **argv) {
             log.log("Freq set to ")->logLong(freq)->logEndl();
         }
         if (strcmp(argv[i], "-h") == 0) {
-            log.log("狸語プログラミング言語")
-                ->logEndl()
-                ->log("ーーーーーーーーーーーーーーー")
-                ->logEndl()
-                ->log("使い方：")
-                ->logEndl()
-                ->log("　./tanuki ファイル名.tnk")
-                ->logEndl()
-                ->logEndl()
-                ->log("パラメーター：")
-                ->logEndl()
-                ->log("　-d lex：lexerの結果を表示（ディバギング）")
-                ->logEndl()
-                ->log("　-d ast：parserの結果を表示（ディバギング）")
-                ->logEndl()
-                ->log(
-                    "　-f "
-                    "数字：evalの何回目の時にメモリを掃除（デフォルトは十万）")
-                ->logEndl()
-                ->log("　-h：このメッセジを表示")
-                ->logEndl();
+            log.log(TANUKI_HELP_MESSAGE);
             return 0;
         }
     }
 
+    // Load file
     const char *sourceFilename = argv[argc - 1];
-    log.log(L"始まります")->log(sourceFilename)->logEndl();
+    log.log(L"実行始まります：")->log(sourceFilename)->logEndl();
     FileInputSource input(sourceFilename);
-    auto t = TanukiTokenizer(&input);
 
+    // Tokenize
+    auto tokenizer = TanukiTokenizer(&input);
     if (print_lex) {
         log.logLn("LEXER 結果:");
         Token current;
-        while ((current = t.getToken()).type != TokenType::END) {
+        while ((current = tokenizer.getToken()).type != TokenType::END) {
             log.logLn(current.toString());
         }
         log.logEndl();
         return 1;
     }
 
-    auto p = Parser(&t, &log);
-    SyntaxNode *tree = p.run();
-
+    // Parse
+    auto parser = Parser(&tokenizer, &log);
+    SyntaxNode *tree = parser.run();
     if (print_ast) {
         string treeString = tree->toString();
         log.logLn("ABSTRACT SYNTAX TREE:");
@@ -100,6 +88,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    // Execute
     Context context;
     context.setFrequency(freq);
     FilesystemImpl filesystem;

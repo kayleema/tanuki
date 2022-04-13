@@ -5,15 +5,15 @@
 #include <memory>
 
 class Filesystem {
-public:
-    virtual unique_ptr<InputSource>
-    getInputSourceForFilename(const string &filename) = 0;
+  public:
+    virtual std::unique_ptr<InputSource>
+    getInputSourceForFilename(const std::string &filename) = 0;
 };
 
 class FilesystemImpl : public Filesystem {
-public:
-    unique_ptr<InputSource>
-    getInputSourceForFilename(const string &filename) override;
+  public:
+    std::unique_ptr<InputSource>
+    getInputSourceForFilename(const std::string &filename) override;
 };
 
-#endif //FILESYSTEM_H
+#endif // FILESYSTEM_H

@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 
 #include "Lexer/Tokenizer.h"
-#include "Parser.h"
+#include "Parser/Parser.h"
 #include "Environment.h"
 #include "Context.h"
 

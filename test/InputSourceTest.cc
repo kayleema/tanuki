@@ -1,10 +1,11 @@
 #include "gtest/gtest.h"
 
-#include "TextInput/InputSource.h"
+#include "TextInput/FileInputSource.h"
 #include "pathutils.h"
 #include <iostream>
 #include "Lexer/Tokenizer.h"
-#include <Parser.h>
+#include "TextInput/StringInputSource.h"
+#include "Parser/Parser.h"
 #include <Context.h>
 #include <CoreFunctions.h>
 #include <Logger.h>

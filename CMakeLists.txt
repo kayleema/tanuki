@@ -22,12 +22,14 @@ include_directories("/usr/include")
 file(GLOB tanuki_SRC
         "src/*.h"
         "src/*.cc"
+        "src/TextInput/*.h"
+        "src/TextInput/*.cc"
         "src/Lexer/*.h"
         "src/Lexer/*.cc"
         "src/Lexer/Matchers/*.h"
         "src/Lexer/Matchers/*.cc"
-        "src/TextInput/*.h"
-        "src/TextInput/*.cc"
+        "src/Parser/*.h"
+        "src/Parser/*.cc"
         )
 file(GLOB tanuki_test_SRC
         "test/*.h"

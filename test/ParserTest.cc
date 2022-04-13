@@ -1,9 +1,10 @@
 #include "gtest/gtest.h"
 
 #include "Lexer/Tokenizer.h"
-#include "Parser.h"
+#include "Parser/Parser.h"
 #include "Logger.h"
 #include "fakeit.hpp"
+#include "TextInput/StringInputSource.h"
 
 TEST(parsing, functions) {
 

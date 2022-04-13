@@ -1,14 +1,15 @@
 #include "Value.h"
 #include "Environment.h"
 #include "Context.h"
-#include "TextInput/InputSource.h"
+#include "TextInput/FileInputSource.h"
+#include "TextInput/StringInputSource.h"
 #include "Extension.h"
 #include "CoreFunctions.h"
+#include "Logger.h"
 
 #include <iostream>
 
 #include "core.tnk"
-#include "Logger.h"
 
 
 // Builtin Functions

@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 
 #include "Lexer/Tokenizer.h"
+#include "TextInput/StringInputSource.h"
 
 TEST(tokenizer, simple_test) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");

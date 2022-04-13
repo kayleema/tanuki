@@ -2,9 +2,10 @@
 #include "gtest/gtest.h"
 #include "fakeit.hpp"
 #include "Lexer/Tokenizer.h"
-#include "Parser.h"
+#include "Parser/Parser.h"
 #include "Environment.h"
 #include "Context.h"
+#include "TextInput/StringInputSource.h"
 
 using namespace fakeit;
 
