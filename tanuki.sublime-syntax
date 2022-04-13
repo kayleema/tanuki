@@ -36,7 +36,7 @@ contexts:
     - match: '\b(－)?[０-９.]+\b'
       scope: constant.numeric.example-c
 
-    - match: '\b([^、（）〜・]*)（'
+    - match: '\b([^、（）〜＝・]*)（'
       captures:
         1: variable.function
 
