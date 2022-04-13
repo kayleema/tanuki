@@ -1,7 +1,7 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include "InputSource.h"
+#include "TextInput/InputSource.h"
 #include <memory>
 
 class Filesystem {

@@ -1,7 +1,7 @@
 #include "Value.h"
 #include "Environment.h"
 #include "Context.h"
-#include "InputSource.h"
+#include "TextInput/InputSource.h"
 #include "Extension.h"
 #include "CoreFunctions.h"
 

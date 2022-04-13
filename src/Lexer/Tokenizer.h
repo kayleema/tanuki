@@ -1,7 +1,7 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
-#include "InputSource.h"
+#include "TextInput/InputSource.h"
 #include "Matcher.h"
 #include "Token.h"
 #include <clocale>

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "InputSource.h"
+#include "TextInput/InputSource.h"
 #include "pathutils.h"
 #include <iostream>
 #include "Lexer/Tokenizer.h"

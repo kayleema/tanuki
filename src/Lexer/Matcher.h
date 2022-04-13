@@ -1,7 +1,7 @@
 #ifndef MATCHER_H
 #define MATCHER_H
 
-#include "InputSource.h"
+#include "TextInput/InputSource.h"
 #include "Token.h"
 #include <optional>
 #include <utility>
