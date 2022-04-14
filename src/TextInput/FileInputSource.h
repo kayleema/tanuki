@@ -17,7 +17,7 @@ class FileInputSource : public InputSource {
 
     bool eof() override;
 
-    bool good() override { return file.good(); }
+    bool good() override { return file.good() && !file.bad(); }
 };
 
 #endif

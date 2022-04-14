@@ -66,4 +66,5 @@ include(GNUInstallDirs)
 
 install(TARGETS tanuki DESTINATION bin)
 install(TARGETS tanuki_dynamic LIBRARY DESTINATION lib)
+install(PROGRAMS tanuki-lib.tnk DESTINATION lib/tanuki RENAME 狸図書館.tnk)
 install(PROGRAMS tanuki-alias.sh DESTINATION bin RENAME 狸)

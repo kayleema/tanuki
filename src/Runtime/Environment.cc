@@ -416,7 +416,7 @@ Value *Environment::eval_subscript_set(Value *source, SyntaxNode *tree) {
 
 Value *Environment::eval_set(Value *source, SyntaxNode *tree) {
     if (source->type != ValueType::DICT) {
-        cout << "実行エラー：「・ ＝」のときに「＝」の左側はSET出来ない型です。" << endl;
+        cout << "実行エラー：「・ ＝」のときに「＝」の左側はSET出来ない型です。" << source->toString() << endl;
         return context->newNoneValue();
     }
     DictionaryValue *sourceDict = static_cast<DictionaryValue*>(source);
@@ -524,9 +524,11 @@ Value *Environment::eval_return(SyntaxNode *tree,
 }
 
 Value *Environment::eval_import(SyntaxNode *tree) {
-    auto path = encodeUTF8(lookup(L"FILE")->toStringValue()->value);
-    auto dir = getDirectoryForPath(path);
+    ConsoleLogger logger;
+    auto currentFilePath = encodeUTF8(lookup(L"FILE")->toStringValue()->value);
+    auto currentFileDir = getDirectoryForPath(currentFilePath);
 
+    // Get relative path
     auto relativePath = string();
     wstring dirToken;
     for (auto child : tree->children) {
@@ -535,16 +537,19 @@ Value *Environment::eval_import(SyntaxNode *tree) {
     }
     relativePath += string(".tnk");
 
-    string tryPath = dir + relativePath;
-    ConsoleLogger logger;
-    logger.log(L"importing from:「")->log(path)
-            ->log(L"」 path:「")->log(tryPath)
-            ->log(L"」 as:「")->log(dirToken)->log("」")->logEndl();
+    // Try Current Directory
+    string tryPath = currentFileDir + relativePath;
     auto fileInputSource = filesystem->getInputSourceForFilename(tryPath);
     if (!fileInputSource->good()) {
-        logger.log("ERROR: could not import")->logEndl();
-        return context->newNoneValue();
+        tryPath = string("/usr/local/lib/tanuki/") + relativePath;
+        fileInputSource = filesystem->getInputSourceForFilename(tryPath);
+        if (!fileInputSource->good()) {
+            logger.log("ERROR: could not import")->logEndl();
+            return context->newNoneValue();
+        }
     }
+
+    // Parse and Exec file
     TanukiTokenizer tokenizer(fileInputSource.get());
     Parser parser(&logger);
     auto parsedTree = parser.run(tokenizer.getAllTokens());
