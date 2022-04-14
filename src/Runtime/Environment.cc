@@ -8,8 +8,7 @@
 
 using namespace std;
 
-Value *Environment::eval(SyntaxNode *tree,
-                         const FunctionValue *tailContext) {
+Value *Environment::eval(SyntaxNode *tree, const FunctionValue *tailContext) {
     context->collect(this);
     switch (tree->type) {
         case NodeType::CALL:
@@ -89,7 +88,11 @@ Value *Environment::eval_sub(SyntaxNode *tree) {
     context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
-                lhs->toNumberValue()->value - rhs->toNumberValue()->value);
+            lhs->toNumberValue()->value - rhs->toNumberValue()->value);
+    } else if (lhs->type == ValueType::NUM_FLOAT &&
+               rhs->type == ValueType::NUM_FLOAT) {
+        return context->newFloatValue(
+            lhs->toFloatValue()->value - rhs->toFloatValue()->value);
     }
     return context->newNoneValue();
 }
@@ -101,7 +104,11 @@ Value *Environment::eval_mul(SyntaxNode *tree) {
     context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
-                lhs->toNumberValue()->value * rhs->toNumberValue()->value);
+            lhs->toNumberValue()->value * rhs->toNumberValue()->value);
+    } else if (lhs->type == ValueType::NUM_FLOAT &&
+               rhs->type == ValueType::NUM_FLOAT) {
+        return context->newFloatValue(lhs->toFloatValue()->value *
+                                      rhs->toFloatValue()->value);
     }
     return context->newNoneValue();
 }
@@ -114,6 +121,10 @@ Value *Environment::eval_div(SyntaxNode *tree) {
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
         return context->newNumberValue(
                 lhs->toNumberValue()->value / rhs->toNumberValue()->value);
+    } else if (lhs->type == ValueType::NUM_FLOAT &&
+               rhs->type == ValueType::NUM_FLOAT) {
+        return context->newFloatValue(lhs->toFloatValue()->value /
+                                      rhs->toFloatValue()->value);
     }
     return context->newNoneValue();
 }
@@ -140,7 +151,11 @@ Value *Environment::eval_gt(SyntaxNode *tree) {
     auto rhs = eval(tree->children[1]);
     context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
-        return context->newNumberValue(lhs->toNumberValue()->value > rhs->toNumberValue()->value ? 1 : 0);
+        return context->newNumberValue(
+            lhs->toNumberValue()->value > rhs->toNumberValue()->value ? 1 : 0);
+    } else if (lhs->type == ValueType::NUM_FLOAT && rhs->type == ValueType::NUM_FLOAT) {
+        return context->newNumberValue(
+            lhs->toFloatValue()->value > rhs->toFloatValue()->value ? 1 : 0);
     }
     return context->newNoneValue();
 }
@@ -151,7 +166,11 @@ Value *Environment::eval_lt(SyntaxNode *tree) {
     auto rhs = eval(tree->children[1]);
     context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
-        return context->newNumberValue(lhs->toNumberValue()->value < rhs->toNumberValue()->value ? 1 : 0);
+        return context->newNumberValue(
+            lhs->toNumberValue()->value < rhs->toNumberValue()->value ? 1 : 0);
+    } else if (lhs->type == ValueType::NUM_FLOAT && rhs->type == ValueType::NUM_FLOAT) {
+        return context->newNumberValue(
+            lhs->toFloatValue()->value < rhs->toFloatValue()->value ? 1 : 0);
     }
     return context->newNoneValue();
 }
@@ -162,7 +181,11 @@ Value *Environment::eval_gte(SyntaxNode *tree) {
     auto rhs = eval(tree->children[1]);
     context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
-        return context->newNumberValue(lhs->toNumberValue()->value >= rhs->toNumberValue()->value ? 1 : 0);
+        return context->newNumberValue(
+            lhs->toNumberValue()->value >= rhs->toNumberValue()->value ? 1 : 0);
+    } else if (lhs->type == ValueType::NUM_FLOAT && rhs->type == ValueType::NUM_FLOAT) {
+        return context->newNumberValue(
+            lhs->toFloatValue()->value >= rhs->toFloatValue()->value ? 1 : 0);
     }
     return context->newNoneValue();
 }
@@ -173,7 +196,11 @@ Value *Environment::eval_lte(SyntaxNode *tree) {
     auto rhs = eval(tree->children[1]);
     context->tempRefDecrement(lhs);
     if (lhs->type == ValueType::NUM && rhs->type == ValueType::NUM) {
-        return context->newNumberValue(lhs->toNumberValue()->value <= rhs->toNumberValue()->value ? 1 : 0);
+        return context->newNumberValue(
+            lhs->toNumberValue()->value <= rhs->toNumberValue()->value ? 1 : 0);
+    } else if (lhs->type == ValueType::NUM_FLOAT && rhs->type == ValueType::NUM_FLOAT) {
+        return context->newNumberValue(
+            lhs->toFloatValue()->value <= rhs->toFloatValue()->value ? 1 : 0);
     }
     return context->newNoneValue();
 }

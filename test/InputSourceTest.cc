@@ -6,8 +6,8 @@
 #include "Lexer/Tokenizer.h"
 #include "TextInput/StringInputSource.h"
 #include "Parser/Parser.h"
-#include <Context.h>
-#include <CoreFunctions.h>
+#include "Runtime/Context.h"
+#include "Runtime/CoreFunctions.h"
 #include <Logger.h>
 #include "TextInput/UnicodeConversion.h"
 

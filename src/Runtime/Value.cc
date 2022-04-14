@@ -79,7 +79,8 @@ string NumberValue::toStringJP() const {
 
 bool FloatValue::equals(const Value *rhs) const {
     static const double EPSILON = 0.00001;
-    return Value::equals(rhs) && ( abs(value - ((FloatValue *) rhs)->value) < EPSILON);
+    return Value::equals(rhs) &&
+           (abs(value - ((FloatValue *)rhs)->value) < EPSILON);
 }
 
 string FloatValue::toString() const {

@@ -1,7 +1,7 @@
 #ifndef PINPON_MAIN_H
 #define PINPON_MAIN_H
 
-#include "Environment.h"
+#include "Runtime/Environment.h"
 
 extern "C" {
     void tanukiLoadModule(Environment *env);

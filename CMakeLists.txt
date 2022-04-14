@@ -30,6 +30,8 @@ file(GLOB tanuki_SRC
         "src/Lexer/Matchers/*.cc"
         "src/Parser/*.h"
         "src/Parser/*.cc"
+        "src/Runtime/*.h"
+        "src/Runtime/*.cc"
         )
 file(GLOB tanuki_test_SRC
         "test/*.h"

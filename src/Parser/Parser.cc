@@ -466,6 +466,9 @@ SyntaxNode *Parser::run_expression() {
         if (accept(TokenType::NUMBER, &start)) {
             start.number = -start.number;
             return new SyntaxNode(start);
+        } else if (accept(TokenType::NUMBER_FLOAT, &start)) {
+            start.numberFloat = -start.numberFloat;
+            return new SyntaxNode(start);
         } else {
             logInternal("エラー：役に立たないマイナスがあります。");
             return new SyntaxNode(NodeType::PARSE_ERROR);

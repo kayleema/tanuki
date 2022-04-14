@@ -20,10 +20,10 @@ const string ValueTypeStrings[] = {
 };
 
 class NumberValue;
-
+class FloatValue;
 class StringValue;
-
 class DictionaryValue;
+class FunctionValue;
 
 class Value {
 public:
@@ -39,6 +39,10 @@ public:
     virtual string toStringJP() const;
 
     NumberValue *toNumberValue() { return (NumberValue *) this; }
+
+    FunctionValue *toFunctionValue() { return (FunctionValue *) this; }
+
+    FloatValue *toFloatValue() { return (FloatValue *) this; }
 
     StringValue *toStringValue() { return (StringValue *) this; }
 

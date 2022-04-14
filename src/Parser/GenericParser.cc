@@ -74,8 +74,11 @@ Token GenericParser::currentToken() { return allTokens[currentTokenIndex]; }
 
 void GenericParser::logInternal(string message) {
     if (logger) {
-        logger->log(message);
+        logger->log(string("パーシングの"))
+            ->logLong(currentToken().line)
+            ->log("行目に")
+            ->logLn(message);
     } else {
-        std::cout << message;
+        std::cout << "log" << message;
     }
 }

@@ -1,10 +1,9 @@
-#include <CoreFunctions.h>
+#include "Runtime/CoreFunctions.h"
 #include "gtest/gtest.h"
 
 #include "Lexer/Tokenizer.h"
-#include "Parser/Parser.h"
-#include "Environment.h"
-#include "Context.h"
+#include "Runtime/Environment.h"
+#include "Runtime/Context.h"
 
 TEST(coreFunctions, functionNewDictionary) {
     Context context;

@@ -566,12 +566,14 @@ TEST(parsing, parse_error) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     Mock<PinponLogger> logger;
     When(OverloadedMethod(logger, log, PinponLogger * (string))).AlwaysReturn(&logger.get());
+    When(OverloadedMethod(logger, logLn, PinponLogger * (string))).AlwaysReturn(&logger.get());
+    When(OverloadedMethod(logger, logLong, PinponLogger * (long))).AlwaysReturn(&logger.get());
     auto parser = Parser(&logger.get());
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
 
     EXPECT_EQ(tree->type, NodeType::PARSE_ERROR);
     Verify(
-            OverloadedMethod(logger, log, PinponLogger * (string))
+            OverloadedMethod(logger, logLn, PinponLogger * (string))
             .Using("意外なトークン：plus：”＋”、1行目\n")
     );
 }

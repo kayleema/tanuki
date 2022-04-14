@@ -213,15 +213,18 @@ make tanuki tanuki_dynamic
 ./tanuki ../example/importDynamicLibrary.tnk
 ```
 希望の機能：
-* フローティングポイントのタイプ。floating point calculations
 * infix mod operator　今は関数のみ
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no 
 new lines are allowed in the middle of a statement)
+* 直接渡す無名関数。Kotlinみたいにできればいいと思います
 * 文字列の中のエスケープコード。escape codes in strings
 * multithreading
 * network utilities
 * `－変数名`
+* 漢字で書ける数字。例えば「一万五千」や「一五〇〇〇」など
 
+やるべきリファクタリング：
+* Lexer Postprocessor refactoring.
 
 ### （ピカ狸のGUIの場合だけ）必要なライブラリ
 * asio (ピカ狸のGUIのためだけ)　このライブラリはgit submoduleに入っていません. 
