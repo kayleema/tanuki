@@ -7,7 +7,7 @@ if (WIN32)
     set(CMAKE_CXX_FLAGS_DEBUG "/EHa /MTd /utf-8")
 else ()
     set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-    set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Og")
 endif ()
 
 add_subdirectory(./googletest EXCLUDE_FROM_ALL)
@@ -42,22 +42,23 @@ file(GLOB dynamic_SRC
         "dynamic/*.cc"
         )
 
-add_executable(tanuki main.cc ${tanuki_SRC})
-target_link_libraries(tanuki dl)
-
 add_library(tanuki_lib ${tanuki_SRC})
 target_link_libraries(tanuki_lib dl)
 
-add_library(tanuki_dynamic SHARED ${dynamic_SRC} ${tanuki_SRC})
+add_executable(tanuki main.cc)
+target_link_libraries(tanuki tanuki_lib dl)
+
+add_library(tanuki_dynamic SHARED ${dynamic_SRC})
+target_link_libraries(tanuki_dynamic tanuki_lib)
 
 set(CTEST_OUTPUT_ON_FAILURE ON)
 enable_testing()
-add_executable(tanuki_test ${tanuki_SRC} ${tanuki_test_SRC})
+add_executable(tanuki_test ${tanuki_test_SRC})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     set_target_properties(tanuki_test PROPERTIES COMPILE_FLAGS " -O1")
 endif ()
-target_link_libraries(tanuki_test gtest dl)
+target_link_libraries(tanuki_test tanuki_lib gtest dl)
 add_test(NAME tanuki_test COMMAND tanuki_test)
 
 #add_subdirectory(pikatanuki)

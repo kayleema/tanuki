@@ -17,7 +17,7 @@ cloneしたレポジトリのrootから
 ```
   mkdir build
   cd build
-  cmake ..
+  cmake -DCMAKE_BUILD_TYPE=Release ..
   make tanuki
 ```
 
@@ -213,6 +213,7 @@ make tanuki tanuki_dynamic
 ./tanuki ../example/importDynamicLibrary.tnk
 ```
 希望の機能：
+* improve system import search path and unify with command line search path. 
 * infix mod operator　今は関数のみ
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no 
 new lines are allowed in the middle of a statement)

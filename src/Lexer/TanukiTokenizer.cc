@@ -18,11 +18,15 @@ TanukiTokenizer::TanukiTokenizer(InputSource *input) : InputSourceTokenizer(inpu
     matchers.push_back(new MatcherNumberLiteral());
     matchers.push_back(new MatcherString());
     matchers.push_back(new MatcherSymbol());
+    tokenProcessors.push_back(new IndentationTokenProcessor());
 }
 
 
 TanukiTokenizer::~TanukiTokenizer() {
     for (auto *matcher : matchers) {
         delete matcher;
+    }
+    for (auto *processor : tokenProcessors) {
+        delete processor;
     }
 }

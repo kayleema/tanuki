@@ -4,6 +4,7 @@
 #include "TextInput/InputSource.h"
 #include "Matcher.h"
 #include "Token.h"
+#include "TokenProcessor.h"
 #include <vector>
 
 using namespace std;
@@ -21,10 +22,12 @@ class InputSourceTokenizer : public Tokenizer {
 
   protected:
     vector<Matcher *> matchers;
+    vector<TokenProcessor *> tokenProcessors;
 
   public:
     explicit InputSourceTokenizer(InputSource *input) : input(input) {}
 
+    vector<Token> getAllTokens() override;
     Token getToken() override;
 };
 

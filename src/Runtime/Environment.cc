@@ -541,7 +541,7 @@ Value *Environment::eval_import(SyntaxNode *tree) {
     string tryPath = currentFileDir + relativePath;
     auto fileInputSource = filesystem->getInputSourceForFilename(tryPath);
     if (!fileInputSource->good()) {
-        tryPath = string("/usr/local/lib/tanuki/") + relativePath;
+        tryPath = string(GLOBAL_TANUKI_LIB_SEARCH_PATH) + relativePath;
         fileInputSource = filesystem->getInputSourceForFilename(tryPath);
         if (!fileInputSource->good()) {
             logger.log("ERROR: could not import")->logEndl();

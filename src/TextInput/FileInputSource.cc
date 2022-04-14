@@ -7,7 +7,7 @@ using namespace std;
 FileInputSource::FileInputSource(const char *filename) : file(filename) {
     file.imbue(std::locale(std::locale(), new std::codecvt_utf8<wchar_t>));
     if (file.bad() || !file.good()) {
-        cout << "ERROR：ファイルを開けません。[" << filename << "]" << endl;
+        //cout << "ERROR：ファイルを開けません。[" << filename << "]" << endl;
     }
 }
 

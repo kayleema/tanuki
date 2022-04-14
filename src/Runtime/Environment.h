@@ -8,6 +8,8 @@
 #include "Filesystem.h"
 #include <iostream>
 
+#define GLOBAL_TANUKI_LIB_SEARCH_PATH "/usr/local/lib/tanuki/"
+
 using namespace std;
 
 class Context;
