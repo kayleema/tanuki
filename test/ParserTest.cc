@@ -14,6 +14,7 @@ TEST(parsing, functions) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -44,6 +45,7 @@ TEST(parsing, importing_file) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"IMPORT\n"
@@ -61,6 +63,7 @@ TEST(parsing, function_with_kwargs) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -87,6 +90,7 @@ TEST(parsing, user_function) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"FUNC\n"
@@ -110,6 +114,7 @@ TEST(parsing, user_function_varparam) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::FUNC, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"ほげ", 1)),
@@ -139,6 +144,7 @@ TEST(parsing, user_function_defaultparam) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::FUNC, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"ほげ", 1)),
@@ -174,6 +180,7 @@ TEST(parsing, dot_lookup) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -193,6 +200,7 @@ TEST(parsing, dot_lookup_and_assign) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -218,6 +226,7 @@ TEST(parsing, dot_lookup_and_call) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -239,6 +248,7 @@ TEST(parsing, dot_lookup_and_call_and_lookup) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -266,6 +276,7 @@ TEST(parsing_infix, simple) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     auto expectedTree = SyntaxNode(NodeType::ADD, {
             new SyntaxNode(NodeType::SUB, {
@@ -284,6 +295,7 @@ TEST(parsing_infix, complex) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"ADD\n"
@@ -308,6 +320,7 @@ TEST(parsing_infix, within) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     string treeString = tree->children[0]->toString();
     string expected = (
             u8"CALL\n"
@@ -331,6 +344,7 @@ TEST(parsing_infix, comparison) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::CALL, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"表示", 1)),
@@ -354,6 +368,7 @@ TEST(parsing_infix, comparisonNotEqual) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
@@ -373,6 +388,7 @@ TEST(parsing_infix, comparisonLessThan) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
@@ -392,6 +408,7 @@ TEST(parsing_infix, comparisonGreaterThan) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
@@ -411,6 +428,7 @@ TEST(parsing_infix, comparisonGreaterThanEqual) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
@@ -430,6 +448,7 @@ TEST(parsing_infix, comparisonLessThanEqual) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
@@ -449,6 +468,7 @@ TEST(parsing_infix, assert) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSERT, {
             new SyntaxNode(NodeType::EQUAL, {
@@ -467,6 +487,7 @@ TEST(parsing_subscript, subscript) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::CALL, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
@@ -494,6 +515,7 @@ TEST(parsing_subscript, subscript_complex) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::CALL, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
@@ -523,6 +545,7 @@ TEST(parsing_subscript, subscript_set) {
     auto parser = Parser(nullptr);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::CALL, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
@@ -550,6 +573,7 @@ TEST(parsing_nonlocal, external_sotogawa) {
     Parser parser(new ConsoleLogger);
 
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::EXTERNAL, {
             new SyntaxNode(Token(TokenType::SYMBOL, L"私の変数名", 1)),
@@ -561,7 +585,7 @@ using namespace fakeit;
 
 TEST(parsing, parse_error) {
     auto stringInput = StringInputSource(
-            L"導入＋１"
+        L"導入＋１"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     Mock<PinponLogger> logger;
@@ -571,9 +595,39 @@ TEST(parsing, parse_error) {
     auto parser = Parser(&logger.get());
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
 
+    EXPECT_FALSE(parser.isComplete());
+
     EXPECT_EQ(tree->type, NodeType::PARSE_ERROR);
     Verify(
-            OverloadedMethod(logger, logLn, PinponLogger * (string))
+        OverloadedMethod(logger, logLn, PinponLogger * (string))
             .Using("意外なトークン：plus：”＋”、1行目\n")
     );
+}
+
+TEST(parsing, parse_passed_lambda) {
+    auto stringInput = StringInputSource(
+        L"呼ぶ事（渡す事）：中に渡す事\n"
+        L"　返す、結果\n"
+    );
+
+    auto testTokenizer = TanukiTokenizer(&stringInput);
+    auto parser = Parser(nullptr);
+    SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
+    string treeString = tree->children[0]->toString();
+    string expected = (
+        u8"CALL\n"
+        u8" TERMINAL symbol：”呼ぶ事”、1行目\n"
+        u8" CALL_TAIL\n"
+        u8"  ARGS\n"
+        u8"   TERMINAL symbol：”渡す事”、1行目\n"
+        u8"   FUNC\n"
+        u8"    FUNC_NAME\n"
+        u8"    PARAMS\n"
+        u8"     TERMINAL symbol：”中に渡す事”、1行目\n"
+        u8"    TEXT\n"
+        u8"     RETURN\n"
+        u8"      TERMINAL symbol：”結果”、2行目\n"
+    );
+    EXPECT_EQ(expected, treeString);
 }

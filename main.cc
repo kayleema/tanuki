@@ -88,6 +88,10 @@ int main(int argc, char **argv) {
         delete tree;
         return 1;
     }
+    if (!parser.isComplete()) {
+        log.logLn("エラー：パーシングは途中に止まりました。");
+        return 1;
+    }
 
     // Execute
     Context context;

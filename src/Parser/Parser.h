@@ -25,6 +25,8 @@ public:
 
     SyntaxNode *run_function();
 
+    SyntaxNode *run_function_param();
+
     SyntaxNode *run_expression();
 
     SyntaxNode *run_infix_expression();
@@ -38,6 +40,8 @@ public:
     SyntaxNode *run_args();
 
     SyntaxNode *run_expression_tail();
+
+    SyntaxNode *run_passed_lambda();
 };
 
 #endif

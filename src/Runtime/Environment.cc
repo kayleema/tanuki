@@ -500,6 +500,8 @@ Value *Environment::eval_function(SyntaxNode *tree) {
     if (nameNode->type == NodeType::TERMINAL) {
         wstring name = nameNode->content.content;
         bindings[name] = function;
+    } else if (nameNode->children.empty()) {
+        return function;
     } else {
         auto name1 = nameNode->children[0]->content.content;
         auto name2 = nameNode->children[1]->content.content;

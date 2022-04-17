@@ -327,6 +327,7 @@ wstring makeKanjiNumberString(long input) {
             i /= 10;
         }
     }
+    return L"文字列化出来ませんでした。";
 }
 
 TEST(tokenizer, kanji_number_parsing_first_juuman) {

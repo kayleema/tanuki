@@ -16,6 +16,7 @@ TEST(eval, functions) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     SyntaxNode *expr = tree->children[0];
     string treeString = expr->toString();
 
@@ -36,6 +37,7 @@ TEST(eval, floatNumber) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     SyntaxNode *expr = tree->children[0];
     string treeString = expr->toString();
 
@@ -65,6 +67,7 @@ TEST(eval, import_statement) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     SyntaxNode *expr = tree->children[0];
     string treeString = expr->toString();
 
@@ -91,6 +94,7 @@ TEST(eval, user_function) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -120,6 +124,7 @@ TEST(eval, if_statement) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -167,6 +172,7 @@ TEST(program, fibonacci) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree->children[0]);
@@ -190,6 +196,7 @@ TEST(program, string_eq) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -214,6 +221,7 @@ TEST(program, dictionary) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -240,6 +248,7 @@ TEST(program, if_elif_else) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -257,6 +266,7 @@ TEST(eval, user_function_varargs) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -281,6 +291,7 @@ TEST(eval, call_user_function_varargs) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -304,6 +315,7 @@ TEST(eval, call_user_function_default) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -321,6 +333,7 @@ TEST(eval, infix) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);
@@ -343,6 +356,7 @@ TEST(eval, infix_equality) {
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    EXPECT_TRUE(parser.isComplete());
     Context context;
     Environment env(&context);
     env.eval(tree);

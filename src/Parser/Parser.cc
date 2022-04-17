@@ -1,6 +1,7 @@
 #include "Parser.h"
 
 #include <unordered_map>
+#include <iostream>
 
 SyntaxNode *Parser::run_text() {
     auto result = new SyntaxNode(NodeType::TEXT);
@@ -20,7 +21,7 @@ SyntaxNode *Parser::run_text() {
 }
 
 SyntaxNode *Parser::run_statement() {
-    SyntaxNode *result;
+    SyntaxNode *result = nullptr;
     if ((result = run_import())) {
     } else if ((result = run_nonlocal())) {
     } else if ((result = run_return())) {
@@ -29,11 +30,17 @@ SyntaxNode *Parser::run_statement() {
     } else if ((result = run_assign())) {
     } else if ((result = run_function())) {
     } else if ((result = run_infix_expression())) {
-    } else {
+    } else if (currentToken().type == TokenType::DEDENT) {
         return nullptr;
+    } else if (currentToken().type == TokenType::END) {
+        return nullptr;
+    } else {
+        logInternal("エラー：parse出来ない行です。");
+        logInternal( currentToken().toString() );
     }
-    if (result->isError()) {
-        logInternal("エラー：statementのなかにエラー\n");
+
+    if (result && result->isError()) {
+        logInternal("エラー：statementのなかにエラー");
     }
     return result;
 }
@@ -247,53 +254,12 @@ SyntaxNode *Parser::run_function() {
     auto params = new SyntaxNode(NodeType::PARAMS);
     result->children.push_back(params);
     while (!accept(TokenType::RPAREN)) {
-        Token param;
-        if (accept(TokenType::SYMBOL, &param)) {
-            if (accept(TokenType::COLON)) {
-                auto rhs = run_infix_expression();
-                if (rhs->isError()) {
-                    logInternal("エラー：関数作成文のキーワード引数の「：」の右側。\n");
-                    delete result;
-                    return rhs;
-                }
-                params->children.push_back(
-                        new SyntaxNode(NodeType::DEFAULTPARAM, {
-                                new SyntaxNode(param),
-                                rhs
-                        })
-                );
-            } else {
-                params->children.push_back(new SyntaxNode(param));
-            }
-            accept(TokenType::COMMA);
-        } else if (accept(TokenType::STAR)) {
-            if (accept(TokenType::STAR)) {
-                if (accept(TokenType::SYMBOL, &param)) {
-                    // Variable-length Keyword Parameter
-                    auto kwargs = new SyntaxNode(NodeType::VARKWPARAM, {new SyntaxNode(param)});
-                    params->children.push_back(kwargs);
-                    accept(TokenType::COMMA);
-                } else {
-                    logInternal("エラー：関数作成文のVariable-length Keyword Parameterの問題。\n");
-                    delete result;
-                    return new SyntaxNode(NodeType::PARSE_ERROR);
-                }
-            } else if (accept(TokenType::SYMBOL, &param)) {
-                // Variable-length  Parameter
-                auto varparam = new SyntaxNode(NodeType::VARPARAM);
-                varparam->children.push_back(new SyntaxNode(param));
-                params->children.push_back(varparam);
-                accept(TokenType::COMMA);
-            } else {
-                logInternal("エラー：関数作成文の星の右に何もありません。\n");
-                delete result;
-                return new SyntaxNode(NodeType::PARSE_ERROR);
-            }
-        } else {
-            logInternal("エラー：関数作成文の引数一覧の中に変なトークン。\n");
+        auto param = run_function_param();
+        if (param->isError()) {
             delete result;
-            return new SyntaxNode(NodeType::PARSE_ERROR);
+            return param;
         }
+        params->children.push_back(param);
     }
     if (!expect(TokenType::NEWL) || !expect(TokenType::INDENT)) {
         logInternal("エラー：関数作成文の一行目の後でindentが必要。\n");
@@ -313,6 +279,50 @@ SyntaxNode *Parser::run_function() {
         return new SyntaxNode(NodeType::PARSE_ERROR);
     }
     return result;
+}
+
+SyntaxNode *Parser::run_function_param() {
+    SyntaxNode *resultArg = nullptr;
+    Token param;
+    if (accept(TokenType::SYMBOL, &param)) {
+        if (accept(TokenType::COLON)) {
+            auto rhs = run_infix_expression();
+            if (rhs->isError()) {
+                logInternal("エラー：関数作成文のキーワード引数の「：」の右側。\n");
+                return rhs;
+            }
+            resultArg = new SyntaxNode(NodeType::DEFAULTPARAM,
+                                    {new SyntaxNode(param), rhs});
+        } else {
+            resultArg = new SyntaxNode(param);
+        }
+        accept(TokenType::COMMA);
+    } else if (accept(TokenType::STAR)) {
+        if (accept(TokenType::STAR)) {
+            if (accept(TokenType::SYMBOL, &param)) {
+                // Variable-length Keyword Parameter
+                auto kwargs = new SyntaxNode(NodeType::VARKWPARAM, {new SyntaxNode(param)});
+                resultArg = kwargs;
+                accept(TokenType::COMMA);
+            } else {
+                logInternal("エラー：関数作成文のVariable-length Keyword Parameterの問題。\n");
+                return new SyntaxNode(NodeType::PARSE_ERROR);
+            }
+        } else if (accept(TokenType::SYMBOL, &param)) {
+            // Variable-length  Parameter
+            auto varParam = new SyntaxNode(NodeType::VARPARAM);
+            varParam->children.push_back(new SyntaxNode(param));
+            resultArg = varParam;
+            accept(TokenType::COMMA);
+        } else {
+            logInternal("エラー：関数作成文の星の右に何もありません。\n");
+            resultArg = new SyntaxNode(NodeType::PARSE_ERROR);
+        }
+    } else {
+        logInternal("エラー：関数作成文の引数一覧の中に変なトークン。\n");
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    return resultArg;
 }
 
 SyntaxNode *Parser::run_infix_expression() {
@@ -533,6 +543,12 @@ SyntaxNode *Parser::run_expression_tail() {
             delete node;
             return new SyntaxNode(NodeType::PARSE_ERROR);
         }
+        if (accept(TokenType::COLON)) {
+            auto passed_lambda_arg = run_passed_lambda();
+            if (passed_lambda_arg) {
+                args->children.push_back(passed_lambda_arg);
+            }
+        }
         auto tail = run_expression_tail();
         node->children.push_back(args);
         if (tail) {
@@ -633,4 +649,40 @@ SyntaxNode *Parser::run_args() {
         } while (accept(TokenType::COMMA));
     }
     return node;
+}
+
+SyntaxNode *Parser::run_passed_lambda() {
+    auto result =
+        new SyntaxNode(NodeType::FUNC, {new SyntaxNode(NodeType::FUNC_NAME)});
+
+    auto params = new SyntaxNode(NodeType::PARAMS);
+    while (!accept(TokenType::NEWL)) {
+        auto param = run_function_param();
+        if (param->isError()) {
+            delete result;
+            return param;
+        }
+        params->children.push_back(param);
+    }
+    result->children.push_back(params);
+
+
+    if (!expect(TokenType::INDENT)) {
+        logInternal("エラー：関数作成文の一行目の後でindentが必要。\n");
+        delete result;
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    auto body = run_text();
+    if (body->isError()) {
+        logInternal("エラー：関数作成文の中身で問題がありました。\n");
+        delete result;
+        return body;
+    }
+    result->children.push_back(body);
+    if (!expect(TokenType::DEDENT)) {
+        logInternal("エラー：関数作成文の後でunindentが必要。\n");
+        delete result;
+        return new SyntaxNode(NodeType::PARSE_ERROR);
+    }
+    return result;
 }

@@ -14,6 +14,9 @@ class GenericParser {
     // Returns full syntax tree for tokens
     SyntaxNode *run(vector<Token> inputTokens);
 
+    // Return true if all tokens were consumed while parsing.
+    bool isComplete() { return currentToken().type == TokenType::END; }
+
   protected:
     // To be overridden in subclasses to parse subtrees
     virtual SyntaxNode *run_text() = 0;
