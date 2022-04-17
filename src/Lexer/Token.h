@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -58,6 +59,10 @@ class Token {
     Token() : type(TokenType::START), content(L""), line(0) {}
 
     Token(TokenType type, wstring _content, int line);
+
+    Token(TokenType type, wstring _content, int line, long number)
+        : type(type), content(std::move(_content)), line(line), number(number) {
+    }
 
     TokenType type;
     wstring content;

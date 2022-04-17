@@ -4,6 +4,10 @@
 
 #include "Lexer/Tokenizer.h"
 #include "TextInput/StringInputSource.h"
+#include "TextInput/UnicodeConversion.h"
+
+#include <random>
+#include <climits>
 
 TEST(tokenizer, simple_test) {
     auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
@@ -280,18 +284,92 @@ TEST(tokenizer, braces) {
 TEST(tokenizer, nonlocal_external) {
     // 隅付き格好
     auto stringInput = StringInputSource(
-            L"外側、私の変数名"
+        L"外側、私の変数名"
     );
 
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto allTokens = testTokenizer.getAllTokens();
 
     auto expected = vector<Token>(
-            {
-                    Token(TokenType::EXTERN, L"外側", 1),
-                    Token(TokenType::COMMA, L"、", 1),
-                    Token(TokenType::SYMBOL, L"私の変数名", 1),
-                    Token(TokenType::END, L"", 1),
-            });
+        {
+            Token(TokenType::EXTERN, L"外側", 1),
+            Token(TokenType::COMMA, L"、", 1),
+            Token(TokenType::SYMBOL, L"私の変数名", 1),
+            Token(TokenType::END, L"", 1),
+        });
     EXPECT_EQ(allTokens, expected);
+}
+
+
+
+wstring makeKanjiNumberString(long input) {
+    if (input < 10) {
+        return wstring(1, L"零一二三四五六七八九"[input]);
+    }
+
+    static const auto kanjiSuperPowers = wstring(L"京兆億万千百十");
+    long i = 10000000000000000;
+    for (const wchar_t &power : kanjiSuperPowers) {
+        if ((input / i) % i) {
+            wstring lhs = wstring(L"");
+            wstring rhs = wstring(L"");
+            if (input / i > 1) {
+                lhs = makeKanjiNumberString(input / i);
+            }
+            if (input % i) {
+                rhs = makeKanjiNumberString(input % i);
+            }
+            return lhs + wstring(1,power) + rhs;
+        }
+        if ( i > 10000 ) {
+            i /= 10000;
+        } else {
+            i /= 10;
+        }
+    }
+}
+
+TEST(tokenizer, kanji_number_parsing_first_juuman) {
+    for (long i = 0; i < 100000; i++) {
+        auto stringSource = makeKanjiNumberString(i);
+        auto cStringSource = stringSource.c_str();
+        auto stringInput = StringInputSource(cStringSource);
+        auto testTokenizer = TanukiTokenizer(&stringInput);
+        auto token = testTokenizer.getToken();
+        auto result = token.number;
+        ASSERT_EQ(result, i);
+        ASSERT_EQ(token.type, TokenType::NUMBER);
+    }
+}
+
+TEST(tokenizer, kanji_number_parsing_last_juuman) {
+    for (long i = 0; i < 100000; i++) {
+        long valueToTest = LONG_MAX - i;
+
+        auto stringSource = makeKanjiNumberString(valueToTest);
+        auto cStringSource = stringSource.c_str();
+        auto stringInput = StringInputSource(cStringSource);
+        auto testTokenizer = TanukiTokenizer(&stringInput);
+        auto token = testTokenizer.getToken();
+        auto result = token.number;
+        ASSERT_EQ(result, valueToTest);
+    }
+}
+
+TEST(tokenizer, kanji_number_parsing_fuzz_test) {
+    cout << "max long is " << LONG_MAX << endl;
+    std::default_random_engine generator;
+    std::uniform_int_distribution<long> distribution(0,LONG_MAX);
+    for (long i = 0; i < 100000; i++) {
+        long valueToTest = distribution(generator);
+
+        auto stringSource = makeKanjiNumberString(valueToTest);
+        // cout << encodeUTF8(stringSource) << endl;
+        auto cStringSource = stringSource.c_str();
+        auto stringInput = StringInputSource(cStringSource);
+        auto testTokenizer = TanukiTokenizer(&stringInput);
+        auto token = testTokenizer.getToken();
+        auto result = token.number;
+        ASSERT_EQ(result, valueToTest);
+    }
 }
