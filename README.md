@@ -108,6 +108,26 @@ fakeitのライブラリはGCCの`-O2`以上サポートしないだからです
 
 末尾再帰（tail recursion）はオプティマイズされました。
 
+#### 無名関数を引数として直接に渡す
+```
+＃この関数が定義された状態で…
+関数、高階関数（渡す直、もらった関数）
+　表示（もらった関数（渡す直））
+```
+```
+＃関数を直接定義して渡すことができます。↓
+
+高校関数（２）：項目
+　返す、項目＊５
+
+＃（１０が表示されます）
+＃上の二行と下の三行は同じ動きとなります。
+
+関数、無名（項目）
+　返す、項目＊５
+高校関数（２、無名）
+```
+
 ### 数学
 ```
 表示（１＋５ー４）
@@ -213,8 +233,7 @@ make tanuki tanuki_dynamic
 ./tanuki ../example/importDynamicLibrary.tnk
 ```
 希望の機能：
-* 【開発途中】漢字で書ける数字。例えば「一万五千」や「一五〇〇〇」など
-* 直接渡す無名関数。Kotlinみたいにできればいいと思います
+* 漢字で書ける数字literal：「一五〇〇〇」
 * expression parenthesis with line wrapping (currently an underscore must be placed before a pair of parenthesis and no
   new lines are allowed in the middle of a statement)
 * improve system import search path and unify with command line search path. 
