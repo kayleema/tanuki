@@ -1,6 +1,7 @@
 #include "UnicodeConversion.h"
 #include <codecvt>
 #include <iostream>
+#include <locale>
 
 using namespace std;
 
