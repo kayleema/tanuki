@@ -82,6 +82,6 @@ class Token {
 
 const char *tokenTypeToString(TokenType type);
 
-string tokenListToTypeList(vector<Token> list);
+string tokenListToTypeList(std::vector<Token> list);
 
 #endif // TOKEN_H
