@@ -5,7 +5,7 @@
 #include <sstream>
 
 Token::Token(TokenType type, wstring _content, int line)
-    : type(type), content(move(_content)), line(line) {
+    : type(type), content(std::move(_content)), line(line) {
     if (type == TokenType::NUMBER) {
         number = parseNumeric(content);
     }
