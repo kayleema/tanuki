@@ -95,7 +95,7 @@ public:
             if (value->type == ValueType::NUM) {
                 env->logger->logLong(value->toNumberValue()->value);
             } else if (value->type == ValueType::STRING) {
-                env->logger->log(value->toStringValue()->value);
+                env->logger->log(encodeUTF8(value->toStringValue()->value));
             } else {
                 env->logger->log(value->toString());
             }
@@ -199,23 +199,24 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
     return Context::newNoneValue();
 }
 
-class FunctionReadFile : public FunctionValue {
-public:
-    Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
-        if (args.size() != 1) {
-            return Context::newNoneValue();
-        }
-        wstring fileName = args[0]->toStringValue()->value;
-        FileInputSource fileInputSource(encodeUTF8(fileName).c_str());
-        wstring sourceCode;
-        wchar_t newChar;
-        while ((newChar = fileInputSource.getChar()) != -1) {
-            sourceCode.push_back(newChar);
-        }
-        return env->context->newStringValue(sourceCode);
-    };
-};
+//class FunctionReadFile : public FunctionValue {
+//public:
+//    Value *apply(const vector<Value *> &args, Environment *env,
+//                 unordered_map<wstring, Value *> *) const override {
+//        if (args.size() != 1) {
+//            return Context::newNoneValue();
+//        }
+//        wstring fileName = args[0]->toStringValue()->value;
+//        FileInputSource fileInputSource(encodeUTF8(fileName).c_str());
+//        wstring sourceCode;
+//        wchar_t newChar;
+//        while ((newChar = fileInputSource.getChar()) != -1) {
+//            sourceCode.push_back(newChar);
+//        }
+//        return env->context->newStringValue(sourceCode);
+//          return env->context->newStringValue(L"");//TODO：未実装
+//    };
+//};
 
 class FunctionEval : public FunctionValue {
 public:
@@ -226,7 +227,8 @@ public:
         }
         auto moduleEnv = env->newChildEnvironment();
         wstring text = args[0]->toStringValue()->value;
-        StringInputSource inputSource(text.c_str());
+        string text2 = encodeUTF8(text);
+        StringInputSource inputSource(text2.c_str());
         TanukiTokenizer tokenizer(&inputSource);
         ConsoleLogger logger;
         Parser parser(&logger);
@@ -376,7 +378,7 @@ void initModule(Environment *env) {
     env->bind(L"配列追加", new ArrayAdd());
     env->bind(L"辞書調べ", new DictLookup());
     env->bind(L"何型", new FunctionGetType());
-    env->bind(L"ファイル読む", new FunctionReadFile());
+//    env->bind(L"ファイル読む", new FunctionReadFile());
     env->bind(L"評価", new FunctionEval());
     env->bind(L"エキステンション", new FunctionLoadExt());
 }

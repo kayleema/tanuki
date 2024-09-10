@@ -2,18 +2,20 @@
 #define TANUKIPROJECT_STRINGINPUTSOURCE_H
 
 #include "InputSource.h"
+#include "CharDefinitions.h"
+#include "UnicodeConversion.h"
 
 class StringInputSource : public InputSource {
-    const wchar_t *source;
+    const char *source;
     bool finished;
 public:
-    explicit StringInputSource(const wchar_t *source) : source(source), finished(false) {};
+    explicit StringInputSource(const char *source) : source(source), finished(false) {};
 
     ~StringInputSource() override = default;
 
-    wchar_t getChar() override;
+    TnkChar getChar() override;
 
-    wchar_t peekChar() override;
+    TnkChar peekChar() override;
 
     bool eof() override;
 };

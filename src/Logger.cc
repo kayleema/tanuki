@@ -28,22 +28,7 @@ PinponLogger *ConsoleLogger::log(std::string value) {
     return this;
 }
 
-PinponLogger *ConsoleLogger::log(std::wstring value) {
-    if (wide_mode) {
-        std::wcout << value;
-    } else {
-        std::cout << encodeUTF8(value);
-    }
-    return this;
-}
-
 PinponLogger *ConsoleLogger::logLn(std::string value) {
-    log(value);
-    logEndl();
-    return this;
-}
-
-PinponLogger *ConsoleLogger::logLn(std::wstring value) {
     log(value);
     logEndl();
     return this;
@@ -66,12 +51,6 @@ PinponLogger *PinponLogger::logLong(long value) {
 }
 
 PinponLogger *PinponLogger::logLn(std::string value) {
-    log(value);
-    logEndl();
-    return this;
-}
-
-PinponLogger *PinponLogger::logLn(std::wstring value) {
     log(value);
     logEndl();
     return this;

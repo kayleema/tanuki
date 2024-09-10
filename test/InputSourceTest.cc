@@ -12,14 +12,16 @@
 #include "TextInput/UnicodeConversion.h"
 
 TEST(stringInputSource, eof_is_false) {
-    auto stringInput = StringInputSource(L"関数、フィボナッチ（番号）");
+    auto stringInput = StringInputSource("関数、フィボナッチ（番号）");
 
     EXPECT_FALSE(stringInput.eof());
 }
 
 TEST(stringInputSource, readSingleCharacters) {
-    auto stringInput = StringInputSource(L"関n数");
+    auto stringInput = StringInputSource("関n数");
 
+    EXPECT_EQ(stringInput.peekChar(), L'関');
+    EXPECT_EQ(stringInput.peekChar(), L'関');
     EXPECT_EQ(stringInput.peekChar(), L'関');
     EXPECT_EQ(stringInput.getChar(), L'関');
     EXPECT_EQ(stringInput.peekChar(), L'n');
@@ -46,6 +48,8 @@ TEST(stringInputSource, fileSource) {
     auto filename = string("../example/fileInputSource.tnk");
     FileInputSource stringInput(filename.c_str());
 
+    EXPECT_EQ(stringInput.peekChar(), L'関');
+    EXPECT_EQ(stringInput.peekChar(), L'関');
     EXPECT_EQ(stringInput.peekChar(), L'関');
     EXPECT_EQ(stringInput.getChar(), L'関');
     EXPECT_EQ(stringInput.peekChar(), L'n');
@@ -87,7 +91,8 @@ TEST(stringInputSource, selftest) {
     SyntaxNode *tree = p.run(t.getAllTokens());
     EXPECT_NE(tree->type, NodeType::PARSE_ERROR);
     Context context;
-    context.setFrequency(1);
+    // can reduce to further test garbage collection correctness
+    context.setFrequency(100000);
     FilesystemImpl filesystem;
     auto *env = new Environment(&context, &filesystem);
     env->bind(

@@ -266,3 +266,9 @@ OSXの場合は：（最近OSXのthink-asyncのbrewに入っているパッケ�
   make
   sudo make install
 ```
+
+### Docker
+run tests in docker
+```
+docker build . -t tanuki && docker run tanuki /code/build/tanuki_test
+```

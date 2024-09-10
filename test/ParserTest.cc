@@ -9,7 +9,7 @@
 TEST(parsing, functions) {
 
     auto stringInput = StringInputSource(
-            L"あ（い（）、４５６。７８、う（１２３））（え）"
+            "あ（い（）、４５６。７８、う（１２３））（え）"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -40,7 +40,7 @@ TEST(parsing, functions) {
 
 TEST(parsing, importing_file) {
     auto stringInput = StringInputSource(
-            L"導入、フォルダー・フォルダー２・ファイル名"
+            "導入、フォルダー・フォルダー２・ファイル名"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -58,7 +58,7 @@ TEST(parsing, importing_file) {
 
 TEST(parsing, function_with_kwargs) {
     auto stringInput = StringInputSource(
-            L"関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
+            "関数名前（引数一、引数二、キー１：バリュー１、キー２：バリュー２）"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -84,8 +84,8 @@ TEST(parsing, function_with_kwargs) {
 
 TEST(parsing, user_function) {
     auto stringInput = StringInputSource(
-            L"関数、ほげ（引数、＊＊辞書引数）\n"
-            L"　返す、１\n"
+            "関数、ほげ（引数、＊＊辞書引数）\n"
+            "　返す、１\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -108,8 +108,8 @@ TEST(parsing, user_function) {
 
 TEST(parsing, user_function_varparam) {
     auto stringInput = StringInputSource(
-            L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
-            L"　返す、１\n"
+            "関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
+            "　返す、１\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -138,8 +138,8 @@ TEST(parsing, user_function_varparam) {
 
 TEST(parsing, user_function_defaultparam) {
     auto stringInput = StringInputSource(
-            L"関数、ほげ（引数、あ：１＋２、＊配列引数、＊＊辞書引数）\n"
-            L"　返す、１\n"
+            "関数、ほげ（引数、あ：１＋２、＊配列引数、＊＊辞書引数）\n"
+            "　返す、１\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -175,7 +175,7 @@ TEST(parsing, user_function_defaultparam) {
 
 TEST(parsing, dot_lookup) {
     auto stringInput = StringInputSource(
-            L"ほげ・何か・ほか"
+            "ほげ・何か・ほか"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -195,7 +195,7 @@ TEST(parsing, dot_lookup) {
 
 TEST(parsing, dot_lookup_and_assign) {
     auto stringInput = StringInputSource(
-            L"ほげ・何か・ほか＝あ・い・う"
+            "ほげ・何か・ほか＝あ・い・う"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -221,7 +221,7 @@ TEST(parsing, dot_lookup_and_assign) {
 
 TEST(parsing, dot_lookup_and_call) {
     auto stringInput = StringInputSource(
-            L"ほげ・何か・ほか（）"
+            "ほげ・何か・ほか（）"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -243,7 +243,7 @@ TEST(parsing, dot_lookup_and_call) {
 
 TEST(parsing, dot_lookup_and_call_and_lookup) {
     auto stringInput = StringInputSource(
-            L"ほげ・何か・ほか（）・あ・い・う"
+            "ほげ・何か・ほか（）・あ・い・う"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -271,7 +271,7 @@ TEST(parsing, dot_lookup_and_call_and_lookup) {
 
 TEST(parsing_infix, simple) {
     auto stringInput = StringInputSource(
-            L"１－２＋３"
+            "１－２＋３"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -290,7 +290,7 @@ TEST(parsing_infix, simple) {
 
 TEST(parsing_infix, complex) {
     auto stringInput = StringInputSource(
-            L"１－２＋あ（３）＋い"
+            "１－２＋あ（３）＋い"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -315,7 +315,7 @@ TEST(parsing_infix, complex) {
 
 TEST(parsing_infix, within) {
     auto stringInput = StringInputSource(
-            L"表示（１－２＋３）"
+            "表示（１－２＋３）"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -338,7 +338,7 @@ TEST(parsing_infix, within) {
 
 TEST(parsing_infix, comparison) {
     auto stringInput = StringInputSource(
-            L"表示（１＝＝２）"
+            "表示（１＝＝２）"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -362,7 +362,7 @@ TEST(parsing_infix, comparison) {
 
 TEST(parsing_infix, comparisonNotEqual) {
     auto stringInput = StringInputSource(
-            L"あ＝１！＝２"
+            "あ＝１！＝２"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -382,7 +382,7 @@ TEST(parsing_infix, comparisonNotEqual) {
 
 TEST(parsing_infix, comparisonLessThan) {
     auto stringInput = StringInputSource(
-            L"あ＝１＜２"
+            "あ＝１＜２"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -402,7 +402,7 @@ TEST(parsing_infix, comparisonLessThan) {
 
 TEST(parsing_infix, comparisonGreaterThan) {
     auto stringInput = StringInputSource(
-            L"あ＝１＞２"
+            "あ＝１＞２"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -422,7 +422,7 @@ TEST(parsing_infix, comparisonGreaterThan) {
 
 TEST(parsing_infix, comparisonGreaterThanEqual) {
     auto stringInput = StringInputSource(
-            L"あ＝１＞＝２"
+            "あ＝１＞＝２"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -442,7 +442,7 @@ TEST(parsing_infix, comparisonGreaterThanEqual) {
 
 TEST(parsing_infix, comparisonLessThanEqual) {
     auto stringInput = StringInputSource(
-            L"あ＝１＜＝２"
+            "あ＝１＜＝２"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -462,7 +462,7 @@ TEST(parsing_infix, comparisonLessThanEqual) {
 
 TEST(parsing_infix, assert) {
     auto stringInput = StringInputSource(
-            L"確認、１＝＝２"
+            "確認、１＝＝２"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -481,7 +481,7 @@ TEST(parsing_infix, assert) {
 
 TEST(parsing_subscript, subscript) {
     auto stringInput = StringInputSource(
-            L"辞書（名前：「すずき」）【「名前」】"
+            "辞書（名前：「すずき」）【「名前」】"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -509,7 +509,7 @@ TEST(parsing_subscript, subscript) {
 
 TEST(parsing_subscript, subscript_complex) {
     auto stringInput = StringInputSource(
-            L"辞書（名前：「すずき」）【「名前」】・長さ"
+            "辞書（名前：「すずき」）【「名前」】・長さ"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -539,7 +539,7 @@ TEST(parsing_subscript, subscript_complex) {
 
 TEST(parsing_subscript, subscript_set) {
     auto stringInput = StringInputSource(
-            L"辞書（名前：「すずき」）【「名前」】＝「田中」"
+            "辞書（名前：「すずき」）【「名前」】＝「田中」"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -567,7 +567,7 @@ TEST(parsing_subscript, subscript_set) {
 
 TEST(parsing_nonlocal, external_sotogawa) {
     auto stringInput = StringInputSource(
-            L"外側、私の変数名"
+            "外側、私の変数名"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     Parser parser(new ConsoleLogger);
@@ -585,7 +585,7 @@ using namespace fakeit;
 
 TEST(parsing, parse_error) {
     auto stringInput = StringInputSource(
-        L"導入＋１"
+        "導入＋１"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     Mock<PinponLogger> logger;
@@ -606,8 +606,8 @@ TEST(parsing, parse_error) {
 
 TEST(parsing, parse_passed_lambda) {
     auto stringInput = StringInputSource(
-        L"呼ぶ事（渡す事）：中に渡す事\n"
-        L"　返す、結果\n"
+        "呼ぶ事（渡す事）：中に渡す事\n"
+        "　返す、結果\n"
     );
 
     auto testTokenizer = TanukiTokenizer(&stringInput);

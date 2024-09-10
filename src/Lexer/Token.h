@@ -47,7 +47,7 @@ enum TokenType {
     NAMI
 };
 
-static const char *TokenTypeStrings[] = {
+static const char *const TokenTypeStrings[] = {
     "lparen",   "rparen", "comma",  "symbol", "end",    "start",
     "space",    "newl",   "indent", "dedent", "number", "number_float",
     "function", "return", "if",     "else",   "string", "assign",

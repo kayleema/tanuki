@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
         (sourceFilename.substr(sourceFilename.length() - 4) != ".tnk")) {
         sourceFilename.append(".tnk");
     }
-    log.log(L"実行始まります：")->log(sourceFilename)->logEndl();
+    log.log("実行始まります：")->log(sourceFilename)->logEndl();
     FileInputSource input(sourceFilename.c_str());
 
     // Tokenize

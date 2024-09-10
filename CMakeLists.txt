@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(TanukiProject)
 
+add_subdirectory(./googletest EXCLUDE_FROM_ALL)
+add_subdirectory(./fakeit EXCLUDE_FROM_ALL)
+
 set(CMAKE_CXX_STANDARD 11)
 if (WIN32)
     set(CMAKE_CXX_FLAGS "/O2 /EHa /MTd /utf-8")
@@ -9,9 +12,6 @@ else ()
     set(CMAKE_CXX_FLAGS "-Wall -Wextra")
     set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Og")
 endif ()
-
-add_subdirectory(./googletest EXCLUDE_FROM_ALL)
-add_subdirectory(./fakeit EXCLUDE_FROM_ALL)
 
 include_directories("src/")
 include_directories("websocketpp/")
@@ -43,6 +43,7 @@ file(GLOB dynamic_SRC
         )
 
 add_library(tanuki_lib ${tanuki_SRC})
+set_target_properties(tanuki_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(tanuki_lib dl)
 
 add_executable(tanuki main.cc)

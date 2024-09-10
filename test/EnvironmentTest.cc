@@ -11,7 +11,7 @@ using namespace fakeit;
 
 TEST(eval, functions) {
     auto stringInput = StringInputSource(
-            L"足す（２、引く（５、２）、４）"
+            "足す（２、引く（５、２）、４）"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -32,7 +32,7 @@ TEST(eval, functions) {
 
 TEST(eval, floatNumber) {
     auto stringInput = StringInputSource(
-            L"１２。３４"
+            "１２。３４"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -56,13 +56,13 @@ TEST(eval, import_statement) {
     When(Method(mockFilesystem, getInputSourceForFilename)).Do(
             [](const string &) {
                 return unique_ptr<InputSource>(new StringInputSource(
-                        L"あ＝７\n"
+                        "あ＝７\n"
                 ));
             }
     );
 
     auto stringInput = StringInputSource(
-            L"導入、フォルダー・フォルダー２・ファイル名"
+            "導入、フォルダー・フォルダー２・ファイル名"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -87,9 +87,9 @@ TEST(eval, import_statement) {
 
 TEST(eval, user_function) {
     auto stringInput = StringInputSource(
-            L"関数、プラス二（あ）\n"
-            L"　返す、足す（あ、２）\n"
-            L""
+            "関数、プラス二（あ）\n"
+            "　返す、足す（あ、２）\n"
+            ""
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -102,7 +102,7 @@ TEST(eval, user_function) {
     EXPECT_EQ(ValueType::FUNC, functionValue->type);
 
     auto stringInput2 = StringInputSource(
-            L"プラス二（７）"
+            "プラス二（７）"
     );
     auto testTokenizer2 = TanukiTokenizer(&stringInput2);
     auto parser2 = Parser(nullptr);
@@ -115,11 +115,11 @@ TEST(eval, user_function) {
 
 TEST(eval, if_statement) {
     auto stringInput = StringInputSource(
-            L"関数、五番です（番号）\n"
-            L"　もし、イコール（番号、５）\n"
-            L"　　返す、１\n"
-            L"　返す、０\n"
-            L""
+            "関数、五番です（番号）\n"
+            "　もし、イコール（番号、５）\n"
+            "　　返す、１\n"
+            "　返す、０\n"
+            ""
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -132,7 +132,7 @@ TEST(eval, if_statement) {
     EXPECT_EQ(ValueType::FUNC, functionValue->type);
 
     auto stringInput2 = StringInputSource(
-            L"五番です（５）"
+            "五番です（５）"
     );
     auto testTokenizer2 = TanukiTokenizer(&stringInput2);
     parser = Parser(nullptr);
@@ -143,7 +143,7 @@ TEST(eval, if_statement) {
     EXPECT_TRUE(expected.equals(v));
 
     auto stringInput3 = StringInputSource(
-            L"五番です（４）"
+            "五番です（４）"
     );
     auto testTokenizer3 = TanukiTokenizer(&stringInput3);
     parser = Parser(nullptr);
@@ -157,14 +157,14 @@ TEST(eval, if_statement) {
 TEST(program, fibonacci) {
     // Commented out parts are commented out so that tests run faster without optimizations enabled
     auto stringInput = StringInputSource(
-            L"関数、フィボナッチ（号）\n"
-            L"　もし、イコール（号、１）\n"
-            L"　　返す、１\n"
-            L"　もし、イコール（号、０）\n"
-            L"　　返す、１\n"
-            L"　返す、足す（フィボナッチ（引く（号、１））、フィボナッチ（引く（号、２）））\n"
-            L"\n"
-            L"フィボナッチ（７）\n"
+            "関数、フィボナッチ（号）\n"
+            "　もし、イコール（号、１）\n"
+            "　　返す、１\n"
+            "　もし、イコール（号、０）\n"
+            "　　返す、１\n"
+            "　返す、足す（フィボナッチ（引く（号、１））、フィボナッチ（引く（号、２）））\n"
+            "\n"
+            "フィボナッチ（７）\n"
             // L"フィボナッチ（１４）\n"
     );
 
@@ -188,8 +188,8 @@ TEST(program, fibonacci) {
 
 TEST(program, string_eq) {
     auto stringInput = StringInputSource(
-            L"あ＝イコール（「ほげ」、「ほけ」）\n"
-            L"い＝イコール（「ほげ」、「ほげ」）\n"
+            "あ＝イコール（「ほげ」、「ほけ」）\n"
+            "い＝イコール（「ほげ」、「ほげ」）\n"
     );
 
 
@@ -207,14 +207,14 @@ TEST(program, string_eq) {
 
 TEST(program, dictionary) {
     auto stringInput = StringInputSource(
-            L"ほげ＝辞書（）\n"
-            L"ほげ・あ＝辞書（）\n"
-            L"ほげ・あ・い＝辞書（）\n"
-            L"関数、ピン（）\n"
-            L"　返す、ほげ・あ・い\n"
-            L"ほげ・あ・い・う＝ピン\n"
-            L"ほげ・あ・い・え＝５\n"
-            L"あ＝ほげ・あ・い・う（）・え\n"
+            "ほげ＝辞書（）\n"
+            "ほげ・あ＝辞書（）\n"
+            "ほげ・あ・い＝辞書（）\n"
+            "関数、ピン（）\n"
+            "　返す、ほげ・あ・い\n"
+            "ほげ・あ・い・う＝ピン\n"
+            "ほげ・あ・い・え＝５\n"
+            "あ＝ほげ・あ・い・う（）・え\n"
     );
 
 
@@ -231,17 +231,17 @@ TEST(program, dictionary) {
 
 TEST(program, if_elif_else) {
     auto stringInput = StringInputSource(
-            L"関数、五番です（番号）\n"
-            L"　もし、イコール（番号、５）\n"
-            L"　　返す、１\n"
-            L"　あるいは、イコール（番号、６）\n"
-            L"　　返す、６\n"
-            L"　その他\n"
-            L"　　返す、０\n"
-            L"\n"
-            L"あ＝五番です（５）\n"
-            L"い＝五番です（６）\n"
-            L"う＝五番です（７）\n"
+            "関数、五番です（番号）\n"
+            "　もし、イコール（番号、５）\n"
+            "　　返す、１\n"
+            "　あるいは、イコール（番号、６）\n"
+            "　　返す、６\n"
+            "　その他\n"
+            "　　返す、０\n"
+            "\n"
+            "あ＝五番です（５）\n"
+            "い＝五番です（６）\n"
+            "う＝五番です（７）\n"
     );
 
 
@@ -260,8 +260,8 @@ TEST(program, if_elif_else) {
 
 TEST(eval, user_function_varargs) {
     auto stringInput = StringInputSource(
-            L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
-            L"　返す、１\n"
+            "関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
+            "　返す、１\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -284,9 +284,9 @@ TEST(eval, user_function_varargs) {
 
 TEST(eval, call_user_function_varargs) {
     auto stringInput = StringInputSource(
-            L"関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
-            L"　返す、配列引数\n"
-            L"あ＝ほげ（１、２、３、４、あ：５）\n"
+            "関数、ほげ（引数、＊配列引数、＊＊辞書引数）\n"
+            "　返す、配列引数\n"
+            "あ＝ほげ（１、２、３、４、あ：５）\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -307,10 +307,10 @@ TEST(eval, call_user_function_varargs) {
 
 TEST(eval, call_user_function_default) {
     auto stringInput = StringInputSource(
-            L"関数、ほげ（あああ：１＋２）\n"
-            L"　返す、あああ\n"
-            L"あ＝ほげ（あああ：５）\n"
-            L"い＝ほげ（）\n"
+            "関数、ほげ（あああ：１＋２）\n"
+            "　返す、あああ\n"
+            "あ＝ほげ（あああ：５）\n"
+            "い＝ほげ（）\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -328,7 +328,7 @@ TEST(eval, call_user_function_default) {
 
 TEST(eval, infix) {
     auto stringInput = StringInputSource(
-            L"あ＝１＋２－４＋３\n"
+            "あ＝１＋２－４＋３\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);
@@ -346,12 +346,12 @@ TEST(eval, infix) {
 
 TEST(eval, infix_equality) {
     auto stringInput = StringInputSource(
-            L"あ＝１＝＝３\n"
-            L"い＝１！＝３\n"
-            L"う＝１＞＝３\n"
-            L"え＝１＜＝３\n"
-            L"お＝１＞３\n"
-            L"か＝１＜３\n"
+            "あ＝１＝＝３\n"
+            "い＝１！＝３\n"
+            "う＝１＞＝３\n"
+            "え＝１＜＝３\n"
+            "お＝１＞３\n"
+            "か＝１＜３\n"
     );
     auto testTokenizer = TanukiTokenizer(&stringInput);
     auto parser = Parser(nullptr);

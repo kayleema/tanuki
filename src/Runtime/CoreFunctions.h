@@ -7,7 +7,7 @@ class Environment;
 
 void initModule(Environment *env);
 
-extern const wchar_t *coreTanukiStarter;
+extern const char *coreTanukiStarter;
 
 class FunctionNewDictionary : public FunctionValue {
 public:

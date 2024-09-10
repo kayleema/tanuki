@@ -301,11 +301,11 @@ Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
     wstring key = tree->children[0]->content.content;
     DictionaryValue *lookupSource = source->getLookupSource(this);
     if (lookupSource == nullptr) {
-        logger->log("エラー：「・」の左側はGET出来ない型。")->log(key)->logEndl();
+        logger->log("エラー：「・」の左側はGET出来ない型。")->log(encodeUTF8(key))->logEndl();
         return context->newNoneValue();
     }
     if (!lookupSource->has(key)) {
-        logger->log("エラー：辞書にキーは入っていない。")->log(key)->logEndl();
+        logger->log("エラー：辞書にキーは入っていない。")->log(encodeUTF8(key))->logEndl();
         return context->newNoneValue();
     }
     auto getResult = lookupSource->get(key);
@@ -614,7 +614,11 @@ Value *Environment::lookup(const wstring &name) {
     if (parent) {
         return parent->lookup(name);
     }
-    ConsoleLogger().log("lookup failure for '")->log(name)->log("'")->logEndl();
+    ConsoleLogger()
+        .log("lookup failure for '")
+        ->log(encodeUTF8(name))
+        ->log("'")
+        ->logEndl();
     return context->newNoneValue();
 }
 
@@ -627,7 +631,7 @@ void Environment::bind(const wstring &name, Value *value, bool recursive) {
         if (parent) {
             parent->bind(name, value, true);
         } else {
-            ConsoleLogger().log("reached top stack frame for nonlocal '")->log(name)->log("'")->logEndl();
+            ConsoleLogger().log("reached top stack frame for nonlocal '")->log(encodeUTF8(name))->log("'")->logEndl();
         }
     } else {
         bindings[name] = value;
