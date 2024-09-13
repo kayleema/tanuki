@@ -2,24 +2,25 @@
 #include "Lexer/LexerConstants.h"
 #include <iostream>
 #include <unordered_set>
+#include "TextInput/UnicodeConversion.h"
 
-MatcherResult MatcherComparison::match(wchar_t first, int currentLineNumber,
+MatcherResult MatcherComparison::match(TnkChar first, int currentLineNumber,
                                        InputSource *input) {
     static const auto comparisonChars =
-        std::unordered_set<wchar_t>({greaterThan, lessThan, assign, notSign});
+        std::unordered_set<TnkChar>({greaterThan, lessThan, assign, notSign});
 
     if (comparisonChars.count(first) &&
         comparisonChars.count(input->peekChar())) {
-        wstring comparison(1, first);
-        comparison.append(1, input->getChar());
-        if (comparison == L"＝＝") {
-            return MatcherResult(Token(EQ, L"＝＝", currentLineNumber));
-        } else if (comparison == L"＞＝") {
-            return MatcherResult(Token(GEQ, L"＞＝", currentLineNumber));
-        } else if (comparison == L"＜＝") {
-            return MatcherResult(Token(LEQ, L"＜＝", currentLineNumber));
-        } else if (comparison == L"！＝") {
-            return MatcherResult(Token(NEQ, L"！＝", currentLineNumber));
+        auto second = input->getChar();
+
+        if (first == assign && second == assign) {
+            return MatcherResult(Token(EQ, "＝＝", currentLineNumber));
+        } else if (first == greaterThan && second == assign) {
+            return MatcherResult(Token(GEQ, "＞＝", currentLineNumber));
+        } else if (first == lessThan && second == assign) {
+            return MatcherResult(Token(LEQ, "＜＝", currentLineNumber));
+        } else if (first == notSign && second == assign) {
+            return MatcherResult(Token(NEQ, "！＝", currentLineNumber));
         } else {
             std::cout << "lexer error : invalid comparison" << std::endl;
         }

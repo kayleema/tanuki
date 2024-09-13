@@ -42,16 +42,16 @@ public:
 
     FloatValue *newFloatValue(double number);
 
-    StringValue *newStringValue(wstring str);
+    StringValue *newStringValue(string str);
 
     DictionaryValue *newDictionaryValue();
 
     UserFunctionValue *newUserFunctionValue(
-            vector<wstring> params, SyntaxNode *body, Environment *e);
+            vector<string> params, SyntaxNode *body, Environment *e);
 
     UserFunctionValue *newUserFunctionValue(
-            vector<wstring> params,
-            unordered_map<wstring, Value *> paramsWithDefault,
+            vector<string> params,
+            unordered_map<string, Value *> paramsWithDefault,
             SyntaxNode *body, Environment *e);
 
     FunctionValue *newBoundFunctionValue(FunctionValue *function, Value *jibun);

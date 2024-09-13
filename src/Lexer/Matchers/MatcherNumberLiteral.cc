@@ -1,23 +1,24 @@
 #include "MatcherNumberLiteral.h"
 #include "Lexer/Matcher.h"
+#include "TextInput/UnicodeConversion.h"
 
-bool charIsNumeric(wchar_t c) {
+bool charIsNumeric(TnkChar c) {
     return (c <= L'９' && c >= L'０') || c == L'。';
 }
 
-MatcherResult MatcherNumberLiteral::match(wchar_t first, int currentLineNumber,
+MatcherResult MatcherNumberLiteral::match(TnkChar first, int currentLineNumber,
                                           InputSource *input) {
     if (charIsNumeric(first)) {
-        wstring resultNumber = wstring(1, first);
+        string resultNumber = tnkCharToString(first);
         while (charIsNumeric(input->peekChar()) && !input->eof()) {
-            resultNumber.push_back(input->getChar());
+            resultNumber.append(tnkCharToString(input->getChar()));
         }
-        TokenType tokenType = (resultNumber.find(L'。') != std::string::npos)
+        TokenType tokenType = (resultNumber.find("。") != std::string::npos)
                                   ? TokenType::NUMBER_FLOAT
                                   : TokenType::NUMBER;
 
         return MatcherResult(
-            Token(tokenType, wstring(resultNumber), currentLineNumber));
+            Token(tokenType, string(resultNumber), currentLineNumber));
     }
     return {};
 }

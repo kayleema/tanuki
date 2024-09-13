@@ -20,7 +20,7 @@ class MatcherResult {
 
 class Matcher {
   public:
-    virtual MatcherResult match(wchar_t first, int currentLineNumber,
+    virtual MatcherResult match(TnkChar first, int currentLineNumber,
                                 InputSource *input) = 0;
 
     virtual ~Matcher() = default;

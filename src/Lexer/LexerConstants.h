@@ -1,27 +1,27 @@
 #ifndef LEXERCONSTANTS_H
 #define LEXERCONSTANTS_H
 
-const wchar_t lparen = L'（';
-const wchar_t rparen = L'）';
-const wchar_t lsquare = L'「';
-const wchar_t rsquare = L'」';
-const wchar_t lbrace = L'【';
-const wchar_t rbrace = L'】';
-const wchar_t comma = L'、';
-const wchar_t space = L'　';
-const wchar_t assign = L'＝';
-const wchar_t dot = L'・';
-const wchar_t newline = L'\n';
-const wchar_t minuszenkaku = L'－';
-const wchar_t star = L'＊';
-const wchar_t colon = L'：';
-const wchar_t sharp = L'＃';
-const wchar_t plusSign = L'＋';
-const wchar_t slash = L'／';
-const wchar_t nullChar = L'\0';
-const wchar_t greaterThan = L'＞';
-const wchar_t lessThan = L'＜';
-const wchar_t notSign = L'！';
-const wchar_t nami = L'〜';
+const TnkChar lparen = L'（';
+const TnkChar rparen = L'）';
+const TnkChar lsquare = L'「';
+const TnkChar rsquare = L'」';
+const TnkChar lbrace = L'【';
+const TnkChar rbrace = L'】';
+const TnkChar comma = L'、';
+const TnkChar space = L'　';
+const TnkChar assign = L'＝';
+const TnkChar dot = L'・';
+const TnkChar newline = L'\n';
+const TnkChar minuszenkaku = L'－';
+const TnkChar star = L'＊';
+const TnkChar colon = L'：';
+const TnkChar sharp = L'＃';
+const TnkChar plusSign = L'＋';
+const TnkChar slash = L'／';
+const TnkChar nullChar = L'\0';
+const TnkChar greaterThan = L'＞';
+const TnkChar lessThan = L'＜';
+const TnkChar notSign = L'！';
+const TnkChar nami = L'〜';
 
 #endif // LEXERCONSTANTS_H

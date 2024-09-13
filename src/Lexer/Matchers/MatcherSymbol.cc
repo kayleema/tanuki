@@ -2,11 +2,12 @@
 #include "Lexer/LexerConstants.h"
 #include "Lexer/Matcher.h"
 #include "TextInput/UnicodeConversion.h"
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 
-bool charIsSymbolic(wchar_t c) {
-    static const std::unordered_set<wchar_t> symbolicChars(
+bool charIsSymbolic(TnkChar c) {
+    static const std::unordered_set<TnkChar> symbolicChars(
         {lparen,       rparen,   comma,    space,  newline,
          assign,       dot,      star,     colon,  sharp,
          minuszenkaku, plusSign, nullChar, slash,  greaterThan,
@@ -15,11 +16,11 @@ bool charIsSymbolic(wchar_t c) {
     return c != 0 && symbolicChars.count(c) == 0;
 }
 
-MatcherResult MatcherSymbol::match(wchar_t first, int currentLineNumber,
+MatcherResult MatcherSymbol::match(TnkChar first, int currentLineNumber,
                                    InputSource *input) {
-    wstring resultSymbol = wstring(1, first);
+    string resultSymbol = tnkCharToString(first);
     while (charIsSymbolic(input->peekChar()) && !input->eof()) {
-        resultSymbol.push_back(input->getChar());
+        resultSymbol.append(tnkCharToString(input->getChar()));
     }
 
     auto resultIdentifier = matchIdentifier(resultSymbol, currentLineNumber);
@@ -33,70 +34,83 @@ MatcherResult MatcherSymbol::match(wchar_t first, int currentLineNumber,
     }
 
     return MatcherResult(
-        Token(TokenType::SYMBOL, wstring(resultSymbol), currentLineNumber));
+        Token(TokenType::SYMBOL, resultSymbol, currentLineNumber));
 }
 
-MatcherResult MatcherSymbol::matchIdentifier(const wstring &tokenString,
+MatcherResult MatcherSymbol::matchIdentifier(const string &tokenString,
                                              int currentLineNumber) {
-    const std::unordered_map<wstring, TokenType> identifiers(
-        {{L"関数", TokenType::FUNC},
-         {L"返す", TokenType::RETURN},
-         {L"もし", TokenType::IF},
-         {L"あるいは", TokenType::ELIF},
-         {L"その他", TokenType::ELSE},
-         {L"導入", TokenType::IMPORT},
-         {L"確認", TokenType::ASSERT},
-         {L"外側", TokenType::EXTERN}});
+    const std::unordered_map<string, TokenType> identifiers(
+        {{"関数", TokenType::FUNC},
+         {"返す", TokenType::RETURN},
+         {"もし", TokenType::IF},
+         {"あるいは", TokenType::ELIF},
+         {"その他", TokenType::ELSE},
+         {"導入", TokenType::IMPORT},
+         {"確認", TokenType::ASSERT},
+         {"外側", TokenType::EXTERN}});
 
     if (identifiers.count(tokenString)) {
         const TokenType newTokenType = identifiers.at(tokenString);
         return MatcherResult(
-            Token(newTokenType, wstring(tokenString), currentLineNumber));
+            Token(newTokenType, tokenString, currentLineNumber));
     }
-    return MatcherResult();
+    return {};
 }
 
-MatcherResult MatcherSymbol::matchKanjiNumber(const wstring &tokenString,
+static const TnkChar kanjiCharsTnk[] = {
+    L'零', L'一', L'二', L'三', L'四', L'五', L'六', L'七', L'八',
+    L'九', L'十', L'百', L'千', L'万', L'億', L'兆', L'京',
+};
+
+MatcherResult MatcherSymbol::matchKanjiNumber(const string &tokenString,
                                               int currentLineNumber) {
-    static const auto kanjiChars = wstring(L"零一二三四五六七八九十百千万億兆京");
-    for (wchar_t const &c : tokenString) {
-        if (kanjiChars.find(c) == std::string::npos) {
-            return MatcherResult();
+    const char *tokenCString = tokenString.c_str();
+    TnkChar currentChar = getFirstUtfChar(tokenCString);
+    while (currentChar != 0) {
+        if (std::find(std::begin(kanjiCharsTnk), std::end(kanjiCharsTnk),
+                      currentChar) == std::end(kanjiCharsTnk)) {
+            return {};
         }
+        tokenCString += getUtfCharSize(*tokenCString);
+        currentChar = getFirstUtfChar(tokenCString);
     }
 
-    return MatcherResult(
-        Token(
-        TokenType::NUMBER,
-        tokenString,
-        currentLineNumber,
-        parseKanjiNumber(tokenString)
-    ));
+    return MatcherResult(Token(TokenType::NUMBER, tokenString,
+                               currentLineNumber,
+                               parseKanjiNumber(tokenString)));
 }
 
+static const TnkChar kanjiTen[] = {
+    L'零',L'一',L'二',L'三',L'四',L'五',L'六',L'七',L'八',L'九',L'十',
+};
+static const char * const kanjiPowers[] = {
+    "京", "兆", "億", "万", "千", "百", "十",
+};
 
-long MatcherSymbol::parseKanjiNumber(wstring input) {
-    static const auto kanjiTen = wstring(L"零一二三四五六七八九十");
-    if (input.length() == 1) {
-        auto pos = kanjiTen.find(input[0]);
-        if (pos != std::string::npos) {
-            return long(pos);
+long MatcherSymbol::parseKanjiNumber(string input_s) {
+    bool isOneChar = input_s.length() == (size_t)getUtfCharSize(input_s[0]);
+    if (isOneChar) {
+        auto oneChar = getFirstUtfChar(input_s.c_str());
+        auto foundPointer =
+            find(begin(kanjiTen), end(kanjiTen), oneChar);
+        if (foundPointer != end(kanjiTen)) {
+            return foundPointer - kanjiTen;
         }
     }
 
-    static const auto kanjiPowers = wstring(L"京兆億万千百十");
+    static const int charSize = getUtfCharSize(kanjiPowers[0][0]);
     long i = 10000000000000000;
-    for (const wchar_t &power : kanjiPowers) {
-        auto splitPoint = input.find(power);
+    for (const auto &power : kanjiPowers) {
+        auto splitPoint = input_s.find(power);
         if (splitPoint != std::string::npos) {
-            auto lhs = input.substr(0, splitPoint);
-            auto rhs = input.substr(splitPoint + 1);
+            auto lhs = input_s.substr(0, splitPoint);
+            auto rhs = input_s.substr(splitPoint + charSize);
             long lhsNum = 1;
             long rhsNum = 0;
-            if (lhs.length() > 0) {
+            if (!lhs.empty()) {
                 lhsNum = parseKanjiNumber(lhs);
             }
-            if (rhs.length() > 0) {
+            if (!rhs.empty()) {
                 rhsNum = parseKanjiNumber(rhs);
             }
             return lhsNum * i + rhsNum;

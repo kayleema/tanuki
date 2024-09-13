@@ -12,13 +12,19 @@ extern const char *coreTanukiStarter;
 class FunctionNewDictionary : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *kwargsIn) const override;
+                 unordered_map<string, Value *> *kwargsIn) const override;
 };
 
 class FunctionForEach : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *kwargsIn) const override;
+                 unordered_map<string, Value *> *kwargsIn) const override;
+};
+
+class LengthFunction : public FunctionValue {
+  public:
+    Value *apply(const vector<Value *> &args, Environment *env,
+                 unordered_map<string, Value *> *kwargsIn) const override;
 };
 
 #endif

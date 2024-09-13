@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
     context.setFrequency(freq);
     FilesystemImpl filesystem;
     auto *env = new Environment(&context, &filesystem);
-    env->bind(L"FILE", context.newStringValue(decodeUTF8(sourceFilename)));
+    env->bind("FILE", context.newStringValue(sourceFilename));
     evalTanukiStarter(env);
     env->eval(tree);
 

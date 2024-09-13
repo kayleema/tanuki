@@ -52,7 +52,7 @@ Value *Environment::eval(SyntaxNode *tree, const FunctionValue *tailContext) {
         case NodeType::ASSERT:
             return eval_assert(tree);
         default:
-            return context->newNoneValue();
+            return Context::newNoneValue();
     }
 }
 
@@ -78,7 +78,11 @@ Value *Environment::eval_add(SyntaxNode *tree) {
         result->value.insert(result->value.end(), b.begin(), b.end());
         return result;
     }
-    return context->newNoneValue();
+//    auto adder = lhs->getLookupSource(this)->get("足す");
+//    if (adder && adder->type == ValueType::FUNC) {
+//        return adder->toFunctionValue()->apply({lhs, rhs}, this, nullptr);
+//    }//TODO: user defined infix evaluation
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_sub(SyntaxNode *tree) {
@@ -240,16 +244,16 @@ Value *Environment::eval_calltail(Value *functionInput, SyntaxNode *tail,
                                   const FunctionValue *tailContext) {
     if (functionInput->type != ValueType::FUNC) {
         logger->log("実行エラー：関数型ではない物を呼べません。")->logEndl();
-        return context->newNoneValue();
+        return Context::newNoneValue();
     }
-    auto function = static_cast<FunctionValue *>(functionInput);
+    auto function = dynamic_cast<FunctionValue *>(functionInput);
     if (tail->children.size() == 2) {
         tailContext = nullptr;
     }
 
     SyntaxNode *args_tree = tail->children[0];
     vector<Value *> args;
-    unordered_map<wstring, Value *> kwargsIn;
+    unordered_map<string, Value *> kwargsIn;
     for (auto expression : args_tree->children) {
         if (expression->type == NodeType::KWARG) {
             auto *lhs = expression->children[0];
@@ -267,7 +271,7 @@ Value *Environment::eval_calltail(Value *functionInput, SyntaxNode *tail,
         for (auto arg : args) {
             context->tempRefDecrement(arg);
         }
-        for (auto arg : kwargsIn) {
+        for (const auto& arg : kwargsIn) {
             context->tempRefDecrement(arg.second);
         }
         auto result = new TailCallValue(args);
@@ -298,15 +302,15 @@ Value *Environment::eval_calltail(Value *functionInput, SyntaxNode *tail,
 }
 
 Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
-    wstring key = tree->children[0]->content.content;
+    string key = tree->children[0]->content.content;
     DictionaryValue *lookupSource = source->getLookupSource(this);
     if (lookupSource == nullptr) {
-        logger->log("エラー：「・」の左側はGET出来ない型。")->log(encodeUTF8(key))->logEndl();
-        return context->newNoneValue();
+        logger->log("エラー：「・」の左側はGET出来ない型。")->log(key)->logEndl();
+        return Context::newNoneValue();
     }
     if (!lookupSource->has(key)) {
-        logger->log("エラー：辞書にキーは入っていない。")->log(encodeUTF8(key))->logEndl();
-        return context->newNoneValue();
+        logger->log("エラー：辞書にキーは入っていない。")->log(key)->logEndl();
+        return Context::newNoneValue();
     }
     auto getResult = lookupSource->get(key);
     context->tempRefIncrement(getResult);
@@ -319,20 +323,20 @@ Value *Environment::eval_get(Value *source, SyntaxNode *tree) {
 }
 
 Value *Environment::eval_get_bind(Value *source, SyntaxNode *tree) {
-    wstring key = tree->children[0]->content.content;
+    string key = tree->children[0]->content.content;
     DictionaryValue *lookupSource = source->getLookupSource(this);
     if (lookupSource == nullptr) {
-        cout << "実行エラー：波ダッシュの左側はGET出来ない型がある。" << encodeUTF8(key) << endl;
-        return context->newNoneValue();
+        cout << "実行エラー：波ダッシュの左側はGET出来ない型がある。" << (key) << endl;
+        return Context::newNoneValue();
     }
     if (!lookupSource->has(key)) {
-        cout << "実行エラー：辞書にキーは入っていない。" << encodeUTF8(key) << endl;
-        return context->newNoneValue();
+        cout << "実行エラー：辞書にキーは入っていない。" << (key) << endl;
+        return Context::newNoneValue();
     }
     auto getResult = lookupSource->get(key);
     if (getResult->type != ValueType::FUNC) {
         cout << "実行エラー：波線の右側のタイプは関数ではありません。バインドはできません。" << endl;
-        return context->newNoneValue();
+        return Context::newNoneValue();
     }
     context->tempRefIncrement(getResult);
     auto boundGetResult = context->newBoundFunctionValue(dynamic_cast<FunctionValue *>(getResult), source);
@@ -350,9 +354,9 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
     if (source->type == ValueType::DICT) {
         auto sourceDictionary = (DictionaryValue *) source;
         SyntaxNode *arg = tree->children[0];
-        wstring key = ((StringValue *) eval(arg))->value;
+        string key = ((StringValue *) eval(arg))->value;
         if (!sourceDictionary->has(key)) {
-            return context->newNoneValue();
+            return Context::newNoneValue();
         }
         auto result = sourceDictionary->get(key);
         if (tree->children.size() == 2) {
@@ -367,7 +371,7 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         long index = ((NumberValue *) eval(arg))->value;
         if (sourceArray->length() <= index) {
             cout << "添字は配列の外　添字：" << index << "　長さ：" << sourceArray->length() << endl;
-            return context->newNoneValue();
+            return Context::newNoneValue();
         }
         auto result = sourceArray->getIndex(index);
         if (tree->children.size() == 2) {
@@ -375,14 +379,21 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         }
         return result;
     } else if (source->type == ValueType::STRING) {
-        auto sourceString = (StringValue *) source;
+        // TODO: strengthen testing of string subscript
         SyntaxNode *arg = tree->children[0];
         long index = ((NumberValue *) eval(arg))->value;
-        if ((long) sourceString->value.length() <= index) {
-            cout << "添字は文字列の外　添字：" << index << "　長さ：" << sourceString->value.length() << endl;
-            return context->newNoneValue();
+        auto sourceString = source->toStringValue()->value;
+        auto sourceStringIteration = sourceString.c_str();
+        TnkChar currentChar;
+        for (int i = 0; i <= index; i++) {
+            currentChar = getFirstUtfChar(sourceStringIteration);
+            if (currentChar == 0) {
+                cout << "添字は文字列の外　添字：" << index << "　長さ：" << sourceString.length() << endl;
+                return Context::newNoneValue();
+            }
+            sourceStringIteration += getUtfCharSize(*sourceStringIteration);
         }
-        Value *result = context->newStringValue(wstring(1, sourceString->value[index]));
+        Value *result = context->newStringValue(tnkCharToString(currentChar));
         if (tree->children.size() == 2) {
             context->tempRefIncrement(result);
             result = eval_tail(result, tree->children[1]);
@@ -390,14 +401,14 @@ Value *Environment::eval_subscript(Value *source, SyntaxNode *tree) {
         }
         return result;
     }
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_subscript_set(Value *source, SyntaxNode *tree) {
     if (source->type == ValueType::DICT) {
         auto sourceDictionary = (DictionaryValue *) source;
         SyntaxNode *arg = tree->children[0];
-        wstring key = ((StringValue *) eval(arg))->value;
+        string key = ((StringValue *) eval(arg))->value;
         auto rhs = eval(tree->children[1]);
         sourceDictionary->set(key, rhs);
     } else if (source->type == ValueType::ARRAY) {
@@ -406,32 +417,32 @@ Value *Environment::eval_subscript_set(Value *source, SyntaxNode *tree) {
         long index = ((NumberValue *) eval(arg))->value;
         if (sourceArray->length() <= index) {
             cout << "添字は配列の外　添字：" << index << "　長さ：" << sourceArray->length() << endl;
-            return context->newNoneValue();
+            return Context::newNoneValue();
         }
         auto rhs = eval(tree->children[1]);
         sourceArray->set(index, rhs);
     }
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_set(Value *source, SyntaxNode *tree) {
     if (source->type != ValueType::DICT) {
         cout << "実行エラー：「・ ＝」のときに「＝」の左側はSET出来ない型です。" << source->toString() << endl;
-        return context->newNoneValue();
+        return Context::newNoneValue();
     }
-    DictionaryValue *sourceDict = static_cast<DictionaryValue*>(source);
-    wstring key = tree->children[0]->content.content;
+    auto *sourceDict = dynamic_cast<DictionaryValue*>(source);
+    string key = tree->children[0]->content.content;
     auto rhs = eval(tree->children[1]);
     sourceDict->set(key, rhs);
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_terminal(SyntaxNode *tree) {
     if (tree->content.type == TokenType::SYMBOL) {
-        wstring name = tree->content.content;
+        string name = tree->content.content;
         auto result = lookup(name);
         if (!result) {
-            return context->newNoneValue();
+            return Context::newNoneValue();
         }
         return lookup(name);
     }
@@ -447,7 +458,7 @@ Value *Environment::eval_terminal(SyntaxNode *tree) {
         auto result = context->newStringValue(tree->content.content);
         return result;
     }
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_text(SyntaxNode *tree,
@@ -457,20 +468,18 @@ Value *Environment::eval_text(SyntaxNode *tree,
         if (statementReturnValue->type == ValueType::RETURN ||
             statementReturnValue->type == ValueType::TAIL_CALL) {
             return statementReturnValue;
-        } else if (statementReturnValue != nullptr && // TODO: always true
-                   statementReturnValue->type != ValueType::NONE) {
         }
     }
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_function(SyntaxNode *tree) {
-    std::vector<wstring> params;
-    std::unordered_map<wstring, Value *> paramsWithDefault;
+    std::vector<string> params;
+    std::unordered_map<string, Value *> paramsWithDefault;
     bool hasKwParam = false;
     bool hasVarParam = false;
-    wstring kwParamName;
-    wstring varParamName;
+    string kwParamName;
+    string varParamName;
     for (auto param : tree->children[1]->children) {
         if (param->type == NodeType::TERMINAL) {
             params.push_back(param->content.content);
@@ -481,7 +490,6 @@ Value *Environment::eval_function(SyntaxNode *tree) {
             hasVarParam = true;
             varParamName = param->children[0]->content.content;
         } else if (param->type == NodeType::DEFAULTPARAM) {
-//            wcout << L"DEFAULTPARAM:" << param->children[0]->content.content << endl;
             auto defaultValue = eval(param->children[1], nullptr);
             context->tempRefIncrement(defaultValue);
             paramsWithDefault[param->children[0]->content.content] = defaultValue;
@@ -498,7 +506,7 @@ Value *Environment::eval_function(SyntaxNode *tree) {
     }
     auto nameNode = tree->children[0];
     if (nameNode->type == NodeType::TERMINAL) {
-        wstring name = nameNode->content.content;
+        string name = nameNode->content.content;
         bindings[name] = function;
     } else if (nameNode->children.empty()) {
         return function;
@@ -510,7 +518,7 @@ Value *Environment::eval_function(SyntaxNode *tree) {
             cout << "error not of type dict" << endl;
             return Context::newNoneValue();
         }
-        DictionaryValue *dictionary = static_cast<DictionaryValue *>(name1value);
+        auto *dictionary = dynamic_cast<DictionaryValue *>(name1value);
         dictionary->set(name2, function);
     }
     return Context::newNoneValue();
@@ -526,16 +534,15 @@ Value *Environment::eval_return(SyntaxNode *tree,
 }
 
 Value *Environment::eval_import(SyntaxNode *tree) {
-    ConsoleLogger logger;
-    auto currentFilePath = encodeUTF8(lookup(L"FILE")->toStringValue()->value);
+    auto currentFilePath = (lookup("FILE")->toStringValue()->value);
     auto currentFileDir = getDirectoryForPath(currentFilePath);
 
     // Get relative path
     auto relativePath = string();
-    wstring dirToken;
+    string dirToken;
     for (auto child : tree->children) {
         dirToken = child->content.content;
-        relativePath += string("/") + encodeUTF8(dirToken);
+        relativePath += string("/") + (dirToken);
     }
     relativePath += string(".tnk");
 
@@ -546,28 +553,28 @@ Value *Environment::eval_import(SyntaxNode *tree) {
         tryPath = string(GLOBAL_TANUKI_LIB_SEARCH_PATH) + relativePath;
         fileInputSource = filesystem->getInputSourceForFilename(tryPath);
         if (!fileInputSource->good()) {
-            logger.log("ERROR: could not import")->logEndl();
-            return context->newNoneValue();
+            logger->log("ERROR: could not import")->logEndl();
+            return Context::newNoneValue();
         }
     }
 
     // Parse and Exec file
     TanukiTokenizer tokenizer(fileInputSource.get());
-    Parser parser(&logger);
+    Parser parser(logger);
     auto parsedTree = parser.run(tokenizer.getAllTokens());
     auto importEnv = newChildEnvironment();
-    importEnv->bind(L"FILE", context->newStringValue(decodeUTF8(tryPath)));
+    importEnv->bind("FILE", context->newStringValue(tryPath));
     importEnv->eval(parsedTree);
     auto module = importEnv->toNewDictionaryValue();
     bind(dirToken, module);
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_nonlocal(SyntaxNode *tree) {
     for (auto &child : tree->children) {
         nonlocals.insert(child->content.content);
     }
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_if(SyntaxNode *tree) {
@@ -583,55 +590,59 @@ Value *Environment::eval_if(SyntaxNode *tree) {
             return result;
         }
     }
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_assign(SyntaxNode *tree) {
-    wstring lhs = tree->children[0]->content.content;
+    auto lhs = tree->children[0]->content.content;
     bind(lhs, eval(tree->children[1]));
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
 Value *Environment::eval_assert(SyntaxNode *tree) {
     auto rhs = eval(tree->children[0]);
     if (!rhs->isTruthy()) {
-        ConsoleLogger().log("確認エラー終了：")->logLong(tree->content.line)->logLn("行目");
+        logger->log("確認エラー終了：")->logLong(tree->content.line)->logLn("行目");
         if (exitHandler != nullptr) {
             exitHandler->handleExit();
             return new ReturnValue(context->newNumberValue(1));
         } else {
-            ConsoleLogger().log("exit ")->logLn("now");
+            logger->log("exit ")->logLn("now");
             exit(1);
         }
     }
     return Context::newNoneValue();
 }
 
-Value *Environment::lookup(const wstring &name) {
+Value *Environment::lookup(const string &name) {
     if (bindings.count(name)) {
         return bindings[name];
     }
     if (parent) {
         return parent->lookup(name);
     }
-    ConsoleLogger()
-        .log("lookup failure for '")
-        ->log(encodeUTF8(name))
+    logger
+        ->log("lookup failure for '")
+        ->log(name)
         ->log("'")
         ->logEndl();
-    return context->newNoneValue();
+    return Context::newNoneValue();
 }
 
-bool Environment::isBound(const wstring &name) {
+bool Environment::isBound(const string &name) const {
     return bindings.count(name) || (parent && parent->isBound(name));
 }
 
-void Environment::bind(const wstring &name, Value *value, bool recursive) {
+void Environment::bind(const string &name, Value *value, bool recursive) {
     if ((recursive && bindings.find(name) == bindings.end()) || (nonlocals.find(name) != nonlocals.end())) {
         if (parent) {
             parent->bind(name, value, true);
         } else {
-            ConsoleLogger().log("reached top stack frame for nonlocal '")->log(encodeUTF8(name))->log("'")->logEndl();
+            logger
+                ->log("reached top stack frame for nonlocal '")
+                ->log(name)
+                ->log("'")
+                ->logEndl();
         }
     } else {
         bindings[name] = value;

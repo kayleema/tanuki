@@ -2,15 +2,16 @@
 #include "Lexer/LexerConstants.h"
 #include "Lexer/Matcher.h"
 #include <iostream>
+#include "TextInput/UnicodeConversion.h"
 
-MatcherResult MatcherString::match(wchar_t first, int currentLineNumber,
+MatcherResult MatcherString::match(TnkChar first, int currentLineNumber,
                                    InputSource *input) {
     if (first == lsquare) {
-        wstring resultString = wstring(L"");
-        wchar_t nextChar;
+        string resultString = string("");
+        TnkChar nextChar;
         int lineCount = 0;
         while ((nextChar = input->getChar()) != rsquare) {
-            resultString.push_back(nextChar);
+            resultString.append(tnkCharToString(nextChar));
             if (nextChar == newline) {
                 lineCount++;
             }
@@ -20,10 +21,10 @@ MatcherResult MatcherString::match(wchar_t first, int currentLineNumber,
                        u8"）"
                     << endl;
                 return MatcherResult(
-                    Token(TokenType::END, L"", currentLineNumber));
+                    Token(TokenType::END, "", currentLineNumber));
             }
         }
-        return MatcherResult(Token(TokenType::STRING, wstring(resultString),
+        return MatcherResult(Token(TokenType::STRING, string(resultString),
                                    currentLineNumber + lineCount),
                              lineCount);
     }

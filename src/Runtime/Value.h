@@ -36,8 +36,6 @@ public:
 
     virtual string toString() const;
 
-    virtual string toStringJP() const;
-
     NumberValue *toNumberValue() { return (NumberValue *) this; }
 
     FunctionValue *toFunctionValue() { return (FunctionValue *) this; }
@@ -65,7 +63,6 @@ public:
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
-    string toStringJP() const override;
 
     bool isTruthy() const override { return value != 0; };
 
@@ -81,7 +78,6 @@ public:
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
-    string toStringJP() const override;
 
     bool isTruthy() const override { return value != 0; };
 
@@ -92,16 +88,15 @@ public:
 
 class StringValue : public Value {
 public:
-    explicit StringValue(wstring str) : Value(ValueType::STRING), value(std::move(str)) {};
+    explicit StringValue(string str) : Value(ValueType::STRING), value(std::move(str)) {};
 
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
-    string toStringJP() const override;
 
     DictionaryValue *getLookupSource(Environment *env) override;
 
-    wstring value;
+    string value;
 };
 
 class DictionaryValue : public Value {
@@ -109,16 +104,16 @@ class DictionaryValue : public Value {
 public:
     DictionaryValue();
 
-    unordered_map<wstring, Value *> value;
+    unordered_map<string, Value *> value;
     DictionaryValue *parent = nullptr;
 
     void setParent(DictionaryValue *p) { parent = p; }
 
     DictionaryValue *getLookupSource(Environment *env) override;
 
-    void set(const wstring &name, Value *v) { value[name] = v; }
+    void set(const string &name, Value *v) { value[name] = v; }
 
-    virtual Value *get(const wstring &name) {
+    virtual Value *get(const string &name) {
         if (value.count(name)) {
             return value[name];
         } else if (parent) {
@@ -127,14 +122,13 @@ public:
         return nullptr;
     }
 
-    virtual bool has(const wstring &name) {
+    virtual bool has(const string &name) {
         return value.count(name) || (parent && parent->has(name));
     }
 
     bool equals(const Value *rhs) const override;
 
     string toString() const override;
-    string toStringJP() const override;
 };
 
 
@@ -149,7 +143,7 @@ public:
 
     void set(long index, Value *v) { value[index] = v; }
 
-    bool has(const wstring &name) override {
+    bool has(const string &name) override {
         return (parent && parent->has(name));
     }
 
@@ -167,7 +161,6 @@ public:
     }
 
     string toString() const override;
-    string toStringJP() const override;
 };
 
 // Indicates that an expression should force exit of func body eval.
@@ -182,7 +175,7 @@ class TailCallValue : public Value {
 public:
     vector<Value *> args;
     bool hasKwArgs = false;
-    unordered_map<wstring, Value *> kwArgs;
+    unordered_map<string , Value *> kwArgs;
 
     explicit TailCallValue(vector<Value *> _args)
             : Value(ValueType::TAIL_CALL), args(std::move(_args)) {};
@@ -197,34 +190,32 @@ public:
     FunctionValue() : Value(ValueType::FUNC) {};
 
     virtual Value *apply(const vector<Value *> &args, Environment *env,
-                         unordered_map<wstring, Value *> *kwargsIn = nullptr) const = 0;
+                         unordered_map<string, Value *> *kwargsIn = nullptr) const = 0;
 
     FunctionValueType functionType = FunctionValueType::NONE;
 
     DictionaryValue *getLookupSource(Environment *env) override;
-
-    string toStringJP() const override;
 };
 
 class SyntaxNode;
 
 class UserFunctionValue : public FunctionValue {
-    vector<wstring> params;
-    unordered_map<wstring, Value *> paramsWithDefault;
+    vector<string> params;
+    unordered_map<string, Value *> paramsWithDefault;
     bool hasVarKeywordArgs;
-    wstring varKeywordArgsParam;
+    string varKeywordArgsParam;
     bool hasVarArgs{};
-    wstring varArgsParam;
+    string varArgsParam;
     SyntaxNode *body;
 public:
-    UserFunctionValue(vector<wstring> params, SyntaxNode *body,
+    UserFunctionValue(vector<string> params, SyntaxNode *body,
                       Environment *parentEnv)
             : FunctionValue(), params(std::move(params)), hasVarKeywordArgs(false), body(body),
               parentEnv(parentEnv) {
         functionType = FunctionValueType::USER_FUNCTION;
     };
 
-    UserFunctionValue(vector<wstring> params, unordered_map<wstring, Value *> paramsWithDefault,
+    UserFunctionValue(vector<string> params, unordered_map<string, Value *> paramsWithDefault,
                       SyntaxNode *body, Environment *parentEnv)
             : FunctionValue(), params(std::move(params)), paramsWithDefault(std::move(paramsWithDefault)),
               hasVarKeywordArgs(false), body(body), parentEnv(parentEnv) {
@@ -234,25 +225,25 @@ public:
     Environment *parentEnv;
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *kwargsIn = nullptr) const override;
+                 unordered_map<string, Value *> *kwargsIn = nullptr) const override;
 
     string toString() const override;
 
-    const unordered_map<wstring, Value *> &getParamsWithDefault() {
+    const unordered_map<string, Value *> &getParamsWithDefault() {
         return paramsWithDefault;
     }
 
-    void setVarKeywordParam(wstring name);
+    void setVarKeywordParam(string name);
 
     bool hasVarKeywordParam() const { return hasVarKeywordArgs; };
 
-    const wstring getVarKeywordParam() const { return varKeywordArgsParam; };
+    string getVarKeywordParam() const { return varKeywordArgsParam; };
 
-    void setVarParam(wstring name);
+    void setVarParam(string name);
 
     bool hasVarParam() const { return hasVarArgs; };
 
-    const wstring getVarParam() const { return varArgsParam; };
+    string getVarParam() const { return varArgsParam; };
 };
 
 class BoundFunctionValue : public FunctionValue {
@@ -266,7 +257,7 @@ public:
     };
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *kwargsIn = nullptr) const override;
+                 unordered_map<string, Value *> *kwargsIn = nullptr) const override;
 };
 
 #endif

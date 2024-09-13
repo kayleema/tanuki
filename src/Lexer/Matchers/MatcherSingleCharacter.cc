@@ -1,11 +1,12 @@
 #include "MatcherSingleCharacter.h"
 #include "Lexer/LexerConstants.h"
 #include <unordered_map>
+#include "TextInput/UnicodeConversion.h"
 
-MatcherResult MatcherSingleCharacter::match(wchar_t first,
+MatcherResult MatcherSingleCharacter::match(TnkChar first,
                                             int currentLineNumber,
                                             InputSource *) {
-    static const std::unordered_map<wchar_t, const TokenType>
+    static const std::unordered_map<TnkChar, const TokenType>
         charToTokenTypeMap({{lparen, TokenType::LPAREN},
                             {lparen, TokenType::LPAREN},
                             {lbrace, TokenType::LBRACE},
@@ -25,7 +26,8 @@ MatcherResult MatcherSingleCharacter::match(wchar_t first,
                             {L'　', TokenType::INDENT}});
     if (charToTokenTypeMap.count(first)) {
         return MatcherResult(Token(charToTokenTypeMap.at(first),
-                                   wstring(1, first), currentLineNumber));
+                                   tnkCharToString(first),
+                                   currentLineNumber));
     }
     return {};
 }

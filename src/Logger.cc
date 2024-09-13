@@ -1,7 +1,8 @@
 ﻿#include "Logger.h"
-#include "TextInput/UnicodeConversion.h"
 #include <iostream>
 #include <sstream>
+#include <codecvt>
+#include <locale>
 
 #ifdef _WIN32
 #include <io.h>
@@ -17,6 +18,15 @@ PinponLogger *ConsoleLogger::setup() {
 #endif
     }
     return this;
+}
+
+wstring decodeUTF8(const string &in) {
+    try {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>> conv1;
+        return conv1.from_bytes(in);
+    } catch (const std::range_error &exception) {
+        return {L"XXX"};
+    }
 }
 
 PinponLogger *ConsoleLogger::log(std::string value) {

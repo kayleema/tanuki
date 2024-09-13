@@ -7,7 +7,6 @@
 #include "Context.h"
 #include "Logger.h"
 #include "Lexer/Tokenizer.h"
-#include "TextInput/UnicodeConversion.h"
 
 bool Value::equals(const Value *rhs) const {
     return (type == rhs->type);
@@ -18,15 +17,15 @@ DictionaryValue *Value::getLookupSource(Environment *) {
 }
 
 DictionaryValue *NumberValue::getLookupSource(Environment *env) {
-    return dynamic_cast<DictionaryValue *>(env->lookup(L"番号型"));
+    return dynamic_cast<DictionaryValue *>(env->lookup("番号型"));
 }
 
 DictionaryValue *FloatValue::getLookupSource(Environment *env) {
-    return dynamic_cast<DictionaryValue *>(env->lookup(L"番号フロート型"));
+    return dynamic_cast<DictionaryValue *>(env->lookup("番号フロート型"));
 }
 
 DictionaryValue *StringValue::getLookupSource(Environment *env) {
-    return dynamic_cast<DictionaryValue *>(env->lookup(L"文字列型"));
+    return dynamic_cast<DictionaryValue *>(env->lookup("文字列型"));
 }
 
 DictionaryValue *DictionaryValue::getLookupSource(Environment *) {
@@ -34,13 +33,7 @@ DictionaryValue *DictionaryValue::getLookupSource(Environment *) {
 }
 
 DictionaryValue *FunctionValue::getLookupSource(Environment *env) {
-    return dynamic_cast<DictionaryValue *>(env->lookup(L"関数型"));
-}
-
-string FunctionValue::toStringJP() const {
-    stringstream ss;
-    ss << "関数値";
-    return ss.str();
+    return dynamic_cast<DictionaryValue *>(env->lookup("関数型"));
 }
 
 bool NumberValue::equals(const Value *rhs) const {
@@ -55,12 +48,6 @@ string Value::toString() const {
     return result.str();
 }
 
-string Value::toStringJP() const {
-    ostringstream result;
-    result << "無";
-    return result.str();
-}
-
 bool operator==(const Value &lhs, const Value &rhs) {
     return lhs.equals(&rhs);
 }
@@ -68,12 +55,6 @@ bool operator==(const Value &lhs, const Value &rhs) {
 string NumberValue::toString() const {
     ostringstream result;
     result << "NumberValue(" << value << ")";
-    return result.str();
-}
-
-string NumberValue::toStringJP() const {
-    ostringstream result;
-    result << value;
     return result.str();
 }
 
@@ -89,20 +70,8 @@ string FloatValue::toString() const {
     return result.str();
 }
 
-string FloatValue::toStringJP() const {
-    ostringstream result;
-    result << value;
-    return result.str();
-}
-
 string StringValue::toString() const {
-    return string("string");
-}
-
-string StringValue::toStringJP() const {
-    ostringstream result;
-    result << "「" << encodeUTF8(value) << "」";
-    return result.str();
+    return {"string"};
 }
 
 bool StringValue::equals(const Value *rhs) const {
@@ -112,12 +81,6 @@ bool StringValue::equals(const Value *rhs) const {
 string DictionaryValue::toString() const {
     ostringstream result;
     result << "DictionaryValue(" << value.size() << ")";
-    return result.str();
-}
-
-string DictionaryValue::toStringJP() const {
-    ostringstream result;
-    result << "辞書〈長さ：" << value.size() << "〉";
     return result.str();
 }
 
@@ -133,23 +96,22 @@ string UserFunctionValue::toString() const {
     return result.str();
 }
 
-Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
-                                Environment *caller, unordered_map<wstring, Value *> *kwargsIn) const {
+Value *
+UserFunctionValue::apply(const vector<Value *> &argsIn, Environment *caller,
+                         unordered_map<string, Value *> *kwargsIn) const {
     Value *bodyReturnValue = nullptr;
     Environment *env;
     env = parentEnv->newChildEnvironment();
     env->caller = caller;
     vector<Value *> args;
     args.insert(args.end(), argsIn.begin(), argsIn.end());
-    unordered_map<wstring, Value *> kwArgsStatic;
+    unordered_map<string, Value *> kwArgsStatic;
     if (kwargsIn != nullptr) {
         kwArgsStatic = *kwargsIn;
     }
-    unordered_map<wstring, Value *> *kwArgs = (kwargsIn == nullptr) ? nullptr : (&kwArgsStatic);
+    unordered_map<string, Value *> *kwArgs = (kwargsIn == nullptr) ? nullptr : (&kwArgsStatic);
     do {
-        if (bodyReturnValue != nullptr) {
-            delete bodyReturnValue;
-        }
+        delete bodyReturnValue;
 
         if (params.size() > argsIn.size()) {
             // TODO: also log original function name
@@ -157,7 +119,7 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
                     ->log("必要は")->logLong((long) params.size())
                     ->log(" 渡したのは")->logLong((long) argsIn.size())
                     ->logEndl();
-            return env->context->newNoneValue();
+            return Context::newNoneValue();
         }
 
         // bind normal params
@@ -166,8 +128,8 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
         }
 
         // bind default parameters when not specified
-        for (auto item : paramsWithDefault) {
-            wstring left = item.first;
+        for (const auto& item : paramsWithDefault) {
+            string left = item.first;
             if (kwArgs && kwArgs->count(item.first)) {
                 env->bind(item.first, (*kwArgs)[item.first]);
             } else {
@@ -199,7 +161,7 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
             return inner;
         }
         if (bodyReturnValue->type == ValueType::TAIL_CALL) {
-            TailCallValue *tailCallValue = (TailCallValue *) bodyReturnValue;
+            auto *tailCallValue = (TailCallValue *) bodyReturnValue;
             args = tailCallValue->args;
             if (tailCallValue->hasKwArgs) {
                 if (!kwArgs) {
@@ -216,12 +178,12 @@ Value *UserFunctionValue::apply(const vector<Value *> &argsIn,
     return bodyReturnValue;
 }
 
-void UserFunctionValue::setVarKeywordParam(wstring name) {
+void UserFunctionValue::setVarKeywordParam(string name) {
     hasVarKeywordArgs = true;
     varKeywordArgsParam = std::move(name);
 }
 
-void UserFunctionValue::setVarParam(wstring name) {
+void UserFunctionValue::setVarParam(string name) {
     hasVarArgs = true;
     varArgsParam = std::move(name);
 }
@@ -232,14 +194,8 @@ string ArrayValue::toString() const {
     return ss.str();
 }
 
-string ArrayValue::toStringJP() const {
-    stringstream ss;
-    ss << "配列〈長さ：" << length() << "〉";
-    return ss.str();
-}
-
 Value *BoundFunctionValue::apply(const vector<Value *> &args, Environment *env,
-                                 unordered_map<wstring, Value *> *kwargsIn) const {
+                                 unordered_map<string, Value *> *kwargsIn) const {
     vector<Value *> newArgs;
     newArgs.push_back(jibun);
     newArgs.insert(newArgs.end(), args.begin(), args.end());

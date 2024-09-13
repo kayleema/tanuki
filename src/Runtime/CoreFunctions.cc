@@ -17,9 +17,12 @@ class FunctionSum : public FunctionValue {
 public:
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         long result = 0;
         for (auto value : args) {
+            if (value->type != ValueType::NUM) {
+                return Context::newNoneValue();
+            }
             result += value->toNumberValue()->value;
         }
         return env->context->newNumberValue(result);
@@ -30,7 +33,7 @@ class FunctionDiff : public FunctionValue {
 public:
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         long result = 0;
         bool first = true;
         for (auto value : args) {
@@ -49,7 +52,7 @@ class FunctionDiv : public FunctionValue {
 public:
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         long result = 0;
         bool first = true;
         for (auto value : args) {
@@ -68,7 +71,7 @@ class FunctionMul : public FunctionValue {
 public:
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         long result = 0;
         bool first = true;
         for (auto value : args) {
@@ -90,12 +93,12 @@ public:
     ~FunctionPrint() override {}
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         for (auto value : args) {
             if (value->type == ValueType::NUM) {
                 env->logger->logLong(value->toNumberValue()->value);
             } else if (value->type == ValueType::STRING) {
-                env->logger->log(encodeUTF8(value->toStringValue()->value));
+                env->logger->log((value->toStringValue()->value));
             } else {
                 env->logger->log(value->toString());
             }
@@ -109,7 +112,7 @@ class FunctionEqual : public FunctionValue {
 public:
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         if (args[0]->equals(args[1])) {
             return env->context->newNumberValue(1);
         }
@@ -121,7 +124,7 @@ class FunctionCompare : public FunctionValue {
 public:
 
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         if ((args[0]->type != ValueType::NUM) ||
             (args[1]->type != ValueType::NUM)) {
             return env->context->newNumberValue(0);
@@ -134,7 +137,7 @@ public:
 
 Value *FunctionNewDictionary::apply(const vector<Value *> &args,
                                     Environment *env,
-                                    unordered_map<wstring, Value *> *kwargs) const {
+                                    unordered_map<string, Value *> *kwargs) const {
     auto result = env->context->newDictionaryValue();
     if (!args.empty() && result->type == ValueType::DICT) {
         result->setParent(args[0]->toDictionaryValue());
@@ -149,12 +152,12 @@ Value *FunctionNewDictionary::apply(const vector<Value *> &args,
 
 Value *FunctionForEach::apply(const vector<Value *> &args,
                               Environment *env,
-                              unordered_map<wstring, Value *> *) const {
+                              unordered_map<string, Value *> *) const {
     if (args.size() == 2 && args[1]->type == ValueType::FUNC) {
         if (args[0]->type == ValueType::DICT) {
             auto dictionary = args[0]->toDictionaryValue();
             auto function = (FunctionValue *) args[1];
-            vector<wstring> keys;
+            vector<string> keys;
             for (const auto &item : dictionary->value) {
                 keys.push_back(item.first);
             }
@@ -177,11 +180,13 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
             }
             return Context::newNoneValue();
         } else if (args[0]->type == ValueType::STRING) {
-            auto s = args[0]->toStringValue();
+            auto argStringIter = args[0]->toStringValue()->value.c_str();
             auto function = (FunctionValue *) args[1];
-            vector<wstring> keys;
-            for (wchar_t &c : s->value) {
-                keys.emplace_back(1, c);
+            vector<string> keys;
+            while (*argStringIter != 0) {
+                TnkChar current = getFirstUtfChar(argStringIter);
+                keys.push_back(tnkCharToString(current));
+                argStringIter += getUtfCharSize(*argStringIter);
             }
             for (const auto &key : keys) {
                 function->apply({env->context->newStringValue(key)}, env);
@@ -202,13 +207,13 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
 //class FunctionReadFile : public FunctionValue {
 //public:
 //    Value *apply(const vector<Value *> &args, Environment *env,
-//                 unordered_map<wstring, Value *> *) const override {
+//                 unordered_map<string, Value *> *) const override {
 //        if (args.size() != 1) {
 //            return Context::newNoneValue();
 //        }
-//        wstring fileName = args[0]->toStringValue()->value;
+//        string fileName = args[0]->toStringValue()->value;
 //        FileInputSource fileInputSource(encodeUTF8(fileName).c_str());
-//        wstring sourceCode;
+//        string sourceCode;
 //        wchar_t newChar;
 //        while ((newChar = fileInputSource.getChar()) != -1) {
 //            sourceCode.push_back(newChar);
@@ -221,14 +226,13 @@ Value *FunctionForEach::apply(const vector<Value *> &args,
 class FunctionEval : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         if (args.size() != 1) {
             return Context::newNoneValue();
         }
         auto moduleEnv = env->newChildEnvironment();
-        wstring text = args[0]->toStringValue()->value;
-        string text2 = encodeUTF8(text);
-        StringInputSource inputSource(text2.c_str());
+        string text = args[0]->toStringValue()->value;
+        StringInputSource inputSource(text.c_str());
         TanukiTokenizer tokenizer(&inputSource);
         ConsoleLogger logger;
         Parser parser(&logger);
@@ -242,32 +246,31 @@ public:
 class FunctionLoadExt : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
-        wstring name = args[0]->toStringValue()->value;
-        loadDynamic(env, encodeUTF8(name).c_str());
+                 unordered_map<string, Value *> *) const override {
+        string name = args[0]->toStringValue()->value;
+        loadDynamic(env, name.c_str());
         return Context::newNoneValue();
     };
 };
 
-class LengthFunction : public FunctionValue {
-public:
-    Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
-        if (args[0]->type == ValueType::ARRAY) {
-            auto *array = (ArrayValue *) (args[0]);
-            return env->context->newNumberValue(array->length());
-        } else if (args[0]->type == ValueType::STRING) {
-            return env->context->newNumberValue(args[0]->toStringValue()->value.length());
-        } else {
-            return Context::newNoneValue();
-        }
-    };
+Value *LengthFunction::apply(const vector<Value *> &args, Environment *env,
+             unordered_map<string, Value *> *) const {
+    if (args[0]->type == ValueType::ARRAY) {
+        auto *array = (ArrayValue *)(args[0]);
+        return env->context->newNumberValue(array->length());
+    } else if (args[0]->type == ValueType::STRING) {
+
+        return env->context->newNumberValue(
+            getCodepointLength(args[0]->toStringValue()->value.c_str()));
+    } else {
+        return Context::newNoneValue();
+    }
 };
 
 class IndexFunction : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         auto *array = (ArrayValue *) (args[0]);
         auto *index = (NumberValue *) (args[1]);
         return array->getIndex(index->value);
@@ -277,7 +280,7 @@ public:
 class ArrayUpdate : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         auto *array = (ArrayValue *) (args[0]);
         auto *index = (NumberValue *) (args[1]);
         auto newValue = args[2];
@@ -289,7 +292,7 @@ public:
 class ArrayAdd : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *e,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         if (args[0]->type != ValueType::ARRAY ) {
             return e->context->newNoneValue();
         }
@@ -303,7 +306,7 @@ public:
 //class ArrayInsert : public FunctionValue {
 //public:
 //    Value *apply(const vector<Value *> &args, Environment *,
-//                 unordered_map<wstring, Value *> *) const override {
+//                 unordered_map<string, Value *> *) const override {
 //        auto *array = (ArrayValue*)(args[0]);
 //        auto *index = (NumberValue*)(args[1]);
 //        auto newValue = args[2];
@@ -315,7 +318,7 @@ public:
 class DictLookup : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         auto *dict = args[0]->toDictionaryValue();
         StringValue *key = args[1]->toStringValue();
         return dict->get(key->value);
@@ -325,7 +328,7 @@ public:
 class ModFunction : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         auto *arg1 = args[0];
         auto *arg2 = args[1];
         return env->context->newNumberValue(arg1->toNumberValue()->value % arg2->toNumberValue()->value);
@@ -335,16 +338,16 @@ public:
 class FunctionSetParent : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         auto *arg0 = args[0];
         auto *arg1 = args[1];
         if (!(arg0->type == ValueType::ARRAY || arg0->type == ValueType::DICT) ||
-            !(arg1->type == ValueType::DICT)) {
+            arg1->type != ValueType::DICT) {
             // TODO: log error
-            return env->context->newNoneValue();
+            return Context::newNoneValue();
         }
-        DictionaryValue *dict = static_cast<DictionaryValue *> (arg0);
-        DictionaryValue *parentDict = static_cast<DictionaryValue *> (arg1);
+        auto *dict = dynamic_cast<DictionaryValue *> (arg0);
+        auto *parentDict = dynamic_cast<DictionaryValue *> (arg1);
         dict->setParent(parentDict);
         return env->context->newNoneValue();
     };
@@ -353,32 +356,32 @@ public:
 class FunctionGetType : public FunctionValue {
 public:
     Value *apply(const vector<Value *> &args, Environment *env,
-                 unordered_map<wstring, Value *> *) const override {
+                 unordered_map<string, Value *> *) const override {
         auto *arg0 = args[0];
         return arg0->getLookupSource(env);
     };
 };
 
 void initModule(Environment *env) {
-    env->bind(L"足す", new FunctionSum());
-    env->bind(L"引く", new FunctionDiff());
-    env->bind(L"割り算", new FunctionDiv());
-    env->bind(L"掛ける", new FunctionMul());
-    env->bind(L"表示", new FunctionPrint());
-    env->bind(L"イコール", new FunctionEqual());
-    env->bind(L"比べ", new FunctionCompare());
-    env->bind(L"剰余", new ModFunction());
-    env->bind(L"辞書", new FunctionNewDictionary());
-    env->bind(L"新種類", new FunctionNewDictionary());
-    env->bind(L"親設定する", new FunctionSetParent());
-    env->bind(L"それぞれ", new FunctionForEach());
-    env->bind(L"長さ", new LengthFunction());
-    env->bind(L"配列調べ", new IndexFunction());
-    env->bind(L"配列更新", new ArrayUpdate());
-    env->bind(L"配列追加", new ArrayAdd());
-    env->bind(L"辞書調べ", new DictLookup());
-    env->bind(L"何型", new FunctionGetType());
-//    env->bind(L"ファイル読む", new FunctionReadFile());
-    env->bind(L"評価", new FunctionEval());
-    env->bind(L"エキステンション", new FunctionLoadExt());
+    env->bind("足す", new FunctionSum());
+    env->bind("引く", new FunctionDiff());
+    env->bind("割り算", new FunctionDiv());
+    env->bind("掛ける", new FunctionMul());
+    env->bind("表示", new FunctionPrint());
+    env->bind("イコール", new FunctionEqual());
+    env->bind("比べ", new FunctionCompare());
+    env->bind("剰余", new ModFunction());
+    env->bind("辞書", new FunctionNewDictionary());
+    env->bind("新種類", new FunctionNewDictionary());
+    env->bind("親設定する", new FunctionSetParent());
+    env->bind("それぞれ", new FunctionForEach());
+    env->bind("長さ", new LengthFunction());
+    env->bind("配列調べ", new IndexFunction());
+    env->bind("配列更新", new ArrayUpdate());
+    env->bind("配列追加", new ArrayAdd());
+    env->bind("辞書調べ", new DictLookup());
+    env->bind("何型", new FunctionGetType());
+//    env->bind("ファイル読む", new FunctionReadFile());
+    env->bind("評価", new FunctionEval());
+    env->bind("エキステンション", new FunctionLoadExt());
 }

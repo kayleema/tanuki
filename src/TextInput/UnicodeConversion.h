@@ -1,5 +1,15 @@
+#ifndef UNICODECONVERSION_H
+#define UNICODECONVERSION_H
+
 #include <string>
+#include "CharDefinitions.h"
 
-std::string encodeUTF8(const std::wstring &in);
+std::string tnkCharToString(TnkChar inputChar);
 
-std::wstring decodeUTF8(const std::string &in);
+TnkChar getFirstUtfChar(const char *input);
+
+int getUtfCharSize(unsigned char c);
+
+int getCodepointLength(const char *input);
+
+#endif // UNICODECONVERSION_H

@@ -1,4 +1,5 @@
 #include "TextInput/StringInputSource.h"
+#include "UnicodeConversion.h"
 #include <cstdint>
 
 using std::uint8_t;
@@ -17,7 +18,6 @@ TnkChar StringInputSource::getChar() {
 TnkChar StringInputSource::peekChar() {
     char currentChar = *source;
     int codepointSize = getUtfCharSize(currentChar);
-//    std::cout << codepointSize << std::endl;
 
     uint32_t codepoint = 0;
 
@@ -36,7 +36,7 @@ TnkChar StringInputSource::peekChar() {
         codepoint |= ((uint8_t)source[2] & 0x3F) << 6;
         codepoint |= ((uint8_t)source[3] & 0x3F);
     }
-//    std::cout << codepoint << std::endl;
+
     if (codepoint == 0) {
         return 0;
     }

@@ -5,7 +5,7 @@
 
 class MatcherComparison : public Matcher {
   public:
-    MatcherResult match(wchar_t first, int currentLineNumber,
+    MatcherResult match(TnkChar first, int currentLineNumber,
                         InputSource *input) override;
 };
 

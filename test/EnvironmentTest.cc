@@ -31,6 +31,7 @@ TEST(eval, functions) {
 }
 
 TEST(eval, floatNumber) {
+    // Todo: fuzz and performance test this
     auto stringInput = StringInputSource(
             "１２。３４"
     );
@@ -73,12 +74,12 @@ TEST(eval, import_statement) {
 
     Context context;
     auto *env = new Environment(&context, &mockFilesystem.get());
-    env->bind(L"FILE", context.newStringValue(L""));
+    env->bind("FILE", context.newStringValue(""));
     env->eval(expr);
 
     auto value = env
-            ->lookup(L"ファイル名")->toDictionaryValue()
-            ->get(L"あ");
+            ->lookup("ファイル名")->toDictionaryValue()
+            ->get("あ");
     EXPECT_EQ(ValueType::NUM, value->type);
     EXPECT_EQ(7, value->toNumberValue()->value);
 
@@ -98,7 +99,7 @@ TEST(eval, user_function) {
     Context context;
     Environment env(&context);
     env.eval(tree);
-    Value *functionValue = env.lookup(L"プラス二");
+    Value *functionValue = env.lookup("プラス二");
     EXPECT_EQ(ValueType::FUNC, functionValue->type);
 
     auto stringInput2 = StringInputSource(
@@ -128,7 +129,7 @@ TEST(eval, if_statement) {
     Context context;
     Environment env(&context);
     env.eval(tree);
-    Value *functionValue = env.lookup(L"五番です");
+    Value *functionValue = env.lookup("五番です");
     EXPECT_EQ(ValueType::FUNC, functionValue->type);
 
     auto stringInput2 = StringInputSource(
@@ -165,7 +166,7 @@ TEST(program, fibonacci) {
             "　返す、足す（フィボナッチ（引く（号、１））、フィボナッチ（引く（号、２）））\n"
             "\n"
             "フィボナッチ（７）\n"
-            // L"フィボナッチ（１４）\n"
+            // "フィボナッチ（１４）\n"
     );
 
 
@@ -201,8 +202,8 @@ TEST(program, string_eq) {
     Environment env(&context);
     env.eval(tree);
 
-    EXPECT_FALSE(env.lookup(L"あ")->isTruthy());
-    EXPECT_TRUE(env.lookup(L"い")->isTruthy());
+    EXPECT_FALSE(env.lookup("あ")->isTruthy());
+    EXPECT_TRUE(env.lookup("い")->isTruthy());
 }
 
 TEST(program, dictionary) {
@@ -226,7 +227,7 @@ TEST(program, dictionary) {
     Environment env(&context);
     env.eval(tree);
 
-    EXPECT_TRUE(env.lookup(L"あ")->equals(new NumberValue(5)));
+    EXPECT_TRUE(env.lookup("あ")->equals(new NumberValue(5)));
 }
 
 TEST(program, if_elif_else) {
@@ -253,9 +254,9 @@ TEST(program, if_elif_else) {
     Environment env(&context);
     env.eval(tree);
 
-    EXPECT_TRUE(env.lookup(L"あ")->equals(new NumberValue(1)));
-    EXPECT_TRUE(env.lookup(L"い")->equals(new NumberValue(6)));
-    EXPECT_TRUE(env.lookup(L"う")->equals(new NumberValue(0)));
+    EXPECT_TRUE(env.lookup("あ")->equals(new NumberValue(1)));
+    EXPECT_TRUE(env.lookup("い")->equals(new NumberValue(6)));
+    EXPECT_TRUE(env.lookup("う")->equals(new NumberValue(0)));
 }
 
 TEST(eval, user_function_varargs) {
@@ -270,16 +271,16 @@ TEST(eval, user_function_varargs) {
     Context context;
     Environment env(&context);
     env.eval(tree);
-    Value *functionValue = env.lookup(L"ほげ");
+    Value *functionValue = env.lookup("ほげ");
 
     EXPECT_EQ(functionValue->type, ValueType::FUNC);
     EXPECT_EQ(((FunctionValue *) functionValue)->functionType,
               FunctionValueType::USER_FUNCTION);
     auto *userFunctionValue = (UserFunctionValue *) functionValue;
     EXPECT_TRUE(userFunctionValue->hasVarKeywordParam());
-    EXPECT_EQ(userFunctionValue->getVarKeywordParam(), L"辞書引数");
+    EXPECT_EQ(userFunctionValue->getVarKeywordParam(), "辞書引数");
     EXPECT_TRUE(userFunctionValue->hasVarParam());
-    EXPECT_EQ(userFunctionValue->getVarParam(), L"配列引数");
+    EXPECT_EQ(userFunctionValue->getVarParam(), "配列引数");
 }
 
 TEST(eval, call_user_function_varargs) {
@@ -295,7 +296,7 @@ TEST(eval, call_user_function_varargs) {
     Context context;
     Environment env(&context);
     env.eval(tree);
-//    Value *result = env.lookup(L"あ");
+//    Value *result = env.lookup("あ");
 
 //    EXPECT_EQ(result->type, ValueType::ARRAY);
 //    auto arrayValue = (ArrayValue *) result;
@@ -319,8 +320,8 @@ TEST(eval, call_user_function_default) {
     Context context;
     Environment env(&context);
     env.eval(tree);
-    Value *resultSpecified = env.lookup(L"あ");
-    Value *resultDefault = env.lookup(L"い");
+    Value *resultSpecified = env.lookup("あ");
+    Value *resultDefault = env.lookup("い");
 
     EXPECT_EQ(resultSpecified->toNumberValue()->value, 5);
     EXPECT_EQ(*resultDefault->toNumberValue(), NumberValue(3));
@@ -337,7 +338,7 @@ TEST(eval, infix) {
     Context context;
     Environment env(&context);
     env.eval(tree);
-    Value *result = env.lookup(L"あ");
+    Value *result = env.lookup("あ");
 
     EXPECT_EQ(result->type, ValueType::NUM);
     auto numValue = (NumberValue *) result;
@@ -358,18 +359,33 @@ TEST(eval, infix_equality) {
     SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
     EXPECT_TRUE(parser.isComplete());
     Context context;
-    Environment env(&context);
-    env.eval(tree);
-    Value *result = env.lookup(L"あ");
+    auto *env = new Environment(&context);
+    env->eval(tree);
+    Value *result = env->lookup("あ");
 
     EXPECT_EQ(result->type, ValueType::NUM);
     auto numValue = (NumberValue *) result;
     EXPECT_EQ(numValue->value, 0);
     EXPECT_FALSE(numValue->isTruthy());
 
-    EXPECT_TRUE(env.lookup(L"い")->isTruthy());
-    EXPECT_FALSE(env.lookup(L"う")->isTruthy());
-    EXPECT_TRUE(env.lookup(L"え")->isTruthy());
-    EXPECT_FALSE(env.lookup(L"お")->isTruthy());
-    EXPECT_TRUE(env.lookup(L"か")->isTruthy());
+    EXPECT_TRUE(env->lookup("い")->isTruthy());
+    EXPECT_FALSE(env->lookup("う")->isTruthy());
+    EXPECT_TRUE(env->lookup("え")->isTruthy());
+    EXPECT_FALSE(env->lookup("お")->isTruthy());
+    EXPECT_TRUE(env->lookup("か")->isTruthy());
+    context.cleanup();
+}
+
+TEST(eval, add) {
+    auto stringInput = StringInputSource(
+        "あ＝７＋９\n"
+    );
+    auto testTokenizer = TanukiTokenizer(&stringInput);
+    auto parser = Parser(nullptr);
+    SyntaxNode *tree = parser.run(testTokenizer.getAllTokens());
+    Context context;
+    auto *env = new Environment(&context);
+    env->eval(tree);
+    EXPECT_EQ(env->lookup("あ")->type, ValueType::NUM);
+    context.cleanup();
 }

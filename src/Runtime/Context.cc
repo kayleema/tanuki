@@ -146,7 +146,7 @@ FloatValue *Context::newFloatValue(double number) {
     return result;
 }
 
-StringValue *Context::newStringValue(wstring str) {
+StringValue *Context::newStringValue(string str) {
     auto result = new StringValue(std::move(str));
     values.insert(result);
     return result;
@@ -159,14 +159,14 @@ DictionaryValue *Context::newDictionaryValue() {
 }
 
 UserFunctionValue *Context::newUserFunctionValue(
-        vector<wstring> params, SyntaxNode *body, Environment *e) {
+        vector<string> params, SyntaxNode *body, Environment *e) {
     auto result = new UserFunctionValue(std::move(params), body, e);
     values.insert(result);
     return result;
 }
 
 UserFunctionValue *Context::newUserFunctionValue(
-        vector<wstring> params, unordered_map<wstring, Value *> paramsWithDefault,
+        vector<string> params, unordered_map<string, Value *> paramsWithDefault,
         SyntaxNode *body, Environment *e) {
     auto result = new UserFunctionValue(std::move(params),
                                         std::move(paramsWithDefault), body, e);
@@ -183,8 +183,8 @@ FunctionValue *Context::newBoundFunctionValue(FunctionValue *function, Value *ji
 ArrayValue *Context::newArrayValue(Environment *env) {
     auto result = new ArrayValue();
     values.insert(result);
-    if (env->isBound(L"配列型")) {
-        result->setParent(static_cast<DictionaryValue *>(env->lookup(L"配列型")));
+    if (env->isBound("配列型")) {
+        result->setParent(static_cast<DictionaryValue *>(env->lookup("配列型")));
     }
     return result;
 }

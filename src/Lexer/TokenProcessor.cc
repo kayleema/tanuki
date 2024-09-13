@@ -19,12 +19,12 @@ vector<Token> IndentationTokenProcessor::process(const vector<Token> &input) {
             if (token.type == TokenType::INDENT) {
                 newIndentLevel++;
                 if (newIndentLevel > indentLevel) {
-                    result.emplace_back(TokenType::INDENT, L"", token.line);
+                    result.emplace_back(TokenType::INDENT, "", token.line);
                 }
             } else {
                 if (newIndentLevel < indentLevel && !indentProcessed) {
                     for (int i = 0; i < (indentLevel - newIndentLevel); i++) {
-                        result.emplace_back(TokenType::DEDENT, L"", token.line);
+                        result.emplace_back(TokenType::DEDENT, "", token.line);
                     }
                 }
                 result.push_back(token);

@@ -90,17 +90,17 @@ public:
     Environment *parent = nullptr;
     Environment *caller = nullptr;
     Context *context;
-    unordered_map<wstring, Value *> bindings;
-    unordered_set<wstring> nonlocals;
+    unordered_map<string, Value *> bindings;
+    unordered_set<string> nonlocals;
     Filesystem *filesystem;
     PinponLogger *logger;
     ExitHandler *exitHandler = nullptr;
 
-    Value *lookup(const wstring &name);
+    Value *lookup(const string &name);
 
-    bool isBound(const wstring &name);
+    bool isBound(const string &name) const;
 
-    void bind(const wstring &name, Value *value, bool recursive=false);
+    void bind(const string &name, Value *value, bool recursive=false);
 
     Value *eval(SyntaxNode *node, const FunctionValue *tailContext = nullptr);
 

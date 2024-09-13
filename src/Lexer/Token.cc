@@ -1,10 +1,8 @@
 #include "Token.h"
-#include "Tokenizer.h"
 #include "NumericConversion.h"
-#include "TextInput/UnicodeConversion.h"
 #include <sstream>
 
-Token::Token(TokenType type, wstring _content, int line)
+Token::Token(TokenType type, string _content, int line)
     : type(type), content(std::move(_content)), line(line) {
     if (type == TokenType::NUMBER) {
         number = parseNumeric(content);
@@ -17,14 +15,14 @@ Token::Token(TokenType type, wstring _content, int line)
 string Token::toString() const {
     ostringstream result("");
     result << TokenTypeStrings[(int)type];
-    result << u8"：”" << encodeUTF8(content);
+    result << "：”" << content;
     if (type == TokenType::NUMBER) {
-        result << u8"（" << number << u8"）";
+        result << "（" << number << "）";
     }
     if (type == TokenType::NUMBER_FLOAT) {
-        result << u8"（" << numberFloat << u8"）";
+        result << "（" << numberFloat << "）";
     }
-    result << u8"”、" << line << u8"行目";
+    result << "”、" << line << "行目";
     return result.str();
 }
 
@@ -34,7 +32,7 @@ bool Token::operator==(const Token &rhs) const {
 
 ostream &operator<<(ostream &os, const Token &token) {
     return os << "Token(" << TokenTypeStrings[(int)token.type] << ", \""
-              << encodeUTF8(token.content) << "\", " << token.line << ")";
+              << token.content << "\", " << token.line << ")";
 }
 
 const char *tokenTypeToString(TokenType type) {

@@ -96,8 +96,8 @@ TEST(stringInputSource, selftest) {
     FilesystemImpl filesystem;
     auto *env = new Environment(&context, &filesystem);
     env->bind(
-            L"FILE",
-            context.newStringValue(decodeUTF8(filename))
+            "FILE",
+            context.newStringValue(filename)
     );
     evalTanukiStarter(env);
     env->eval(tree);

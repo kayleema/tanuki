@@ -117,19 +117,19 @@ TEST(parsing, user_function_varparam) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::FUNC, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"ほげ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "ほげ", 1)),
             new SyntaxNode(NodeType::PARAMS, {
-                    new SyntaxNode(Token(TokenType::SYMBOL, L"引数", 1)),
+                    new SyntaxNode(Token(TokenType::SYMBOL, "引数", 1)),
                     new SyntaxNode(NodeType::VARPARAM, {
-                            new SyntaxNode(Token(TokenType::SYMBOL, L"配列引数", 1))
+                            new SyntaxNode(Token(TokenType::SYMBOL, "配列引数", 1))
                     }),
                     new SyntaxNode(NodeType::VARKWPARAM, {
-                            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書引数", 1))
+                            new SyntaxNode(Token(TokenType::SYMBOL, "辞書引数", 1))
                     })
             }),
             new SyntaxNode(NodeType::TEXT, {
                     new SyntaxNode(NodeType::RETURN, {
-                            new SyntaxNode(Token(TokenType::NUMBER, L"１", 2))
+                            new SyntaxNode(Token(TokenType::NUMBER, "１", 2))
                     })
             })
     });
@@ -147,26 +147,26 @@ TEST(parsing, user_function_defaultparam) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::FUNC, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"ほげ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "ほげ", 1)),
             new SyntaxNode(NodeType::PARAMS, {
-                    new SyntaxNode(Token(TokenType::SYMBOL, L"引数", 1)),
+                    new SyntaxNode(Token(TokenType::SYMBOL, "引数", 1)),
                     new SyntaxNode(NodeType::DEFAULTPARAM, {
-                            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+                            new SyntaxNode(Token(TokenType::SYMBOL, "あ", 1)),
                             new SyntaxNode(NodeType::ADD, {
-                                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
                             }),
                     }),
                     new SyntaxNode(NodeType::VARPARAM, {
-                            new SyntaxNode(Token(TokenType::SYMBOL, L"配列引数", 1))
+                            new SyntaxNode(Token(TokenType::SYMBOL, "配列引数", 1))
                     }),
                     new SyntaxNode(NodeType::VARKWPARAM, {
-                            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書引数", 1))
+                            new SyntaxNode(Token(TokenType::SYMBOL, "辞書引数", 1))
                     })
             }),
             new SyntaxNode(NodeType::TEXT, {
                     new SyntaxNode(NodeType::RETURN, {
-                            new SyntaxNode(Token(TokenType::NUMBER, L"１", 2))
+                            new SyntaxNode(Token(TokenType::NUMBER, "１", 2))
                     })
             })
     });
@@ -280,10 +280,10 @@ TEST(parsing_infix, simple) {
 
     auto expectedTree = SyntaxNode(NodeType::ADD, {
             new SyntaxNode(NodeType::SUB, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             }),
-            new SyntaxNode(Token(TokenType::NUMBER, L"３", 1))
+            new SyntaxNode(Token(TokenType::NUMBER, "３", 1))
     });
     EXPECT_EQ(expectedTree, *tree->children[0]);
 }
@@ -347,12 +347,12 @@ TEST(parsing_infix, comparison) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::CALL, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"表示", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "表示", 1)),
             new SyntaxNode(NodeType::CALL_TAIL, {
                     new SyntaxNode(NodeType::ARGS, {
                             new SyntaxNode(NodeType::EQUAL, {
-                                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
                             })
                     })
             })
@@ -371,10 +371,10 @@ TEST(parsing_infix, comparisonNotEqual) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "あ", 1)),
             new SyntaxNode(NodeType::NEQ, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
@@ -391,10 +391,10 @@ TEST(parsing_infix, comparisonLessThan) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "あ", 1)),
             new SyntaxNode(NodeType::LT, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
@@ -411,10 +411,10 @@ TEST(parsing_infix, comparisonGreaterThan) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "あ", 1)),
             new SyntaxNode(NodeType::GT, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
@@ -431,10 +431,10 @@ TEST(parsing_infix, comparisonGreaterThanEqual) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "あ", 1)),
             new SyntaxNode(NodeType::GTE, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
@@ -451,10 +451,10 @@ TEST(parsing_infix, comparisonLessThanEqual) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expected(NodeType::ASSIGN, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"あ", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "あ", 1)),
             new SyntaxNode(NodeType::LTE, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
@@ -472,8 +472,8 @@ TEST(parsing_infix, assert) {
 
     SyntaxNode expected(NodeType::ASSERT, {
             new SyntaxNode(NodeType::EQUAL, {
-                    new SyntaxNode(Token(TokenType::NUMBER, L"１", 1)),
-                    new SyntaxNode(Token(TokenType::NUMBER, L"２", 1))
+                    new SyntaxNode(Token(TokenType::NUMBER, "１", 1)),
+                    new SyntaxNode(Token(TokenType::NUMBER, "２", 1))
             })
     });
     EXPECT_EQ(expected, *tree->children[0]);
@@ -490,16 +490,16 @@ TEST(parsing_subscript, subscript) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::CALL, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "辞書", 1)),
             new SyntaxNode(NodeType::CALL_TAIL, {
                     new SyntaxNode(NodeType::ARGS, {
                             new SyntaxNode(NodeType::KWARG, {
-                                    new SyntaxNode(Token(TokenType::SYMBOL, L"名前", 1)),
-                                    new SyntaxNode(Token(TokenType::STRING, L"すずき", 1))
+                                    new SyntaxNode(Token(TokenType::SYMBOL, "名前", 1)),
+                                    new SyntaxNode(Token(TokenType::STRING, "すずき", 1))
                             }),
                     }),
                     new SyntaxNode(NodeType::SUBSCRIPT, {
-                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1))
+                            new SyntaxNode(Token(TokenType::STRING, "名前", 1))
                     })
             })
     });
@@ -518,18 +518,18 @@ TEST(parsing_subscript, subscript_complex) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::CALL, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "辞書", 1)),
             new SyntaxNode(NodeType::CALL_TAIL, {
                     new SyntaxNode(NodeType::ARGS, {
                             new SyntaxNode(NodeType::KWARG, {
-                                    new SyntaxNode(Token(TokenType::SYMBOL, L"名前", 1)),
-                                    new SyntaxNode(Token(TokenType::STRING, L"すずき", 1))
+                                    new SyntaxNode(Token(TokenType::SYMBOL, "名前", 1)),
+                                    new SyntaxNode(Token(TokenType::STRING, "すずき", 1))
                             }),
                     }),
                     new SyntaxNode(NodeType::SUBSCRIPT, {
-                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1)),
+                            new SyntaxNode(Token(TokenType::STRING, "名前", 1)),
                             new SyntaxNode(NodeType::GET, {
-                                    new SyntaxNode(Token(TokenType::SYMBOL, L"長さ", 1))
+                                    new SyntaxNode(Token(TokenType::SYMBOL, "長さ", 1))
                             })
                     })
             })
@@ -548,17 +548,17 @@ TEST(parsing_subscript, subscript_set) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::CALL, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"辞書", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "辞書", 1)),
             new SyntaxNode(NodeType::CALL_TAIL, {
                     new SyntaxNode(NodeType::ARGS, {
                             new SyntaxNode(NodeType::KWARG, {
-                                    new SyntaxNode(Token(TokenType::SYMBOL, L"名前", 1)),
-                                    new SyntaxNode(Token(TokenType::STRING, L"すずき", 1))
+                                    new SyntaxNode(Token(TokenType::SYMBOL, "名前", 1)),
+                                    new SyntaxNode(Token(TokenType::STRING, "すずき", 1))
                             }),
                     }),
                     new SyntaxNode(NodeType::SUBSCRIPT_SET, {
-                            new SyntaxNode(Token(TokenType::STRING, L"名前", 1)),
-                            new SyntaxNode(Token(TokenType::STRING, L"田中", 1))
+                            new SyntaxNode(Token(TokenType::STRING, "名前", 1)),
+                            new SyntaxNode(Token(TokenType::STRING, "田中", 1))
                     })
             })
     });
@@ -576,7 +576,7 @@ TEST(parsing_nonlocal, external_sotogawa) {
     EXPECT_TRUE(parser.isComplete());
 
     SyntaxNode expectedTree(NodeType::EXTERNAL, {
-            new SyntaxNode(Token(TokenType::SYMBOL, L"私の変数名", 1)),
+            new SyntaxNode(Token(TokenType::SYMBOL, "私の変数名", 1)),
     });
     EXPECT_EQ(expectedTree, *tree->children[0]);
 }

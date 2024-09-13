@@ -3,8 +3,8 @@
 
 #include <string>
 
-long parseNumeric(std::wstring s);
+long parseNumeric(const std::string& s);
 
-float parseNumericFloat(std::wstring s);
+float parseNumericFloat(const std::string& s);
 
 #endif
