@@ -269,6 +269,13 @@ OSXの場合は：（最近OSXのthink-asyncのbrewに入っているパッケ�
 
 ### Docker
 run tests in docker
-```
+```shell
 docker build . -t tanuki && docker run tanuki /code/build/tanuki_test
+```
+
+build tanukiweb
+```shell
+docker build -t tanuki-web -f ./docker/Dockerfile-tanukiweb ./docker
+
+docker run -p 8080:80 tanuki-web
 ```
